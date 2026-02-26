@@ -1741,7 +1741,7 @@ const homeStyles = `
 
   .app-shell {
     width: 100%;
-    max-width: 1120px;
+    max-width: 1360px;
     padding: 0 var(--space-xs);
   }
 
@@ -1757,6 +1757,8 @@ const homeStyles = `
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    flex: 1 1 380px;
+    min-width: 0;
   }
 
   .canvas-heading {
@@ -1768,7 +1770,8 @@ const homeStyles = `
   }
 
   .phone {
-    width: min(380px, 100vw - 48px);
+    width: 100%;
+    max-width: min(600px, 100%);
     background: var(--card);
     border-radius: 26px;
     border: 1px solid var(--border-subtle);
@@ -3234,6 +3237,88 @@ const homeStyles = `
     padding-right: 90px;
     min-height: 24px;
   }
+
+  /* ── Search overlay ── */
+  #search-ov {
+    display: none; position: fixed; inset: 0; z-index: 9998;
+    background: rgba(8,12,24,0.72); backdrop-filter: blur(4px);
+    align-items: flex-start; justify-content: center;
+    padding: 56px 16px 16px;
+  }
+  #search-ov.open { display: flex; }
+  #search-box {
+    width: 100%; max-width: 520px;
+    background: #fff; border-radius: 16px;
+    overflow: hidden; box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+  }
+  #search-input-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px; border-bottom: 1px solid #e5e7eb;
+  }
+  #search-input {
+    flex: 1; border: none; outline: none;
+    font-size: 0.95rem; font-family: inherit;
+    background: transparent; color: #111;
+  }
+  #search-close {
+    border: none; background: none; cursor: pointer;
+    font-size: 1rem; color: #9ca3af; padding: 2px 4px; line-height: 1;
+  }
+  #search-results { max-height: 420px; overflow-y: auto; padding: 6px 0; }
+  .search-hit {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 14px; text-decoration: none; color: inherit;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .search-hit:hover { background: #f0f9ff; }
+  .search-hit-icon { font-size: 1rem; padding-top: 1px; }
+  .search-hit-type {
+    font-size: 0.62rem; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #0284c7; font-weight: 700;
+  }
+  .search-hit-title { font-size: 0.84rem; font-weight: 700; color: #111827; margin-top: 1px; }
+  .search-hit-desc { font-size: 0.73rem; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+  .search-empty { padding: 28px 14px; text-align: center; color: #9ca3af; font-size: 0.85rem; }
+
+  /* ── Nav menu overlay ── */
+  #nav-ov {
+    display: none; position: fixed; inset: 0; z-index: 9997;
+    background: rgba(8,12,24,0.5); backdrop-filter: blur(2px);
+  }
+  #nav-ov.open { display: block; }
+  #nav-panel {
+    position: absolute; top: 0; left: 0; bottom: 0; width: 272px;
+    background: #fff; box-shadow: 4px 0 28px rgba(0,0,0,0.14);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #nav-panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 16px; border-bottom: 1px solid #e5e7eb;
+    font-weight: 700; font-size: 0.88rem; color: #111;
+  }
+  #nav-close {
+    border: none; background: none; cursor: pointer;
+    font-size: 1rem; color: #9ca3af; padding: 2px 4px; line-height: 1;
+  }
+  #nav-panel-body { flex: 1; overflow-y: auto; padding: 6px 0 24px; }
+  .nav-section-label {
+    font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #9ca3af; font-weight: 700; padding: 12px 16px 3px;
+  }
+  .nav-item {
+    display: block; padding: 9px 16px;
+    color: #374151; text-decoration: none;
+    font-size: 0.84rem; font-weight: 500;
+  }
+  .nav-item:hover { background: #f0f9ff; color: #0284c7; }
+  .nav-item-active { color: #0284c7; font-weight: 700; }
+
+  /* ── Interactive header icons ── */
+  button.phone-header-icon {
+    background: none; border: none; cursor: pointer;
+    padding: 0; font-size: inherit; font-family: inherit;
+  }
+  button.phone-header-icon:hover { opacity: 0.7; }
 `;
 
 // Lightbox HTML injected once per page before </body>
@@ -5228,6 +5313,146 @@ const renderExampleReferences = (id: ExampleId): string => {
   return "";
 };
 
+const renderHomeOverlays = (): string => {
+  const idx = JSON.stringify([
+    ...Object.values(topics).map((t) => ({
+      type: "topic", icon: "📖",
+      title: t.label,
+      desc: t.shortDescription,
+      url: `/topic/${t.id}`,
+      tags: (t.companies ?? []).join(" ").toLowerCase(),
+    })),
+    ...Object.values(examples).map((e) => ({
+      type: "example", icon: "▶",
+      title: e.label,
+      desc: `Ad example: ${e.surface}`,
+      url: `/example/${e.id}`,
+      tags: "",
+    })),
+    ...Object.values(glossary).map((g) => ({
+      type: "glossary", icon: "📚",
+      title: g.term,
+      desc: g.shortDefinition,
+      url: `/glossary?term=${g.id}`,
+      tags: g.category.toLowerCase(),
+    })),
+  ]);
+
+  const topicLinks = Object.values(topics)
+    .map((t) => `<a class="nav-item" href="/topic/${t.id}">${t.label}</a>`)
+    .join("");
+  const exampleLinks = Object.values(examples)
+    .map((e) => `<a class="nav-item" href="/example/${e.id}">${e.label}</a>`)
+    .join("");
+
+  return `
+<div id="search-ov" role="dialog" aria-modal="true" aria-label="Search">
+  <div id="search-box">
+    <div id="search-input-row">
+      <span style="font-size:1rem;color:#9ca3af;">🔍</span>
+      <input id="search-input" type="search" placeholder="Search topics, examples, glossary…" autocomplete="off" />
+      <button id="search-close" aria-label="Close search">✕</button>
+    </div>
+    <div id="search-results"></div>
+  </div>
+</div>
+<div id="nav-ov" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <div id="nav-panel">
+    <div id="nav-panel-header">
+      <span>Ad Tech Ecosystem</span>
+      <button id="nav-close" aria-label="Close menu">✕</button>
+    </div>
+    <nav id="nav-panel-body">
+      <div class="nav-section-label">Topics</div>
+      ${topicLinks}
+      <div class="nav-section-label">Ad Examples</div>
+      ${exampleLinks}
+      <div class="nav-section-label">Reference</div>
+      <a class="nav-item" href="/glossary">Glossary (all terms)</a>
+    </nav>
+  </div>
+</div>
+<script>
+(function(){
+  var INDEX = ${idx};
+
+  /* ── search ── */
+  var searchOv = document.getElementById('search-ov');
+  var searchInput = document.getElementById('search-input');
+  var searchResults = document.getElementById('search-results');
+
+  function openSearch(){
+    searchOv.classList.add('open');
+    document.body.style.overflow='hidden';
+    setTimeout(function(){ searchInput.focus(); renderResults(''); }, 30);
+  }
+  function closeSearch(){
+    searchOv.classList.remove('open');
+    document.body.style.overflow='';
+    searchInput.value='';
+    searchResults.innerHTML='';
+  }
+  function score(item, q){
+    var ql=q.toLowerCase(), tl=item.title.toLowerCase(), dl=item.desc.toLowerCase();
+    if(tl===ql) return 100;
+    if(tl.startsWith(ql)) return 80;
+    if(tl.includes(ql)) return 60;
+    if(dl.includes(ql)) return 30;
+    if(item.tags && item.tags.includes(ql)) return 15;
+    return 0;
+  }
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+  function hit(item){
+    return '<a class="search-hit" href="'+esc(item.url)+'">'
+      +'<span class="search-hit-icon">'+item.icon+'</span>'
+      +'<div><div class="search-hit-type">'+esc(item.type)+'</div>'
+      +'<div class="search-hit-title">'+esc(item.title)+'</div>'
+      +'<div class="search-hit-desc">'+esc(item.desc)+'</div></div>'
+      +'</a>';
+  }
+  function renderResults(q){
+    var hits;
+    if(!q.trim()){
+      hits = INDEX.slice(0,18);
+    } else {
+      hits = INDEX
+        .map(function(i){ return {i:i, s:score(i,q)}; })
+        .filter(function(x){ return x.s>0; })
+        .sort(function(a,b){ return b.s-a.s; })
+        .slice(0,14)
+        .map(function(x){ return x.i; });
+    }
+    searchResults.innerHTML = hits.length
+      ? hits.map(hit).join('')
+      : '<div class="search-empty">No results for \u201c'+esc(q)+'\u201d</div>';
+  }
+
+  searchInput.addEventListener('input', function(){ renderResults(this.value); });
+  document.getElementById('search-close').addEventListener('click', closeSearch);
+  searchOv.addEventListener('click', function(e){ if(e.target===searchOv) closeSearch(); });
+
+  var searchBtn = document.getElementById('search-btn');
+  if(searchBtn) searchBtn.addEventListener('click', openSearch);
+
+  /* ── menu ── */
+  var navOv = document.getElementById('nav-ov');
+  function openNav(){ navOv.classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeNav(){ navOv.classList.remove('open'); document.body.style.overflow=''; }
+
+  var menuBtn = document.getElementById('menu-btn');
+  if(menuBtn) menuBtn.addEventListener('click', openNav);
+  document.getElementById('nav-close').addEventListener('click', closeNav);
+  navOv.addEventListener('click', function(e){ if(e.target===navOv) closeNav(); });
+
+  /* ── keyboard ── */
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){ closeSearch(); closeNav(); }
+    if((e.key==='k'||e.key==='K') && (e.metaKey||e.ctrlKey)){ e.preventDefault(); openSearch(); }
+  });
+})();
+</script>`;
+};
+
 const renderNewHome = (selectedExample?: ExampleId): string => {
   const exampleId: ExampleId = selectedExample && selectedExample in examples ? selectedExample : "instagram";
 
@@ -5250,9 +5475,9 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     "        <h2 class='canvas-heading'>Ecosystem Overview</h2>",
     "        <article class='phone phone-ecosystem' aria-label='Ad tech ecosystem map'>",
     "          <header class='phone-header'>",
-    "            <div class='phone-header-icon' aria-hidden='true'>☰</div>",
+    "            <button class='phone-header-icon' id='menu-btn' aria-label='Open menu'>☰</button>",
     "            <div class='phone-header-center'>Ad Tech Ecosystem</div>",
-    "            <div class='phone-header-icon' aria-hidden='true'>🔍</div>",
+    "            <button class='phone-header-icon' id='search-btn' aria-label='Search'>🔍</button>",
     "          </header>",
     "          <div class='phone-body'>",
     "            <h1 class='ecosystem-title'>Ecosystem Map</h1>",
@@ -5340,6 +5565,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     "      </section>",
     "    </div>",
     "  </div>",
+    renderHomeOverlays(),
     "</body>",
     "</html>",
   ].join("\n");
