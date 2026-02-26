@@ -2041,8 +2041,8 @@ const homeStyles = `
   }
 
   .example-tab {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 1 1 auto;
+    min-width: max-content;
     border-radius: 999px;
     border: 1px solid var(--border-subtle);
     padding: 4px 8px;
@@ -2328,18 +2328,19 @@ const homeStyles = `
   }
 
   .diagram-rail {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
+    display: flex;
+    flex-wrap: nowrap;
     gap: 6px;
     align-items: center;
   }
 
   .diagram-rail.stack {
-    grid-auto-flow: row;
+    flex-direction: column;
   }
 
   .diagram-node {
+    flex: 1 1 0;
+    min-width: max-content;
     border-radius: 999px;
     border: 1px solid var(--border-subtle);
     background: #f9fafb;
@@ -2363,6 +2364,7 @@ const homeStyles = `
   }
 
   .diagram-arrow {
+    flex: 0 0 auto;
     font-size: 0.85rem;
     color: var(--text-muted);
     text-align: center;
