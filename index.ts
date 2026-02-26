@@ -2811,7 +2811,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
     const nh = 42;
     const y = (H - nh) / 2;
     const pad = 8;
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
+    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
     return (
       "<div class='flow-title'>Streaming / CTV ad flow</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2977,6 +2977,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
   const allEntries = Object.values(glossary);
   const active =
     selected && glossary[selected] ? glossary[selected] : allEntries[0];
+  if (!active) return "";
 
   const listHtml = allEntries
     .sort((a, b) => a.term.localeCompare(b.term))
