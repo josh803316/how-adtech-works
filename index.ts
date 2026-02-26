@@ -3447,121 +3447,283 @@ const renderTopicDiagram = (id: TopicId): string => {
 };
 
 const renderTopicFlowDiagram = (id: TopicId): string => {
-  const W = 360;
-  const H = 130;
-  const stroke = "#0284c7";
-  const fill = "#e0f2fe";
-  const fillStrong = "#bae6fd";
-  const text = "#0f172a";
-  const defs = `<defs><marker id="tarrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="${stroke}"/></marker></defs>`;
-  const node = (x: number, y: number, w: number, h: number, label: string, sub?: string, primary = false) =>
-    `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${primary ? fillStrong : fill}" stroke="${stroke}" stroke-width="1.5"/><text x="${x + w/2}" y="${y + (sub ? 22 : h/2 + 5)}" text-anchor="middle" font-size="10" font-weight="600" fill="${text}">${label}</text>${sub ? `<text x="${x + w/2}" y="${y + 36}" text-anchor="middle" font-size="8" fill="#475569">${sub}</text>` : ""}</g>`;
-  const arrow = (x1: number, y1: number, x2: number, y2: number) =>
-    `<path stroke="${stroke}" stroke-width="2" fill="none" marker-end="url(#tarrow)" d="M${x1} ${y1} L${x2} ${y2}"/>`;
+  // Shared helpers
+  const bl = "#0284c7", blF = "#e0f2fe", blD = "#0c4a6e";
+  const gr = "#16a34a", grF = "#dcfce7", grD = "#14532d";
+  const pu = "#7c3aed", puF = "#ede9fe";
+  const or = "#d97706", orF = "#fef3c7";
+  const st = "#475569", mu = "#94a3b8";
 
-  const nw = 62;
-  const nh = 40;
-  const y = (H - nh) / 2;
-  const pad = 8;
+  const mk = (mid: string, c: string) =>
+    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`;
+
+  const bx = (x: number, y: number, w: number, h: number, label: string, sub: string, fc: string, sc: string, co = "") =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fc}" stroke="${sc}" stroke-width="1.5"/>` +
+    `<text x="${x+w/2}" y="${y+16}" text-anchor="middle" font-size="9" font-weight="700" fill="${sc}">${label}</text>` +
+    `<text x="${x+w/2}" y="${y+27}" text-anchor="middle" font-size="7.5" fill="${st}">${sub}</text>` +
+    (co ? `<text x="${x+w/2}" y="${y+38}" text-anchor="middle" font-size="6.5" fill="${mu}" font-style="italic">${co}</text>` : "");
+
+  const ln = (x1: number, y1: number, x2: number, y2: number, lbl: string, c: string, mid: string) =>
+    `<path stroke="${c}" stroke-width="1.5" fill="none" marker-end="url(#${mid})" d="M${x1} ${y1} L${x2} ${y2}"/>` +
+    (lbl ? `<text x="${(x1+x2)/2}" y="${Math.min(y1,y2)+(Math.abs(y2-y1)||0)/2-5}" text-anchor="middle" font-size="7" fill="${c}" font-weight="600">${lbl}</text>` : "");
+
+  const zone = (x: number, y: number, w: number, h: number, label: string, c: string, fc: string) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fc}" stroke="${c}" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>` +
+    `<text x="${x+6}" y="${y+12}" font-size="7" fill="${c}" font-weight="700" letter-spacing="0.06em">${label}</text>`;
+
+  const tag = (x: number, y: number, label: string, c: string, fc: string) =>
+    `<rect x="${x}" y="${y}" width="${label.length * 5.5 + 8}" height="13" rx="3" fill="${fc}" stroke="${c}" stroke-width="1"/>` +
+    `<text x="${x + label.length * 5.5/2 + 4}" y="${y+9}" text-anchor="middle" font-size="7" fill="${c}" font-weight="600">${label}</text>`;
 
   if (id === "buy-side") {
-    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Buying path</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Advertiser", "goals") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Agency", "strategy") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "DSP", "bid decision", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Exchange", "auction") +
-      "</svg>"
-    );
+    const W = 560, H = 270;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>RTB Bidding Architecture (Buy Side)</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      // Zone backgrounds
+      zone(2, 18, 190, 200, "BUYER STACK", bl, "#f0f9ff") +
+      zone(196, 18, 160, 200, "DSP / BID ENGINE", pu, "#faf5ff") +
+      zone(360, 18, 196, 200, "EXCHANGE + PUBLISHER", gr, "#f0fdf4") +
+      // Row 1 nodes
+      bx(8, 32, 85, 44, "Advertiser", "goals & budget", blF, bl, "P&G · Nike · Samsung") +
+      bx(100, 32, 86, 44, "Agency", "strategy & plan", blF, bl, "Horizon · GroupM") +
+      bx(202, 28, 148, 52, "DSP", "bid engine: evaluate every impression", puF, pu, "The Trade Desk · DV360 · Amazon DSP · Xandr") +
+      bx(366, 32, 88, 44, "Exchange", "OpenRTB auction", puF, pu, "Google · Index · Xandr") +
+      bx(462, 32, 90, 44, "Publisher", "ad slot filled", grF, gr, "NYT · ESPN · apps") +
+      // Arrows row 1
+      ln(93, 54, 98, 54, "brief", bl, "ab") +
+      ln(186, 54, 200, 54, "RFP", bl, "ab") +
+      ln(350, 54, 364, 54, "bid $8.40", pu, "ap") +
+      ln(454, 54, 460, 54, "win!", gr, "ag") +
+      // DSP internals (row 2 inside DSP zone)
+      `<rect x="202" y="86" width="148" height="18" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="276" y="99" text-anchor="middle" font-size="8" fill="${pu}">Audience segs + context signals</text>` +
+      `<rect x="202" y="108" width="148" height="18" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="276" y="121" text-anchor="middle" font-size="8" fill="${pu}">Bid model: pCTR × bid value</text>` +
+      `<rect x="202" y="130" width="148" height="18" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="276" y="143" text-anchor="middle" font-size="8" fill="${pu}">Frequency cap · Brand safety</text>` +
+      // Row 2: win flow
+      bx(202, 158, 148, 44, "Win Notification", "nurl + billing event", orF, or, "DSP logs impression cost") +
+      bx(366, 158, 90, 44, "Creative", "HTML/VAST markup", blF, bl, "300×250 banner or video") +
+      bx(462, 158, 90, 44, "Pixel fires", "impression event", grF, gr, "S3 · BigQuery logs") +
+      ln(276, 130, 276, 156, "", pu, "ap") +
+      ln(350, 180, 364, 180, "markup", bl, "ab") +
+      ln(456, 180, 460, 180, "beacon", gr, "ag") +
+      // Timing bar
+      `<rect x="2" y="224" width="556" height="14" rx="3" fill="#f8fafc" stroke="#e2e8f0"/>` +
+      `<text x="8" y="234" font-size="6.5" fill="${mu}" font-weight="700">TIMING:</text>` +
+      `<text x="60" y="234" font-size="6.5" fill="${mu}">0ms page load</text>` +
+      `<text x="140" y="234" font-size="6.5" fill="${mu}">· 5ms ad request</text>` +
+      `<text x="220" y="234" font-size="6.5" fill="${mu}">· 30ms DSPs evaluate</text>` +
+      `<text x="330" y="234" font-size="6.5" fill="${mu}">· 100ms auction closes</text>` +
+      `<text x="440" y="234" font-size="6.5" fill="${mu}">· 150ms ad renders</text>` +
+      // Legend
+      `<text x="2" y="256" font-size="6.5" fill="${mu}">Key: DSP = Demand-Side Platform · OpenRTB = open auction protocol · nurl = win notification URL · pCTR = predicted click-through rate</text>` +
+      `</svg>`;
   }
 
   if (id === "sell-side") {
-    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Inventory flow</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Page / App", "slots") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Ad server", "demand", true) +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "SSP", "package") +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Exchanges", "buyers") +
-      "</svg>"
-    );
+    const W = 560, H = 280;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>Publisher Yield Stack &amp; Header Bidding</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      zone(2, 18, 130, 220, "PUBLISHER", gr, "#f0fdf4") +
+      zone(136, 18, 170, 220, "HEADER BIDDING", bl, "#f0f9ff") +
+      zone(310, 18, 246, 220, "EXCHANGE + DSPs", pu, "#faf5ff") +
+      // Publisher side
+      bx(8, 32, 118, 44, "Publisher Page/App", "ad slots available", grF, gr, "NYT · Hulu · ESPN") +
+      bx(8, 90, 118, 44, "GAM Ad Server", "Google Ad Manager", grF, gr, "direct deals checked first") +
+      bx(8, 148, 118, 44, "Floor Prices", "min CPM per slot", grF, gr, "set by yield team") +
+      ln(67, 76, 67, 88, "", gr, "ag") +
+      ln(67, 134, 67, 146, "", gr, "ag") +
+      // Header bidding fan-out
+      bx(142, 32, 158, 30, "Prebid.js (in page )", "parallel auction · ~200ms timeout", blF, bl) +
+      ln(126, 54, 140, 48, "", bl, "ab") +
+      bx(142, 78, 148, 36, "Magnite SSP", "floor: $4.50 min", blF, bl, "bid: $7.10 ✓ winner") +
+      bx(142, 122, 148, 36, "PubMatic SSP", "floor: $4.50 min", blF, bl, "bid: $6.20") +
+      bx(142, 166, 148, 36, "Index Exchange", "floor: $4.50 min", blF, bl, "bid: $5.80") +
+      ln(221, 62, 221, 76, "", bl, "ab") +
+      ln(221, 62, 221, 76, "", bl, "ab") +
+      `<path stroke="${bl}" stroke-width="1.2" fill="none" d="M221 62 L221 78"/>` +
+      `<path stroke="${bl}" stroke-width="1.2" fill="none" d="M221 62 L215 122"/>` +
+      `<path stroke="${bl}" stroke-width="1.2" fill="none" d="M221 62 L215 166"/>` +
+      // Exchange side
+      bx(318, 52, 110, 44, "Ad Exchange", "OpenRTB bid request", puF, pu, "Google · Index · Magnite") +
+      bx(318, 112, 110, 44, "DSP Bidders", "100+ buyers competing", puF, pu, "TTD · DV360 · Amazon") +
+      bx(318, 172, 110, 44, "Winning Bid", "highest price wins", "#fef3c7", or, "2nd-price or 1st-price") +
+      bx(438, 112, 112, 44, "Creative", "ad markup returned", grF, gr, "HTML iframe or VAST") +
+      ln(296, 96, 316, 70, "$7.10 bid", pu, "ap") +
+      ln(373, 96, 373, 110, "", pu, "ap") +
+      ln(373, 156, 373, 170, "", or, "ab") +
+      ln(428, 134, 436, 134, "markup", gr, "ag") +
+      // Passback note
+      `<text x="142" y="216" font-size="7" fill="${mu}" font-style="italic">If no bid meets floor: passback to next demand source</text>` +
+      // Legend
+      `<text x="2" y="252" font-size="6.5" fill="${mu}">GAM = Google Ad Manager (publisher ad server) · SSP = Supply-Side Platform · Floor = minimum acceptable CPM</text>` +
+      `</svg>`;
   }
 
   if (id === "data") {
-    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Data pipeline</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Events", "SDKs, pixels") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Data lake", "raw") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "Transforms", "joins", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Audiences", "features") +
-      "</svg>"
-    );
+    const W = 560, H = 270;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>Ad-Tech Data Pipeline Architecture</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      // Layer labels
+      `<text x="2" y="34" font-size="7" fill="${bl}" font-weight="700">COLLECTION</text>` +
+      `<text x="2" y="110" font-size="7" fill="${pu}" font-weight="700">STORAGE &amp; PROCESS</text>` +
+      `<text x="2" y="188" font-size="7" fill="${gr}" font-weight="700">APPLICATIONS</text>` +
+      // Collection layer (row 1)
+      bx(2, 38, 90, 40, "SDK Events", "mobile + web", blF, bl, "Segment · mParticle") +
+      bx(100, 38, 90, 40, "Ad Pixels", "1×1 img beacons", blF, bl, "impression, click") +
+      bx(198, 38, 90, 40, "Server Logs", "bid, win, serve", blF, bl, "raw JSON events") +
+      bx(296, 38, 90, 40, "Conversion API", "server-to-server", blF, bl, "Meta CAPI, GTAT") +
+      bx(394, 38, 90, 40, "ACR / CTV", "TV viewing data", blF, bl, "Samba TV, iSpot") +
+      // Stream bus
+      bx(130, 92, 300, 30, "Kafka / Kinesis  — real-time event bus", "billions of events/day · partitioned by user_id", puF, pu) +
+      ln(47, 78, 47, 92, "", pu, "ap") + ln(145, 78, 200, 92, "", pu, "ap") +
+      ln(243, 78, 280, 92, "", pu, "ap") + ln(341, 78, 350, 92, "", pu, "ap") +
+      ln(439, 78, 390, 92, "", pu, "ap") +
+      // Storage + process layer (row 2)
+      bx(2, 136, 100, 40, "Data Lake", "S3 / GCS raw", "#fef3c7", or, "immutable Parquet/ORC") +
+      bx(110, 136, 100, 40, "Spark / Flink", "ETL &amp; joins", puF, pu, "hourly batch + streaming") +
+      bx(218, 136, 100, 40, "dbt", "SQL transforms", puF, pu, "clean, model, test") +
+      bx(326, 136, 108, 40, "Warehouse", "Snowflake / BigQuery", puF, pu, "queryable, governed") +
+      bx(442, 136, 112, 40, "Feature Store", "Redis / Feast", blF, bl, "low-latency bidder reads") +
+      ln(280, 122, 50, 134, "", or, "ab") + ln(102, 156, 108, 156, "", pu, "ap") +
+      ln(210, 156, 216, 156, "", pu, "ap") + ln(318, 156, 324, 156, "", pu, "ap") +
+      ln(434, 156, 440, 156, "", bl, "ab") +
+      // Application layer (row 3)
+      bx(2, 194, 130, 40, "Audience Segments", "1P + 3P targeting", grF, gr, "LiveRamp · Lotame") +
+      bx(140, 194, 120, 40, "Attribution Model", "last-click / MTA / MMM", grF, gr, "Rockerbox · Northbeam") +
+      bx(268, 194, 120, 40, "Bidder Enrichment", "user score at bid time", grF, gr, "&lt;5ms latency SLA") +
+      bx(396, 194, 158, 40, "Reporting &amp; BI", "Looker · Tableau · custom", grF, gr, "pacing, ROAS, reach") +
+      ln(434, 176, 66, 192, "", gr, "ag") + ln(434, 176, 198, 192, "", gr, "ag") +
+      ln(498, 176, 326, 192, "", gr, "ag") + ln(498, 176, 474, 192, "", gr, "ag") +
+      `<text x="2" y="254" font-size="6.5" fill="${mu}">ACR = Automatic Content Recognition · CAPI = Conversions API · dbt = data build tool · MTA = Multi-Touch Attribution · MMM = Media Mix Modeling</text>` +
+      `</svg>`;
   }
 
   if (id === "third-parties") {
-    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Partner integrations</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Partner feeds", "audience, fraud") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Integration", "APIs, schema", true) +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "Models", "joined") +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Activation", "targeting") +
-      "</svg>"
-    );
+    const W = 560, H = 270;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>Third-Party Ecosystem: Identity, Verification &amp; Measurement</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      // Track headers
+      zone(2, 16, 170, 220, "IDENTITY", bl, "#f0f9ff") +
+      zone(178, 16, 196, 220, "BRAND SAFETY + FRAUD", pu, "#faf5ff") +
+      zone(380, 16, 178, 220, "MEASUREMENT", gr, "#f0fdf4") +
+      // Identity track
+      bx(8, 32, 158, 40, "Publisher (ATS.js)", "user logs in, email hashed", blF, bl, "NYT, ESPN, Conde Nast") +
+      bx(8, 88, 158, 40, "LiveRamp ATS", "email → RampID resolution", blF, bl, "deterministic ID graph") +
+      bx(8, 144, 158, 40, "UID2 / ID5", "open-source unified ID", blF, bl, "TTD · built on consent") +
+      bx(8, 200, 158, 40, "DSP Matching", "buyer targets RampID", blF, bl, "no cookie needed") +
+      ln(87, 72, 87, 86, "hashed email", bl, "ab") +
+      ln(87, 128, 87, 142, "resolve ID", bl, "ab") +
+      ln(87, 184, 87, 198, "pass in bid req", bl, "ab") +
+      // Verification track
+      bx(184, 32, 184, 40, "URL / Page Scanner", "content category + risk", puF, pu, "IAS · DoubleVerify · Oracle") +
+      bx(184, 88, 184, 40, "Brand Safety Score", "block violent / adult / fake news", puF, pu, "pre-bid API signal") +
+      bx(184, 144, 184, 40, "IVT Detection", "bot traffic, datacenter IPs", puF, pu, "GIVT + SIVT categories") +
+      bx(184, 200, 184, 40, "Viewability Signal", "MRC: 50% pixels, 1 sec", puF, pu, "Moat · IAS tag in creative") +
+      ln(276, 72, 276, 86, "score", pu, "ap") +
+      ln(276, 128, 276, 142, "flag", pu, "ap") +
+      ln(276, 184, 276, 198, "measure", pu, "ap") +
+      // Measurement track
+      bx(386, 32, 166, 40, "Nielsen Panels", "30,000-person sample", grF, gr, "demographic ratings data") +
+      bx(386, 88, 166, 40, "VideoAmp / iSpot", "set-top box + ACR data", grF, gr, "millions of households") +
+      bx(386, 144, 166, 40, "C3 / C7 Currency", "live + 3/7-day DVR views", grF, gr, "TV buying standard") +
+      bx(386, 200, 166, 40, "Clean Room", "Snowflake / ADH / AWS", grF, gr, "overlap w/o sharing PII") +
+      ln(469, 72, 469, 86, "panel data", gr, "ag") +
+      ln(469, 128, 469, 142, "ratings", gr, "ag") +
+      ln(469, 184, 469, 198, "match", gr, "ag") +
+      `<text x="2" y="252" font-size="6.5" fill="${mu}">ATS = Authenticated Traffic Solution · RampID = LiveRamp's people-based ID · IVT = Invalid Traffic · GIVT/SIVT = General/Sophisticated IVT · ADH = Ads Data Hub</text>` +
+      `</svg>`;
   }
 
   if (id === "ad-serving-rtb") {
-    const nw5 = 52;
-    const xs: [number, number, number, number, number] = [pad, pad + nw5 + pad, pad + 2 * (nw5 + pad), pad + 3 * (nw5 + pad), pad + 4 * (nw5 + pad)];
-    return (
-      "<div class='flow-title'>RTB lifecycle</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw5, nh, "Ad request") +
-      arrow(xs[0] + nw5, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw5, nh, "Bid request") +
-      arrow(xs[1] + nw5, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw5, nh, "Bid decision", "DSP", true) +
-      arrow(xs[2] + nw5, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw5, nh, "Auction") +
-      arrow(xs[3] + nw5, y + nh / 2, xs[4] - 4, y + nh / 2) +
-      node(xs[4], y, nw5, nh, "Logs") +
-      "</svg>"
-    );
+    const W = 560, H = 280;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>Full RTB Lifecycle: Page Load to Ad Render (&lt;150ms)</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      // Timeline ruler at top
+      `<rect x="2" y="16" width="556" height="14" rx="3" fill="#f8fafc" stroke="#e2e8f0"/>` +
+      `<text x="8" y="26" font-size="7" fill="${mu}" font-weight="700">ms:</text>` +
+      `<text x="30" y="26" font-size="7" fill="${bl}">0</text>` +
+      `<text x="95" y="26" font-size="7" fill="${bl}">5</text>` +
+      `<text x="160" y="26" font-size="7" fill="${pu}">30</text>` +
+      `<text x="255" y="26" font-size="7" fill="${pu}">80</text>` +
+      `<text x="340" y="26" font-size="7" fill="${gr}">100</text>` +
+      `<text x="420" y="26" font-size="7" fill="${gr}">120</text>` +
+      `<text x="500" y="26" font-size="7" fill="${or}">150</text>` +
+      // Step nodes (two rows)
+      bx(2, 38, 78, 50, "Page Loads", "slot script fires", blF, bl, "GPT / Prebid.js") +
+      bx(88, 38, 78, 50, "Ad Request", "slot params sent", blF, bl, "imp, site, user") +
+      bx(174, 38, 78, 50, "Bid Request", "OpenRTB JSON", puF, pu, "to 10-30 DSPs") +
+      bx(260, 38, 78, 50, "DSP Eval", "ML model + rules", puF, pu, "pCTR × value") +
+      bx(346, 38, 78, 50, "Auction", "highest net bid", puF, pu, "2nd-price clears") +
+      bx(432, 38, 78, 50, "Winner", "notified via nurl", grF, gr, "billing logged") +
+      // Arrows row 1
+      ln(80, 63, 86, 63, "", bl, "ab") + ln(166, 63, 172, 63, "", bl, "ab") +
+      ln(252, 63, 258, 63, "", pu, "ap") + ln(338, 63, 344, 63, "", pu, "ap") +
+      ln(424, 63, 430, 63, "", gr, "ag") +
+      // Bid request fields callout
+      `<rect x="174" y="92" width="78" height="56" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="213" y="103" text-anchor="middle" font-size="6.5" fill="${pu}" font-weight="700">BidRequest fields:</text>` +
+      `<text x="213" y="114" text-anchor="middle" font-size="6.5" fill="${st}">imp: {id,banner,video}</text>` +
+      `<text x="213" y="124" text-anchor="middle" font-size="6.5" fill="${st}">site: {domain,cat,page}</text>` +
+      `<text x="213" y="134" text-anchor="middle" font-size="6.5" fill="${st}">user: {id,buyeruid}</text>` +
+      `<text x="213" y="144" text-anchor="middle" font-size="6.5" fill="${st}">regs: {coppa,gdpr,us_p}</text>` +
+      // Row 2: post-auction
+      bx(346, 102, 78, 50, "Creative", "HTML / VAST URL", grF, gr, "markup in seatbid") +
+      bx(432, 102, 78, 50, "Ad Renders", "iframe or instream", grF, gr, "300×250 or video") +
+      bx(2, 102, 78, 50, "Logs", "raw events → S3", "#fef3c7", or, "Kafka pipeline") +
+      ln(424, 127, 430, 127, "markup", gr, "ag") +
+      `<path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#ag)" d="M471 102 L471 90"/>` +
+      `<path stroke="${or}" stroke-width="1.5" fill="none" marker-end="url(#ab)" d="M471 152 L41 152"/>` +
+      // VAST callout
+      `<rect x="346" y="156" width="78" height="56" rx="4" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>` +
+      `<text x="385" y="167" text-anchor="middle" font-size="6.5" fill="${or}" font-weight="700">VAST (video):</text>` +
+      `<text x="385" y="178" text-anchor="middle" font-size="6.5" fill="${st}">MediaFile URL</text>` +
+      `<text x="385" y="188" text-anchor="middle" font-size="6.5" fill="${st}">TrackingEvents</text>` +
+      `<text x="385" y="198" text-anchor="middle" font-size="6.5" fill="${st}">VideoClicks</text>` +
+      `<text x="385" y="208" text-anchor="middle" font-size="6.5" fill="${st}">Impression URL</text>` +
+      `<text x="2" y="228" font-size="6.5" fill="${mu}">nurl = win notification URL fired by exchange · seatbid = DSP response containing ad markup · GPT = Google Publisher Tag · Prebid.js = open-source header bidding library</text>` +
+      `</svg>`;
   }
 
   if (id === "measurement-currency") {
-    const nw4 = 68;
-    const xs: [number, number, number, number] = [pad, pad + nw4 + pad, pad + 2 * (nw4 + pad), pad + 3 * (nw4 + pad)];
-    return (
-      "<div class='flow-title'>Measurement &amp; currency flow</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw4, nh, "Exposure", "pixels, logs") +
-      arrow(xs[0] + nw4, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw4, nh, "Clean room", "match", true) +
-      arrow(xs[1] + nw4, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw4, nh, "Currency", "ratings") +
-      arrow(xs[2] + nw4, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw4, nh, "Upfronts", "deals") +
-      "</svg>"
-    );
+    const W = 560, H = 270;
+    const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}</defs>`;
+    return `<div class='flow-title'>Measurement, Attribution &amp; TV Currency</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` + defs +
+      zone(2, 16, 270, 110, "DIGITAL ATTRIBUTION", bl, "#f0f9ff") +
+      zone(278, 16, 278, 110, "TV / CTV CURRENCY", gr, "#f0fdf4") +
+      zone(2, 132, 554, 110, "SHARED INFRASTRUCTURE", pu, "#faf5ff") +
+      // Digital track
+      bx(8, 32, 90, 40, "Impression Pixel", "1×1 img on render", blF, bl, "GAM / CM360 tag") +
+      bx(106, 32, 82, 40, "Click Pixel", "redirect + log", blF, bl, "final URL tracking") +
+      bx(196, 32, 70, 40, "Conv. API", "server-side event", blF, bl, "Meta CAPI, GTAT") +
+      ln(98, 52, 104, 52, "", bl, "ab") + ln(178, 52, 194, 52, "", bl, "ab") +
+      bx(8, 84, 90, 40, "Last-Click", "100% to last ad", "#fef3c7", or, "simple, biased") +
+      bx(106, 84, 82, 40, "MTA", "multi-touch credit", "#fef3c7", or, "data-driven model") +
+      bx(196, 84, 70, 40, "MMM", "media mix model", "#fef3c7", or, "econometrics") +
+      ln(53, 72, 53, 82, "", or, "ab") + ln(147, 72, 147, 82, "", or, "ab") + ln(231, 72, 231, 82, "", or, "ab") +
+      // TV track
+      bx(284, 32, 120, 40, "Nielsen Panels", "30k HH sample", grF, gr, "C3/C7 demo ratings") +
+      bx(412, 32, 138, 40, "VideoAmp / iSpot", "STB + ACR data", grF, gr, "millions of households") +
+      bx(284, 84, 120, 40, "Upfront Deals", "annual commitments", grF, gr, "$20B+ US TV market") +
+      bx(412, 84, 138, 40, "Make-Goods", "missed rating deliver", grF, gr, "bonus impressions") +
+      ln(344, 72, 344, 82, "", gr, "ag") + ln(481, 72, 481, 82, "", gr, "ag") +
+      // Shared infrastructure
+      bx(8, 148, 130, 40, "Clean Room", "Snowflake · ADH · AWS", puF, pu, "privacy-safe data join") +
+      bx(146, 148, 120, 40, "Identity Graph", "RampID / UID2 link", puF, pu, "cross-device match") +
+      bx(274, 148, 130, 40, "Incrementality", "holdout testing", puF, pu, "true causal lift") +
+      bx(412, 148, 142, 40, "Reach &amp; Frequency", "deduped audience size", puF, pu, "Nielsen DAR / comScore") +
+      ln(138, 168, 144, 168, "", pu, "ap") + ln(266, 168, 272, 168, "", pu, "ap") + ln(404, 168, 410, 168, "", pu, "ap") +
+      `<path stroke="${pu}" stroke-width="1" fill="none" stroke-dasharray="3,2" d="M 270 124 L 72 146"/>` +
+      `<path stroke="${pu}" stroke-width="1" fill="none" stroke-dasharray="3,2" d="M 270 124 L 481 146"/>` +
+      `<text x="2" y="256" font-size="6.5" fill="${mu}">C3/C7 = live + 3/7-day DVR viewing · MTA = Multi-Touch Attribution · MMM = Media Mix Model · ADH = Ads Data Hub · STB = Set-Top Box · HH = Households</text>` +
+      `</svg>`;
   }
 
   return "";
@@ -3817,133 +3979,190 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
 };
 
 const renderExampleFlowDiagram = (id: ExampleId): string => {
-  const W = 360;
-  const H = 140;
-  const stroke = "#0284c7";
-  const fill = "#e0f2fe";
-  const fillStrong = "#bae6fd";
-  const text = "#0f172a";
+  const bl = "#0284c7", blF = "#e0f2fe";
+  const gr = "#16a34a", grF = "#dcfce7";
+  const pu = "#7c3aed", puF = "#ede9fe";
+  const or = "#d97706", orF = "#fef3c7";
+  const st = "#475569", mu = "#94a3b8";
 
-  const node = (x: number, y: number, w: number, h: number, label: string, sub?: string, primary = false) =>
-    `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${primary ? fillStrong : fill}" stroke="${stroke}" stroke-width="1.5"/><text x="${x + w/2}" y="${y + (sub ? 22 : h/2 + 5)}" text-anchor="middle" font-size="11" font-weight="600" fill="${text}">${label}</text>${sub ? `<text x="${x + w/2}" y="${y + 38}" text-anchor="middle" font-size="9" fill="#475569">${sub}</text>` : ""}</g>`;
-  const arrow = (x1: number, y1: number, x2: number, y2: number) =>
-    `<path stroke="${stroke}" stroke-width="2" fill="none" marker-end="url(#arrow)" d="M${x1} ${y1} L${x2} ${y2}"/>`;
+  const mk = (mid: string, c: string) =>
+    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`;
 
-  const defs = `<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="${stroke}"/></marker></defs>`;
+  const bx = (x: number, y: number, w: number, h: number, label: string, sub: string, fc: string, sc: string, co = "") =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${fc}" stroke="${sc}" stroke-width="1.5"/>` +
+    `<text x="${x+w/2}" y="${y+14}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${sc}">${label}</text>` +
+    `<text x="${x+w/2}" y="${y+25}" text-anchor="middle" font-size="7" fill="${st}">${sub}</text>` +
+    (co ? `<text x="${x+w/2}" y="${y+35}" text-anchor="middle" font-size="6.5" fill="${mu}" font-style="italic">${co}</text>` : "");
+
+  const ln = (x1: number, y1: number, x2: number, y2: number, lbl: string, c: string, mid: string) =>
+    `<path stroke="${c}" stroke-width="1.4" fill="none" marker-end="url(#${mid})" d="M${x1} ${y1} L${x2} ${y2}"/>` +
+    (lbl ? `<text x="${(x1+x2)/2}" y="${(y1+y2)/2 - 3}" text-anchor="middle" font-size="6.5" fill="${c}" font-weight="600">${lbl}</text>` : "");
+
+  const defs = `<defs>${mk("ab",bl)}${mk("ap",pu)}${mk("ag",gr)}${mk("ao",or)}</defs>`;
 
   if (id === "search") {
-    const nw = 58;
-    const nh = 44;
-    const y = (H - nh) / 2;
-    const pad = 12;
-    const x1 = pad;
-    const x2 = x1 + nw + pad;
-    const x3 = x2 + nw + pad;
-    const x4 = x3 + nw + pad;
-    const x5 = x4 + nw + pad;
-    const cx = (a: number, b: number) => a + nw / 2;
-    return (
-      "<div class='flow-title'>How search ads get to the page</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(x1, y, nw, nh, "Query") +
-      arrow(x1 + nw, y + nh / 2, x2 - 4, y + nh / 2) +
-      node(x2, y, nw, nh, "Search", "engine") +
-      arrow(x2 + nw, y + nh / 2, x3 - 4, y + nh / 2) +
-      node(x3, y, nw, nh, "Match", "keywords") +
-      arrow(x3 + nw, y + nh / 2, x4 - 4, y + nh / 2) +
-      node(x4, y, nw, nh, "Auction", "rank & bid", true) +
-      arrow(x4 + nw, y + nh / 2, x5 - 4, y + nh / 2) +
-      node(x5, y, nw, nh, "Ad", "shown") +
-      "</svg>"
-    );
+    const W = 560, H = 250;
+    return `<div class='flow-title'>Google Search Ads: Query to Click &amp; Feedback Loop</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
+      // Row 1: query processing
+      bx(2, 16, 78, 46, "User Query", "lightweight camping tents", blF, bl, "keywords tokenized") +
+      bx(88, 16, 82, 46, "Index Match", "candidate ad set", blF, bl, "keyword → campaign") +
+      bx(178, 16, 90, 46, "Quality Score", "1–10 rating", puF, pu, "CTR + relevance + LP") +
+      bx(276, 16, 90, 46, "Ad Rank", "bid × QS × ext", puF, pu, "determines position") +
+      bx(374, 16, 90, 46, "Auction", "top N ads shown", puF, pu, "VCG / Vickrey pricing") +
+      bx(472, 16, 82, 46, "SERP", "ad rendered", grF, gr, "paid + organic mix") +
+      ln(80, 39, 86, 39, "", bl, "ab") + ln(170, 39, 176, 39, "", bl, "ab") +
+      ln(268, 39, 274, 39, "formula", pu, "ap") + ln(366, 39, 372, 39, "", pu, "ap") +
+      ln(464, 39, 470, 39, "position", gr, "ag") +
+      // QS breakdown callout
+      `<rect x="178" y="66" width="90" height="56" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="223" y="77" text-anchor="middle" font-size="7" fill="${pu}" font-weight="700">Quality Score =</text>` +
+      `<text x="223" y="88" text-anchor="middle" font-size="7" fill="${st}">Expected CTR (historical)</text>` +
+      `<text x="223" y="99" text-anchor="middle" font-size="7" fill="${st}">+ Ad relevance (to query)</text>` +
+      `<text x="223" y="110" text-anchor="middle" font-size="7" fill="${st}">+ Landing page exp.</text>` +
+      // Ad Rank callout
+      `<rect x="276" y="66" width="90" height="44" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
+      `<text x="321" y="77" text-anchor="middle" font-size="7" fill="${pu}" font-weight="700">Ad Rank =</text>` +
+      `<text x="321" y="88" text-anchor="middle" font-size="7" fill="${st}">Max CPC bid × QS</text>` +
+      `<text x="321" y="99" text-anchor="middle" font-size="7" fill="${st}">× Ext. impact + context</text>` +
+      // Row 2: post-click feedback
+      bx(2, 140, 100, 44, "Click", "user clicks ad", blF, bl, "CPC charged") +
+      bx(110, 140, 100, 44, "Landing Page", "conversion event", blF, bl, "Goal tag fires") +
+      bx(218, 140, 110, 44, "Smart Bidding", "tROAS / tCPA model", puF, pu, "updates bid strategy") +
+      bx(336, 140, 110, 44, "Conversion Data", "signal fed to model", grF, gr, "gclid match") +
+      bx(454, 140, 100, 44, "Next Auctions", "bid auto-adjusted", grF, gr, "closed-loop system") +
+      ln(102, 162, 108, 162, "CPC", bl, "ab") + ln(210, 162, 216, 162, "", bl, "ab") +
+      ln(328, 162, 334, 162, "", pu, "ap") + ln(446, 162, 452, 162, "", gr, "ag") +
+      `<path stroke="${or}" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#ao)" d="M513 140 C 513 120 80 120 82 140"/>` +
+      `<text x="300" y="118" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Smart Bidding feedback loop</text>` +
+      `<text x="2" y="202" font-size="6.5" fill="${mu}">QS = Quality Score · LP = Landing Page · CPC = Cost Per Click · VCG = Vickrey-Clarke-Groves (generalized 2nd price) · tROAS/tCPA = target return / cost bidding strategies</text>` +
+      `</svg>`;
   }
 
   if (id === "instagram") {
-    const nw = 56;
-    const nh = 42;
-    const y = (H - nh) / 2;
-    const pad = 10;
-    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
-    return (
-      "<div class='flow-title'>How feed ads are chosen</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Feed", "scroll") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Ad", "decision") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "Bidders", "DSPs", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Creative", "served") +
-      arrow(xs[3] + nw, y + nh / 2, xs[4] - 4, y + nh / 2) +
-      node(xs[4], y, nw, nh, "Events", "logs") +
-      "</svg>"
-    );
+    const W = 560, H = 240;
+    return `<div class='flow-title'>Instagram / Meta Feed Ad: From Scroll to Conversion API</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
+      // Row 1: ad selection
+      bx(2, 16, 88, 46, "Feed Scroll", "slot eligible", blF, bl, "Ads Manager campaign") +
+      bx(98, 16, 96, 46, "Meta Adv+", "Advantage+ auction", puF, pu, "internal + FBX buyers") +
+      bx(202, 16, 96, 46, "ML Ranking", "predicted value score", puF, pu, "p(action) × bid") +
+      bx(306, 16, 96, 46, "Creative", "personalized ad", blF, bl, "DCO + DPA variants") +
+      bx(410, 16, 88, 46, "Impression", "viewable render", grF, gr, "1-sec in viewport") +
+      bx(506, 16, 50, 46, "Logs", "events S3", grF, gr) +
+      ln(90, 39, 96, 39, "", bl, "ab") + ln(194, 39, 200, 39, "score", pu, "ap") +
+      ln(298, 39, 304, 39, "", pu, "ap") + ln(402, 39, 408, 39, "", gr, "ag") +
+      ln(498, 39, 504, 39, "", gr, "ag") +
+      // Row 2: signal loop
+      bx(2, 108, 110, 44, "Pixel / SDK", "browser + app events", blF, bl, "Meta Pixel · CAPI") +
+      bx(120, 108, 110, 44, "Event Match", "email / phone hash", blF, bl, "hashed PII lookup") +
+      bx(238, 108, 110, 44, "Conversion API", "server-to-server", puF, pu, "bypasses iOS block") +
+      bx(356, 108, 110, 44, "Audience Rebuild", "lookalike + retarget", puF, pu, "Custom Audiences") +
+      bx(474, 108, 80, 44, "Next Bid", "model updated", grF, gr, "closed loop") +
+      ln(112, 130, 118, 130, "", bl, "ab") + ln(230, 130, 236, 130, "", bl, "ab") +
+      ln(348, 130, 354, 130, "", pu, "ap") + ln(466, 130, 472, 130, "", gr, "ag") +
+      `<path stroke="${or}" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#ao)" d="M456 108 C 456 80 100 80 100 108"/>` +
+      `<text x="280" y="78" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Conversion signal feeds back into auction model</text>` +
+      `<text x="2" y="176" font-size="6.5" fill="${mu}">CAPI = Conversions API · DPA = Dynamic Product Ads · DCO = Dynamic Creative Optimization · FBX = Facebook Exchange · Advantage+ = Meta's automated campaign system</text>` +
+      `</svg>`;
   }
 
   if (id === "youtube") {
-    const nw = 54;
-    const nh = 42;
-    const y = (H - nh) / 2;
-    const pad = 8;
-    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Pre-roll systems flow</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Player", "start") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Ad server", "request") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "Auction", "VAST", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Creative", "stream") +
-      arrow(xs[3] + nw, y + nh / 2, xs[4] - 4, y + nh / 2) +
-      node(xs[4], y, nw, nh, "Quartiles", "tracked") +
-      "</svg>"
-    );
+    const W = 560, H = 240;
+    return `<div class='flow-title'>YouTube Pre-Roll: IMA SDK → VAST → Quartile Tracking</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
+      // Row 1: ad delivery
+      bx(2, 16, 86, 46, "Video Plays", "player initiates", blF, bl, "watch.youtube.com") +
+      bx(96, 16, 86, 46, "IMA SDK", "ad request built", blF, bl, "Google IMA / PAL") +
+      bx(190, 16, 96, 46, "Google Ad Mgr", "inventory sold?", puF, pu, "direct vs programmatic") +
+      bx(294, 16, 96, 46, "Auth. Buyers", "DV360 · TTD bid", puF, pu, "parallel OpenRTB") +
+      bx(398, 16, 86, 46, "VAST URL", "XML response", grF, gr, "MediaFile + tracking") +
+      bx(492, 16, 64, 46, "Pre-Roll", "plays in player", grF, gr, "skip after 5s") +
+      ln(88, 39, 94, 39, "", bl, "ab") + ln(182, 39, 188, 39, "request", bl, "ab") +
+      ln(286, 39, 292, 39, "", pu, "ap") + ln(390, 39, 396, 39, "VAST", gr, "ag") +
+      ln(484, 39, 490, 39, "", gr, "ag") +
+      // VAST structure callout
+      `<rect x="398" y="66" width="86" height="68" rx="4" fill="#fef3c7" stroke="${or}" stroke-width="1"/>` +
+      `<text x="441" y="77" text-anchor="middle" font-size="7" fill="${or}" font-weight="700">VAST XML:</text>` +
+      `<text x="441" y="88" text-anchor="middle" font-size="6.5" fill="${st}">&lt;MediaFile&gt; mp4/webm</text>` +
+      `<text x="441" y="99" text-anchor="middle" font-size="6.5" fill="${st}">&lt;Impression&gt; pixel</text>` +
+      `<text x="441" y="110" text-anchor="middle" font-size="6.5" fill="${st}">&lt;TrackingEvents&gt;</text>` +
+      `<text x="441" y="121" text-anchor="middle" font-size="6.5" fill="${st}">&lt;VideoClicks&gt;</text>` +
+      // Row 2: tracking
+      bx(2, 118, 96, 44, "Quartile Events", "0% 25% 50% 75% 100%", blF, bl, "pixel fires per mark") +
+      bx(106, 118, 96, 44, "Viewability", "VPAID / OM SDK", blF, bl, "IAS · DV measure") +
+      bx(210, 118, 96, 44, "Skip Tracked", "if viewer skips", puF, pu, "skip counted, no charge") +
+      bx(314, 118, 96, 44, "Attribution", "view-through", puF, pu, "30-day window") +
+      bx(418, 118, 96, 44, "Google Ads", "campaign stats", grF, gr, "VTR, CPV, ROAS") +
+      ln(98, 140, 104, 140, "", bl, "ab") + ln(202, 140, 208, 140, "", bl, "ab") +
+      ln(306, 140, 312, 140, "", pu, "ap") + ln(410, 140, 416, 140, "", gr, "ag") +
+      `<text x="2" y="186" font-size="6.5" fill="${mu}">IMA = Interactive Media Ads SDK · VAST = Video Ad Serving Template · PAL = Programmatic Access Library · VTR = View-Through Rate · CPV = Cost Per View · OM SDK = Open Measurement SDK</text>` +
+      `</svg>`;
   }
 
   if (id === "web-display") {
-    const nw = 52;
-    const nh = 42;
-    const y = (H - nh) / 2;
-    const pad = 6;
-    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Display banner systems flow</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Page", "slot") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "SSP", "package") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "Exchange", "RTB", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "DSP", "bids") +
-      arrow(xs[3] + nw, y + nh / 2, xs[4] - 4, y + nh / 2) +
-      node(xs[4], y, nw, nh, "Ad", "logs") +
-      "</svg>"
-    );
+    const W = 560, H = 250;
+    return `<div class='flow-title'>Web Display Banner: Prebid.js Header Bidding in Detail</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
+      // Row 1: page to auction
+      bx(2, 16, 82, 46, "Page Load", "Prebid.js in &lt;head&gt;", blF, bl, "&lt;5ms timeout set") +
+      bx(92, 16, 82, 46, "Parallel Bids", "SSPs called at once", blF, bl, "Magnite, PubMatic, IX") +
+      bx(182, 16, 90, 46, "DSPs Respond", "&lt;80ms timeout", puF, pu, "RTB bids returned") +
+      bx(280, 16, 90, 46, "Bid Collected", "highest wins", puF, pu, "sent to GAM as key-val") +
+      bx(378, 16, 90, 46, "GAM Decision", "direct vs prog?", puF, pu, "line item priority") +
+      bx(476, 16, 80, 46, "Creative", "iframe renders", grF, gr, "300×250, 728×90") +
+      ln(84, 39, 90, 39, "~5ms", bl, "ab") + ln(174, 39, 180, 39, "bids", bl, "ab") +
+      ln(272, 39, 278, 39, "", pu, "ap") + ln(370, 39, 376, 39, "", pu, "ap") +
+      ln(468, 39, 474, 39, "", gr, "ag") +
+      // Parallel bids callout
+      `<rect x="92" y="66" width="82" height="58" rx="4" fill="#f0f9ff" stroke="${bl}" stroke-width="1"/>` +
+      `<text x="133" y="77" text-anchor="middle" font-size="7" fill="${bl}" font-weight="700">Parallel requests:</text>` +
+      `<text x="133" y="88" text-anchor="middle" font-size="7" fill="${st}">Magnite → $7.10</text>` +
+      `<text x="133" y="99" text-anchor="middle" font-size="7" fill="${st}">PubMatic → $6.50</text>` +
+      `<text x="133" y="110" text-anchor="middle" font-size="7" fill="${st}">Index Exch → $5.90</text>` +
+      // Row 2: viewability + conversion
+      bx(2, 140, 96, 44, "Ad Loads", "iframe content", blF, bl, "JS tag executes") +
+      bx(106, 140, 96, 44, "Viewability", "IAS / Moat tag", blF, bl, "50% visible, 1 sec") +
+      bx(210, 140, 96, 44, "Click", "redirect chain", blF, bl, "click tracker URL") +
+      bx(314, 140, 96, 44, "Conversion Px", "fires on thank-you", puF, pu, "1×1 pixel or JS") +
+      bx(418, 140, 136, 44, "Attribution", "CM360 / SA360 report", grF, gr, "ROAS, CPA, reach") +
+      ln(98, 162, 104, 162, "", bl, "ab") + ln(202, 162, 208, 162, "", bl, "ab") +
+      ln(306, 162, 312, 162, "", pu, "ap") + ln(410, 162, 416, 162, "", gr, "ag") +
+      `<text x="2" y="206" font-size="6.5" fill="${mu}">GAM = Google Ad Manager · IX = Index Exchange · key-val = key-value pair used to route bids in GAM · CM360 = Campaign Manager 360 · Prebid.js = open-source header bidding wrapper</text>` +
+      `</svg>`;
   }
 
   if (id === "video-player") {
-    const nw = 54;
-    const nh = 42;
-    const y = (H - nh) / 2;
-    const pad = 8;
-    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
-    return (
-      "<div class='flow-title'>Streaming / CTV ad flow</div>" +
-      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
-      node(xs[0], y, nw, nh, "Break", "schedule") +
-      arrow(xs[0] + nw, y + nh / 2, xs[1] - 4, y + nh / 2) +
-      node(xs[1], y, nw, nh, "Ad server", "pod request") +
-      arrow(xs[1] + nw, y + nh / 2, xs[2] - 4, y + nh / 2) +
-      node(xs[2], y, nw, nh, "SSAI", "stitch", true) +
-      arrow(xs[2] + nw, y + nh / 2, xs[3] - 4, y + nh / 2) +
-      node(xs[3], y, nw, nh, "Stream", "with ads") +
-      arrow(xs[3] + nw, y + nh / 2, xs[4] - 4, y + nh / 2) +
-      node(xs[4], y, nw, nh, "Server", "logs") +
-      "</svg>"
-    );
+    const W = 560, H = 250;
+    return `<div class='flow-title'>CTV / Streaming: SCTE-35 Cues → SSAI → Server-Side Beacons</div>` +
+      `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
+      // Row 1: break detection to stitching
+      bx(2, 16, 88, 46, "Content Stream", "HLS/DASH manifest", blF, bl, "live or VOD") +
+      bx(98, 16, 86, 46, "SCTE-35 Cue", "break opportunity", blF, bl, "splice_insert msg") +
+      bx(192, 16, 92, 46, "ADS Request", "context + user ID", puF, pu, "ACR data + IP + FA") +
+      bx(292, 16, 92, 46, "Ad Auction", "SSP/DSP bid", puF, pu, "OpenRTB CTV req") +
+      bx(392, 16, 84, 46, "SSAI Server", "stitches manifest", puF, pu, "Yospace · Verizon") +
+      bx(484, 16, 72, 46, "Player", "seamless play", grF, gr, "no buffering gap") +
+      ln(90, 39, 96, 39, "", bl, "ab") + ln(184, 39, 190, 39, "cue!", bl, "ab") +
+      ln(284, 39, 290, 39, "", pu, "ap") + ln(384, 39, 390, 39, "ad URL", pu, "ap") +
+      ln(476, 39, 482, 39, "", gr, "ag") +
+      // SSAI callout
+      `<rect x="392" y="66" width="84" height="66" rx="4" fill="#faf5ff" stroke="${pu}" stroke-width="1"/>` +
+      `<text x="434" y="77" text-anchor="middle" font-size="7" fill="${pu}" font-weight="700">SSAI stitches:</text>` +
+      `<text x="434" y="88" text-anchor="middle" font-size="6.5" fill="${st}">1. Fetch ad media file</text>` +
+      `<text x="434" y="99" text-anchor="middle" font-size="6.5" fill="${st}">2. Transcode to match</text>` +
+      `<text x="434" y="110" text-anchor="middle" font-size="6.5" fill="${st}">3. Splice into manifest</text>` +
+      `<text x="434" y="121" text-anchor="middle" font-size="6.5" fill="${st}">4. Rewrite segment URLs</text>` +
+      // Row 2: tracking + identity
+      bx(2, 140, 96, 46, "Server Beacon", "impression logged", blF, bl, "server-to-server") +
+      bx(106, 140, 96, 46, "Quartile Fires", "0/25/50/75/100%", blF, bl, "no client pixel needed") +
+      bx(210, 140, 96, 46, "Freq Cap Update", "user+device profile", puF, pu, "Redis / identity svc") +
+      bx(314, 140, 100, 46, "ACR Matching", "show + ad overlap", puF, pu, "Samba TV · LG Ads") +
+      bx(422, 140, 132, 46, "Attribution", "HH lift / tune-in", grF, gr, "iSpot · VideoAmp") +
+      ln(98, 163, 104, 163, "", bl, "ab") + ln(202, 163, 208, 163, "", bl, "ab") +
+      ln(306, 163, 312, 163, "", pu, "ap") + ln(414, 163, 420, 163, "", gr, "ag") +
+      `<text x="2" y="206" font-size="6.5" fill="${mu}">SCTE-35 = digital program insertion standard · SSAI = Server-Side Ad Insertion · ADS = Ad Decision Server · ACR = Automatic Content Recognition · FA = Fingerprinting/Advertising ID</text>` +
+      `</svg>`;
   }
 
   return "";
@@ -4069,37 +4288,567 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
 };
 
 const getGlossaryIllustration = (id: GlossaryId): string => {
-  const w = 200;
-  const h = 120;
-  const stroke = "#0284c7";
-  const fill = "#e0f2fe";
+  const W = 260, H = 160;
+  const bl = "#0284c7", blF = "#e0f2fe", blD = "#0c4a6e";
+  const gr = "#16a34a", grF = "#dcfce7";
+  const pu = "#7c3aed", puF = "#ede9fe";
+  const or = "#d97706", orF = "#fef3c7";
+  const rd = "#dc2626", rdF = "#fee2e2";
+  const st = "#475569", mu = "#94a3b8";
+  const mk = (mid: string, c: string) =>
+    `<defs><marker id="${mid}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${c}"/></marker></defs>`;
+
   const svgs: Record<GlossaryId, string> = {
-    yield: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Yield: revenue per impression</title><path fill="${fill}" stroke="${stroke}" stroke-width="1.5" d="M20 100 L50 70 L80 55 L110 40 L140 30 L170 25 L180 25" fill="none"/><circle cx="180" cy="25" r="5" fill="${stroke}"/></svg>`,
-    inventory: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Inventory: ad slots</title><rect x="30" y="40" width="40" height="50" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><rect x="85" y="35" width="40" height="55" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><rect x="140" y="45" width="40" height="45" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/></svg>`,
-    dsp: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>DSP: demand-side platform</title><circle cx="60" cy="50" r="22" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="60" y="55" text-anchor="middle" font-size="14" fill="${stroke}">$</text><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M85 50 L120 50"/><circle cx="140" cy="50" r="22" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="140" y="55" text-anchor="middle" font-size="12" fill="${stroke}">Bid</text></svg>`,
-    ssp: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>SSP: supply-side platform</title><rect x="25" y="45" width="50" height="40" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M80 65 L115 65"/><circle cx="150" cy="65" r="25" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="150" y="70" text-anchor="middle" font-size="11" fill="${stroke}">SSP</text></svg>`,
-    rtb: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>RTB: real-time bidding</title><path fill="${fill}" stroke="${stroke}" stroke-width="1.5" d="M100 15 L115 50 L155 50 L120 75 L135 110 L100 85 L65 110 L80 75 L45 50 L85 50 Z"/></svg>`,
-    "data-lake": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Data lake: raw storage</title><path fill="${fill}" stroke="${stroke}" stroke-width="1.5" d="M40 50 L70 35 L130 35 L160 50 L160 95 L40 95 Z"/><path fill="none" stroke="${stroke}" stroke-width="1" d="M50 65 Q100 55 150 65" stroke-dasharray="4 2"/><path fill="none" stroke="${stroke}" stroke-width="1" d="M55 80 Q100 70 145 80" stroke-dasharray="4 2"/></svg>`,
-    "identity-graph": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Identity graph: linked IDs</title><circle cx="50" cy="45" r="18" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><circle cx="100" cy="60" r="18" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><circle cx="150" cy="45" r="18" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M68 48 L82 57"/><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M118 57 L132 48"/><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M65 60 Q100 85 135 60"/></svg>`,
-    attribution: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Attribution: ad to conversion</title><circle cx="45" cy="55" r="20" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="45" y="60" text-anchor="middle" font-size="12" fill="${stroke}">Ad</text><path stroke="${stroke}" stroke-width="2" fill="none" marker-end="url(#arr)" d="M70 55 L130 55"/><circle cx="155" cy="55" r="20" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="155" y="60" text-anchor="middle" font-size="10" fill="${stroke}">Conv</text><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="${stroke}"/></marker></defs></svg>`,
-    "clean-room": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Clean room: secure data join</title><rect x="50" y="35" width="100" height="55" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><path stroke="${stroke}" stroke-width="2" fill="none" d="M95 50 L95 75 M105 50 L105 75 M85 62 L115 62"/></svg>`,
-    currency: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Currency: measurement standard</title><rect x="40" y="40" width="120" height="45" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="100" y="70" text-anchor="middle" font-size="14" font-weight="bold" fill="${stroke}">Rating %</text></svg>`,
-    upfronts: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Upfronts: annual TV market</title><rect x="35" y="45" width="35" height="40" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><rect x="82" y="45" width="35" height="40" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><rect x="130" y="45" width="35" height="40" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="52" y="68" text-anchor="middle" font-size="10" fill="${stroke}">Q2</text><text x="99" y="68" text-anchor="middle" font-size="10" fill="${stroke}">Q3</text><text x="147" y="68" text-anchor="middle" font-size="10" fill="${stroke}">Q4</text></svg>`,
-    pixel: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Ad pixel: tracking beacon</title><rect x="85" y="45" width="30" height="30" fill="${stroke}"/><path stroke="${stroke}" stroke-width="1.5" fill="none" d="M100 80 L100 95 M100 95 L115 95 M100 95 L85 110"/></svg>`,
-    vast: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>VAST: video ad template</title><rect x="50" y="40" width="100" height="50" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><path fill="${stroke}" d="M88 55 L88 75 L108 65 Z"/></svg>`,
-    "header-bidding": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Header bidding: parallel auctions</title><rect x="75" y="15" width="50" height="28" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="100" y="33" text-anchor="middle" font-size="9" fill="${stroke}">Publisher</text><path stroke="${stroke}" stroke-width="1.2" fill="none" d="M100 43 L60 65 M100 43 L100 65 M100 43 L140 65"/><rect x="30" y="65" width="40" height="24" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><rect x="80" y="65" width="40" height="24" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><rect x="130" y="65" width="40" height="24" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><text x="50" y="80" text-anchor="middle" font-size="8" fill="${stroke}">SSP1</text><text x="100" y="80" text-anchor="middle" font-size="8" fill="${stroke}">SSP2</text><text x="150" y="80" text-anchor="middle" font-size="8" fill="${stroke}">SSP3</text></svg>`,
-    creative: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Ad creative: banner, video, native</title><rect x="20" y="30" width="70" height="50" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="55" y="60" text-anchor="middle" font-size="8" fill="${stroke}">Banner</text><rect x="110" y="35" width="70" height="45" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><path fill="${stroke}" d="M138 50 L138 68 L156 59 Z"/></svg>`,
-    cpm: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>CPM: cost per mille</title><text x="100" y="55" text-anchor="middle" font-size="28" font-weight="bold" fill="${stroke}">$</text><text x="100" y="85" text-anchor="middle" font-size="11" fill="${stroke}">per 1,000 imps</text></svg>`,
-    "open-rtb": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>OpenRTB: standard API</title><rect x="20" y="35" width="60" height="50" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="50" y="65" text-anchor="middle" font-size="9" fill="${stroke}">Exchange</text><path stroke="${stroke}" stroke-width="1.8" fill="none" marker-end="url(#ar)" d="M84 55 L116 55"/><text x="100" y="48" text-anchor="middle" font-size="7" fill="${stroke}">Bid Req</text><path stroke="${stroke}" stroke-width="1.8" fill="none" d="M116 65 L84 65"/><text x="100" y="78" text-anchor="middle" font-size="7" fill="${stroke}">Bid Resp</text><rect x="120" y="35" width="60" height="50" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="150" y="65" text-anchor="middle" font-size="9" fill="${stroke}">DSP</text><defs><marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${stroke}"/></marker></defs></svg>`,
-    pmp: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Private Marketplace: invite-only</title><circle cx="100" cy="55" r="38" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="100" y="52" text-anchor="middle" font-size="9" fill="${stroke}">PMP</text><text x="100" y="65" text-anchor="middle" font-size="8" fill="${stroke}">Invited buyers</text><rect x="70" y="25" width="20" height="14" rx="3" fill="${stroke}"/></svg>`,
-    dco: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>DCO: dynamic creative optimization</title><rect x="20" y="45" width="45" height="35" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><rect x="78" y="30" width="45" height="22" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><rect x="78" y="58" width="45" height="22" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><rect x="137" y="38" width="44" height="38" rx="4" fill="#bae6fd" stroke="${stroke}" stroke-width="1.5"/><text x="159" y="60" text-anchor="middle" font-size="8" fill="${stroke}">Ad</text></svg>`,
-    "brand-safety": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Brand safety: protecting brand reputation</title><path fill="${fill}" stroke="${stroke}" stroke-width="1.5" d="M100 15 L160 40 L160 75 Q160 100 100 110 Q40 100 40 75 L40 40 Z"/><text x="100" y="70" text-anchor="middle" font-size="20" fill="${stroke}">✓</text></svg>`,
-    viewability: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Viewability: ad in viewport</title><rect x="30" y="20" width="140" height="80" rx="6" fill="none" stroke="${stroke}" stroke-width="1.5"/><rect x="45" y="35" width="110" height="50" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><text x="100" y="64" text-anchor="middle" font-size="9" fill="${stroke}">50%+ pixels visible</text><text x="100" y="76" text-anchor="middle" font-size="9" fill="${stroke}">for 1+ second</text></svg>`,
-    ctv: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>CTV: connected television</title><rect x="25" y="20" width="150" height="90" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><rect x="35" y="28" width="130" height="72" rx="4" fill="#0f172a"/><path fill="${stroke}" d="M88 55 L88 73 L106 64 Z"/><rect x="80" y="112" width="40" height="8" rx="2" fill="${stroke}"/></svg>`,
-    ssai: `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>SSAI: server-side ad insertion</title><rect x="15" y="45" width="45" height="30" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><text x="37" y="63" text-anchor="middle" font-size="7" fill="${stroke}">Content</text><rect x="78" y="35" width="44" height="50" rx="4" fill="#bae6fd" stroke="${stroke}" stroke-width="1.5"/><text x="100" y="63" text-anchor="middle" font-size="8" fill="${stroke}">SSAI</text><rect x="140" y="45" width="45" height="30" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="1.2"/><text x="162" y="63" text-anchor="middle" font-size="7" fill="${stroke}">Player</text></svg>`,
-    "frequency-cap": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Frequency cap: limit ad impressions</title><circle cx="55" cy="60" r="30" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="55" y="65" text-anchor="middle" font-size="16" fill="${stroke}">3x</text><line x1="95" y1="60" x2="120" y2="60" stroke="#dc2626" stroke-width="2"/><line x1="115" y1="55" x2="125" y2="65" stroke="#dc2626" stroke-width="2"/><line x1="115" y1="65" x2="125" y2="55" stroke="#dc2626" stroke-width="2"/><text x="155" y="55" text-anchor="middle" font-size="8" fill="#dc2626">No more</text><text x="155" y="68" text-anchor="middle" font-size="8" fill="#dc2626">today</text></svg>`,
-    "programmatic-guaranteed": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Programmatic guaranteed: fixed price + volume</title><rect x="25" y="35" width="65" height="50" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="57" y="60" text-anchor="middle" font-size="8" fill="${stroke}">Fixed CPM</text><text x="57" y="72" text-anchor="middle" font-size="8" fill="${stroke}">+ Volume</text><path stroke="${stroke}" stroke-width="2" fill="none" d="M94 60 L115 60"/><rect x="115" y="35" width="60" height="50" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="145" y="60" text-anchor="middle" font-size="8" fill="${stroke}">Guaranteed</text><text x="145" y="72" text-anchor="middle" font-size="8" fill="${stroke}">Delivery</text></svg>`,
-    "quality-score": `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>Quality score: ad relevance rating</title><circle cx="100" cy="58" r="42" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="100" y="52" text-anchor="middle" font-size="26" font-weight="bold" fill="${stroke}">8</text><text x="100" y="75" text-anchor="middle" font-size="9" fill="${stroke}">Quality Score</text></svg>`,
+    yield: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Yield optimization curve</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Yield = Revenue / Available Inventory</text>
+      <line x1="20" y1="140" x2="250" y2="140" stroke="${st}" stroke-width="1"/>
+      <line x1="20" y1="20" x2="20" y2="140" stroke="${st}" stroke-width="1"/>
+      <text x="130" y="155" text-anchor="middle" font-size="8" fill="${st}">Time / Impressions</text>
+      <text x="10" y="80" text-anchor="middle" font-size="8" fill="${st}" transform="rotate(-90 10 80)">CPM $</text>
+      <path fill="none" stroke="${bl}" stroke-width="2" d="M25 130 Q60 120 90 100 Q130 75 160 55 Q190 40 230 30"/>
+      <circle cx="230" cy="30" r="4" fill="${bl}"/>
+      <text x="235" y="34" font-size="8" fill="${bl}">$12 CPM</text>
+      <path fill="none" stroke="${or}" stroke-width="1.5" stroke-dasharray="4,2" d="M25 135 Q80 130 130 125 Q170 122 230 120"/>
+      <text x="235" y="124" font-size="8" fill="${or}">floor</text>
+      <text x="25" y="130" font-size="7" fill="${mu}">unfilled</text>
+      <text x="160" y="50" font-size="7" fill="${blD}">optimized</text></svg>`,
+
+    inventory: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Ad inventory slots</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Inventory = Available Ad Slots</text>
+      <rect x="10" y="25" width="230" height="90" rx="6" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="125" y="38" text-anchor="middle" font-size="8" fill="${st}">Publisher Page Layout</text>
+      <rect x="18" y="45" width="214" height="18" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="125" y="58" text-anchor="middle" font-size="8" fill="${bl}">Leaderboard 728×90 — $8.40 CPM</text>
+      <rect x="18" y="68" width="100" height="40" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="68" y="82" text-anchor="middle" font-size="8" fill="${bl}">Rectangle</text>
+      <text x="68" y="93" text-anchor="middle" font-size="7" fill="${bl}">300×250 · $6.20</text>
+      <rect x="128" y="68" width="104" height="40" rx="3" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="180" y="82" text-anchor="middle" font-size="8" fill="${gr}">Video Slot</text>
+      <text x="180" y="93" text-anchor="middle" font-size="7" fill="${gr}">16:9 · $18.00 CPM</text>
+      <text x="8" y="130" font-size="7" fill="${mu}">Unsold slots = wasted revenue → SSP &amp; header bidding maximize fill rate</text></svg>`,
+
+    dsp: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Demand-Side Platform</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">DSP: Demand-Side Platform</text>
+      <rect x="8" y="22" width="70" height="50" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="43" y="40" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Campaign</text>
+      <text x="43" y="52" text-anchor="middle" font-size="7" fill="${st}">audience rules</text>
+      <text x="43" y="63" text-anchor="middle" font-size="7" fill="${st}">max CPM: $12</text>
+      <rect x="92" y="22" width="80" height="50" rx="5" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="132" y="40" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">DSP Engine</text>
+      <text x="132" y="52" text-anchor="middle" font-size="7" fill="${st}">bid model: pCTR</text>
+      <text x="132" y="63" text-anchor="middle" font-size="7" fill="${st}">× value = $8.40</text>
+      <rect x="186" y="22" width="66" height="50" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="219" y="40" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Exchange</text>
+      <text x="219" y="52" text-anchor="middle" font-size="7" fill="${st}">sends bid</text>
+      <text x="219" y="63" text-anchor="middle" font-size="7" fill="${st}">req JSON</text>
+      <path stroke="${bl}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M78 47 L90 47"/>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M172 47 L184 47"/>
+      <text x="8" y="88" font-size="7" fill="${mu}">Brands: The Trade Desk · Google DV360 · Amazon DSP · Xandr</text>
+      <text x="8" y="100" font-size="7" fill="${mu}">Key stat: DSPs evaluate 1M+ impressions/sec per bidder</text>
+      <text x="8" y="112" font-size="7" fill="${mu}">&lt;100ms end-to-end from bid request to creative served</text></svg>`,
+
+    ssp: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Supply-Side Platform</title>
+      ${mk("a",gr)}
+      <text x="8" y="14" font-size="9" fill="${gr}" font-weight="700">SSP: Supply-Side Platform</text>
+      <rect x="8" y="22" width="68" height="45" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="42" y="40" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Publisher</text>
+      <text x="42" y="52" text-anchor="middle" font-size="7" fill="${st}">ad slot, floor $4</text>
+      <rect x="90" y="18" width="80" height="52" rx="5" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="130" y="35" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">SSP</text>
+      <text x="130" y="47" text-anchor="middle" font-size="7" fill="${st}">packages slot</text>
+      <text x="130" y="58" text-anchor="middle" font-size="7" fill="${st}">sets floor, rules</text>
+      <rect x="184" y="22" width="70" height="20" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="219" y="36" text-anchor="middle" font-size="7" fill="${bl}">DSP A: $7.10</text>
+      <rect x="184" y="46" width="70" height="20" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="219" y="60" text-anchor="middle" font-size="7" fill="${bl}">DSP B: $6.20</text>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M76 44 L88 44"/>
+      <path stroke="${pu}" stroke-width="1.2" fill="none" d="M170 35 L182 32"/>
+      <path stroke="${pu}" stroke-width="1.2" fill="none" d="M170 53 L182 56"/>
+      <text x="8" y="88" font-size="7" fill="${mu}">Brands: Magnite · PubMatic · OpenX · Index Exchange · Freewheel</text>
+      <text x="8" y="100" font-size="7" fill="${mu}">SSP controls: floor prices, deal priority, DSP blocklists</text>
+      <text x="8" y="112" font-size="7" fill="${mu}">Header bidding lets SSPs compete simultaneously for each impression</text></svg>`,
+
+    rtb: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Real-Time Bidding auction</title>
+      ${mk("a",pu)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">RTB: Real-Time Bidding (&lt;100ms)</text>
+      <rect x="8" y="20" width="244" height="18" rx="3" fill="#f8fafc" stroke="#e2e8f0"/>
+      <text x="14" y="32" font-size="7" fill="${mu}">0ms</text><text x="60" y="32" font-size="7" fill="${mu}">30ms</text>
+      <text x="115" y="32" font-size="7" fill="${mu}">80ms</text><text x="175" y="32" font-size="7" fill="${mu}">100ms</text><text x="220" y="32" font-size="7" fill="${mu}">150ms</text>
+      <rect x="8" y="42" width="45" height="30" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="30" y="54" text-anchor="middle" font-size="7" font-weight="600" fill="${blD}">Page</text>
+      <text x="30" y="65" text-anchor="middle" font-size="6.5" fill="${st}">loads slot</text>
+      <rect x="62" y="42" width="50" height="30" rx="4" fill="${puF}" stroke="${pu}" stroke-width="1.5"/>
+      <text x="87" y="54" text-anchor="middle" font-size="7" font-weight="600" fill="${pu}">Exchange</text>
+      <text x="87" y="65" text-anchor="middle" font-size="6.5" fill="${st}">bid request</text>
+      <rect x="121" y="42" width="50" height="30" rx="4" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="146" y="54" text-anchor="middle" font-size="7" font-weight="600" fill="${pu}">DSPs bid</text>
+      <text x="146" y="65" text-anchor="middle" font-size="6.5" fill="${st}">pCTR × value</text>
+      <rect x="180" y="42" width="50" height="30" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="205" y="54" text-anchor="middle" font-size="7" font-weight="600" fill="${gr}">Winner</text>
+      <text x="205" y="65" text-anchor="middle" font-size="6.5" fill="${st}">ad renders</text>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M53 57 L60 57"/>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M112 57 L119 57"/>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M171 57 L178 57"/>
+      <text x="8" y="90" font-size="7" fill="${mu}">OpenRTB spec: bid request (imp, site, user) → bid response (seatbid, price, adm)</text>
+      <text x="8" y="102" font-size="7" fill="${mu}">2nd price auction: winner pays 2nd-highest bid + $0.01</text>
+      <text x="8" y="114" font-size="7" fill="${mu}">1st price (now common): winner pays their own bid</text></svg>`,
+
+    "data-lake": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Data lake architecture</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Data Lake → Warehouse → Features</text>
+      <rect x="8" y="22" width="58" height="36" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="37" y="36" text-anchor="middle" font-size="7" font-weight="600" fill="${blD}">Raw Events</text>
+      <text x="37" y="48" text-anchor="middle" font-size="6.5" fill="${st}">S3 · GCS</text>
+      <rect x="74" y="22" width="58" height="36" rx="4" fill="${orF}" stroke="${or}" stroke-width="1.5"/>
+      <text x="103" y="36" text-anchor="middle" font-size="7" font-weight="600" fill="${or}">ETL</text>
+      <text x="103" y="48" text-anchor="middle" font-size="6.5" fill="${st}">Spark · Flink</text>
+      <rect x="140" y="22" width="58" height="36" rx="4" fill="${puF}" stroke="${pu}" stroke-width="1.5"/>
+      <text x="169" y="36" text-anchor="middle" font-size="7" font-weight="600" fill="${pu}">Warehouse</text>
+      <text x="169" y="48" text-anchor="middle" font-size="6.5" fill="${st}">Snowflake · BQ</text>
+      <rect x="206" y="22" width="48" height="36" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="230" y="36" text-anchor="middle" font-size="7" font-weight="600" fill="${gr}">Features</text>
+      <text x="230" y="48" text-anchor="middle" font-size="6.5" fill="${st}">Redis · Feast</text>
+      <line x1="66" y1="40" x2="72" y2="40" stroke="${bl}" stroke-width="1.5" marker-end="url(#a)"/>
+      <line x1="132" y1="40" x2="138" y2="40" stroke="${or}" stroke-width="1.5" marker-end="url(#a)"/>
+      <line x1="198" y1="40" x2="204" y2="40" stroke="${pu}" stroke-width="1.5" marker-end="url(#a)"/>
+      ${mk("a",bl)}
+      <text x="8" y="76" font-size="7" fill="${mu}">Data lake: raw, immutable Parquet/ORC files by date partition</text>
+      <text x="8" y="88" font-size="7" fill="${mu}">ETL runs hourly batch + real-time streaming (Kafka → Flink)</text>
+      <text x="8" y="100" font-size="7" fill="${mu}">Feature store: serves bid-time scores in &lt;5ms via Redis</text>
+      <text x="8" y="112" font-size="7" fill="${mu}">Scale: ad-tech generates 10s of TB/day in raw bid logs</text></svg>`,
+
+    "identity-graph": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Identity graph: linking user IDs</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Identity Graph: One Person, Many IDs</text>
+      <circle cx="130" cy="65" r="22" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="130" y="61" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">Person</text>
+      <text x="130" y="73" text-anchor="middle" font-size="7" fill="${pu}">RampID</text>
+      <circle cx="40" cy="40" r="18" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="40" y="37" text-anchor="middle" font-size="7" fill="${blD}">Cookie</text>
+      <text x="40" y="48" text-anchor="middle" font-size="6.5" fill="${bl}">3P dying</text>
+      <circle cx="220" cy="40" r="18" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="220" y="37" text-anchor="middle" font-size="7" fill="${blD}">Email</text>
+      <text x="220" y="48" text-anchor="middle" font-size="6.5" fill="${bl}">hashed SHA256</text>
+      <circle cx="40" cy="100" r="18" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="40" y="97" text-anchor="middle" font-size="7" fill="${blD}">IDFA</text>
+      <text x="40" y="108" text-anchor="middle" font-size="6.5" fill="${bl}">iOS device ID</text>
+      <circle cx="220" cy="100" r="18" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="220" y="97" text-anchor="middle" font-size="7" fill="${blD}">IP + UA</text>
+      <text x="220" y="108" text-anchor="middle" font-size="6.5" fill="${bl}">probabilistic</text>
+      <line x1="58" y1="48" x2="112" y2="58" stroke="${pu}" stroke-width="1.2"/>
+      <line x1="200" y1="48" x2="150" y2="56" stroke="${pu}" stroke-width="1.2"/>
+      <line x1="58" y1="94" x2="112" y2="74" stroke="${pu}" stroke-width="1.2"/>
+      <line x1="200" y1="94" x2="150" y2="76" stroke="${pu}" stroke-width="1.2"/>
+      <text x="8" y="132" font-size="7" fill="${mu}">Deterministic: same email on two devices = same person</text>
+      <text x="8" y="144" font-size="7" fill="${mu}">Probabilistic: shared IP + browser fingerprint = likely same</text></svg>`,
+
+    attribution: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Ad attribution models</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Attribution: Which Ad Gets Credit?</text>
+      <text x="8" y="28" font-size="7.5" fill="${st}" font-weight="600">Last-Click Model</text>
+      <rect x="8" y="33" width="30" height="16" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="23" y="44" text-anchor="middle" font-size="7" fill="${blD}">Display</text>
+      <rect x="44" y="33" width="30" height="16" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="59" y="44" text-anchor="middle" font-size="7" fill="${blD}">Social</text>
+      <rect x="80" y="33" width="30" height="16" rx="3" fill="#bae6fd" stroke="${bl}" stroke-width="2"/>
+      <text x="95" y="44" text-anchor="middle" font-size="7" font-weight="700" fill="${blD}">Search</text>
+      <text x="95" y="56" text-anchor="middle" font-size="7" fill="${bl}">100% credit</text>
+      <rect x="118" y="33" width="32" height="16" rx="3" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="134" y="44" text-anchor="middle" font-size="7" fill="${gr}">CONVERT</text>
+      <text x="8" y="70" font-size="7.5" fill="${st}" font-weight="600">MTA (Data-Driven) Model</text>
+      <rect x="8" y="75" width="30" height="16" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="23" y="86" text-anchor="middle" font-size="7" fill="${blD}">15%</text>
+      <rect x="44" y="75" width="30" height="16" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="59" y="86" text-anchor="middle" font-size="7" fill="${blD}">30%</text>
+      <rect x="80" y="75" width="30" height="16" rx="3" fill="#bae6fd" stroke="${bl}" stroke-width="2"/>
+      <text x="95" y="86" text-anchor="middle" font-size="7" font-weight="700" fill="${blD}">55%</text>
+      <rect x="118" y="75" width="32" height="16" rx="3" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="134" y="86" text-anchor="middle" font-size="7" fill="${gr}">CONVERT</text>
+      <text x="8" y="108" font-size="7" fill="${mu}">MTA uses Shapley values or logistic regression on full path</text>
+      <text x="8" y="120" font-size="7" fill="${mu}">MMM: econometric regression across channels + external factors</text>
+      <text x="8" y="132" font-size="7" fill="${mu}">Incrementality: A/B holdout group proves causal lift</text></svg>`,
+
+    "clean-room": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Clean room: privacy-safe data matching</title>
+      ${mk("a",pu)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">Clean Room: Join Data Without Sharing PII</text>
+      <rect x="8" y="22" width="72" height="50" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="44" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Advertiser</text>
+      <text x="44" y="50" text-anchor="middle" font-size="7" fill="${st}">CRM: emails</text>
+      <text x="44" y="62" text-anchor="middle" font-size="7" fill="${st}">purchase data</text>
+      <rect x="94" y="18" width="72" height="58" rx="5" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="130" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">Clean Room</text>
+      <text x="130" y="48" text-anchor="middle" font-size="7" fill="${st}">Snowflake · ADH</text>
+      <text x="130" y="60" text-anchor="middle" font-size="7" fill="${st}">AWS · InfoSum</text>
+      <text x="130" y="70" text-anchor="middle" font-size="7" fill="${pu}">no raw PII exits</text>
+      <rect x="180" y="22" width="72" height="50" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="216" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Publisher</text>
+      <text x="216" y="50" text-anchor="middle" font-size="7" fill="${st}">user IDs</text>
+      <text x="216" y="62" text-anchor="middle" font-size="7" fill="${st}">impression log</text>
+      <path stroke="${bl}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M80 47 L92 47"/>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M180 47 L168 47"/>
+      <text x="8" y="92" font-size="7" fill="${mu}">Output: aggregate overlap counts, reach, frequency — never raw rows</text>
+      <text x="8" y="104" font-size="7" fill="${mu}">Used for: audience overlap, attribution, campaign analysis</text>
+      <text x="8" y="116" font-size="7" fill="${mu}">Compliance: GDPR/CCPA safe — PII stays inside each party's env</text></svg>`,
+
+    currency: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>TV currency measurement</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">TV Currency: How Audiences Are Counted</text>
+      <rect x="8" y="22" width="72" height="46" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="44" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Nielsen</text>
+      <text x="44" y="50" text-anchor="middle" font-size="7" fill="${st}">30K HH panel</text>
+      <text x="44" y="62" text-anchor="middle" font-size="7" fill="${st}">C3 / C7 ratings</text>
+      <rect x="94" y="22" width="72" height="46" rx="5" fill="${orF}" stroke="${or}" stroke-width="1.5"/>
+      <text x="130" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${or}">VideoAmp</text>
+      <text x="130" y="50" text-anchor="middle" font-size="7" fill="${st}">STB + ACR</text>
+      <text x="130" y="62" text-anchor="middle" font-size="7" fill="${st}">millions of HH</text>
+      <rect x="180" y="22" width="72" height="46" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="216" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">iSpot.tv</text>
+      <text x="216" y="50" text-anchor="middle" font-size="7" fill="${st}">ACR + outcomes</text>
+      <text x="216" y="62" text-anchor="middle" font-size="7" fill="${st}">real-time verify</text>
+      <text x="8" y="84" font-size="7" fill="${mu}">C3 = live + 3-day DVR viewing; C7 = live + 7-day DVR viewing</text>
+      <text x="8" y="96" font-size="7" fill="${mu}">Currency = the agreed measurement standard used for TV deal pricing</text>
+      <text x="8" y="108" font-size="7" fill="${mu}">Networks sell GRPs (gross rating points) based on currency estimates</text>
+      <text x="8" y="120" font-size="7" fill="${mu}">~$20B in TV upfront deals use currency-based guarantees annually</text></svg>`,
+
+    upfronts: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>TV upfronts annual market</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">TV Upfronts: Annual Buying Commitments</text>
+      <rect x="8" y="22" width="58" height="42" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="37" y="38" text-anchor="middle" font-size="8" font-weight="700" fill="${blD}">May</text>
+      <text x="37" y="50" text-anchor="middle" font-size="7" fill="${st}">networks</text>
+      <text x="37" y="61" text-anchor="middle" font-size="7" fill="${st}">present shows</text>
+      <rect x="72" y="22" width="58" height="42" rx="4" fill="${puF}" stroke="${pu}" stroke-width="1.5"/>
+      <text x="101" y="38" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">June</text>
+      <text x="101" y="50" text-anchor="middle" font-size="7" fill="${st}">buyers negotiate</text>
+      <text x="101" y="61" text-anchor="middle" font-size="7" fill="${st}">CPM + volume</text>
+      <rect x="136" y="22" width="58" height="42" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="165" y="38" text-anchor="middle" font-size="8" font-weight="700" fill="${gr}">July</text>
+      <text x="165" y="50" text-anchor="middle" font-size="7" fill="${st}">deals close</text>
+      <text x="165" y="61" text-anchor="middle" font-size="7" fill="${st}">$20B+ committed</text>
+      <rect x="200" y="22" width="52" height="42" rx="4" fill="${orF}" stroke="${or}" stroke-width="1.5"/>
+      <text x="226" y="38" text-anchor="middle" font-size="8" font-weight="700" fill="${or}">Scatter</text>
+      <text x="226" y="50" text-anchor="middle" font-size="7" fill="${st}">remaining</text>
+      <text x="226" y="61" text-anchor="middle" font-size="7" fill="${st}">inventory sold</text>
+      <text x="8" y="80" font-size="7" fill="${mu}">Upfronts dominate TV but streaming is shifting buyers to programmatic</text>
+      <text x="8" y="92" font-size="7" fill="${mu}">Make-goods: networks deliver bonus impressions if ratings miss guarantees</text>
+      <text x="8" y="104" font-size="7" fill="${mu}">Digital upfronts (NewFronts) happen in parallel for streaming platforms</text></svg>`,
+
+    pixel: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Ad pixel tracking beacon</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Ad Pixel: 1×1 Invisible Tracking Beacon</text>
+      <rect x="8" y="22" width="70" height="50" rx="4" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="43" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${st}">Publisher</text>
+      <text x="43" y="50" text-anchor="middle" font-size="7" fill="${st}">Page renders</text>
+      <rect x="90" y="28" width="8" height="8" rx="1" fill="${bl}"/>
+      <text x="94" y="42" text-anchor="middle" font-size="7" fill="${bl}">1×1px</text>
+      <text x="94" y="52" text-anchor="middle" font-size="7" fill="${bl}">pixel fires</text>
+      <rect x="112" y="22" width="70" height="50" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="147" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Ad Server</text>
+      <text x="147" y="50" text-anchor="middle" font-size="7" fill="${st}">logs: user-id</text>
+      <text x="147" y="62" text-anchor="middle" font-size="7" fill="${st}">ts, IP, referer</text>
+      <rect x="196" y="22" width="56" height="50" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="224" y="38" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Pipeline</text>
+      <text x="224" y="50" text-anchor="middle" font-size="7" fill="${st}">Kafka → S3</text>
+      <text x="224" y="62" text-anchor="middle" font-size="7" fill="${st}">attribution</text>
+      <path stroke="${bl}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M78 47 L88 32"/>
+      <path stroke="${bl}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M99 47 L110 47"/>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M182 47 L194 47"/>
+      <text x="8" y="88" font-size="7" fill="${mu}">Impression pixel: fires when ad renders · Click pixel: fires on click</text>
+      <text x="8" y="100" font-size="7" fill="${mu}">Conversion pixel: fires on thank-you page, measures purchase</text>
+      <text x="8" y="112" font-size="7" fill="${mu}">Server-to-server (CAPI): avoids ITP/iOS blocking of browser pixels</text></svg>`,
+
+    vast: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>VAST: Video Ad Serving Template</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">VAST XML: Video Ad Delivery Contract</text>
+      <rect x="8" y="20" width="120" height="100" rx="5" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="16" y="33" font-size="7" fill="${pu}" font-weight="700">&lt;VAST version="4.2"&gt;</text>
+      <text x="20" y="44" font-size="7" fill="${st}">&lt;Ad&gt;&lt;InLine&gt;</text>
+      <text x="24" y="55" font-size="7" fill="${bl}">&lt;MediaFile&gt;</text>
+      <text x="28" y="64" font-size="6.5" fill="${or}">mp4 URL here</text>
+      <text x="24" y="74" font-size="7" fill="${bl}">&lt;Impression&gt;</text>
+      <text x="28" y="83" font-size="6.5" fill="${or}">pixel URL</text>
+      <text x="24" y="93" font-size="7" fill="${bl}">&lt;Tracking&gt;</text>
+      <text x="28" y="102" font-size="6.5" fill="${or}">start/Q1/Q2/Q3/complete</text>
+      <text x="16" y="113" font-size="7" fill="${pu}" font-weight="700">&lt;/VAST&gt;</text>
+      <rect x="140" y="28" width="112" height="30" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="196" y="42" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Video Player</text>
+      <text x="196" y="54" text-anchor="middle" font-size="7" fill="${st}">IMA SDK parses VAST</text>
+      <rect x="140" y="68" width="112" height="24" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="196" y="78" text-anchor="middle" font-size="7" fill="${gr}">Quartile beacons fire:</text>
+      <text x="196" y="89" text-anchor="middle" font-size="7" fill="${gr}">0% 25% 50% 75% 100%</text>
+      <text x="8" y="135" font-size="7" fill="${mu}">VAST 4.2 adds: SIMID, universal ad ID, viewability</text>
+      <text x="8" y="147" font-size="7" fill="${mu}">VMAP: playlist of multiple VAST ads for ad pods</text></svg>`,
+
+    "header-bidding": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Header bidding parallel auctions</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Header Bidding: Parallel vs Waterfall</text>
+      <rect x="82" y="20" width="96" height="26" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="130" y="30" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Publisher (Prebid.js)</text>
+      <text x="130" y="41" text-anchor="middle" font-size="7" fill="${st}">calls all SSPs simultaneously</text>
+      <path stroke="${bl}" stroke-width="1.2" fill="none" d="M130 46 L50 70"/>
+      <path stroke="${bl}" stroke-width="1.2" fill="none" d="M130 46 L130 70"/>
+      <path stroke="${bl}" stroke-width="1.2" fill="none" d="M130 46 L210 70"/>
+      <rect x="16" y="70" width="68" height="34" rx="4" fill="#f0fdf4" stroke="${gr}" stroke-width="1.5"/>
+      <text x="50" y="83" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Magnite</text>
+      <text x="50" y="95" text-anchor="middle" font-size="7" fill="${st}">bid: $7.10 ✓</text>
+      <rect x="96" y="70" width="68" height="34" rx="4" fill="#f0fdf4" stroke="${gr}" stroke-width="1.5"/>
+      <text x="130" y="83" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">PubMatic</text>
+      <text x="130" y="95" text-anchor="middle" font-size="7" fill="${st}">bid: $6.20</text>
+      <rect x="176" y="70" width="68" height="34" rx="4" fill="#f0fdf4" stroke="${gr}" stroke-width="1.5"/>
+      <text x="210" y="83" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Index Exch</text>
+      <text x="210" y="95" text-anchor="middle" font-size="7" fill="${st}">bid: $5.80</text>
+      <text x="8" y="120" font-size="7" fill="${mu}">All bids collected in ~200ms → highest sent to GAM as key-value</text>
+      <text x="8" y="132" font-size="7" fill="${mu}">vs. Waterfall: SSPs called one by one (slow, lower yield)</text>
+      <text x="8" y="144" font-size="7" fill="${mu}">Server-side header bidding (SSHB): Prebid Server runs in cloud</text></svg>`,
+
+    creative: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Ad creative formats</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Ad Creative Formats</text>
+      <rect x="8" y="20" width="72" height="46" rx="4" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="44" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Banner</text>
+      <text x="44" y="48" text-anchor="middle" font-size="7" fill="${st}">300×250 HTML5</text>
+      <text x="44" y="59" text-anchor="middle" font-size="7" fill="${st}">IAB standard</text>
+      <rect x="88" y="20" width="72" height="46" rx="4" fill="${puF}" stroke="${pu}" stroke-width="1.5"/>
+      <path fill="${pu}" d="M116 36 L116 52 L130 44 Z"/>
+      <text x="145" y="44" text-anchor="middle" font-size="8" font-weight="600" fill="${pu}">Video</text>
+      <text x="145" y="56" text-anchor="middle" font-size="7" fill="${st}">VAST/VPAID</text>
+      <rect x="168" y="20" width="84" height="46" rx="4" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="210" y="35" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Native</text>
+      <text x="210" y="47" text-anchor="middle" font-size="7" fill="${st}">headline + img</text>
+      <text x="210" y="58" text-anchor="middle" font-size="7" fill="${st}">matches feed UI</text>
+      <text x="8" y="82" font-size="7" fill="${mu}">DCO = Dynamic Creative Optimization: real-time personalized assembly</text>
+      <text x="8" y="94" font-size="7" fill="${mu}">Rich media: expandable, interactive, 360° video, HTML5 animated</text>
+      <text x="8" y="106" font-size="7" fill="${mu}">Creative specs: size (px), file weight (KB), format (HTML/mp4)</text>
+      <text x="8" y="118" font-size="7" fill="${mu}">Creative audit: Google, Meta review for policy before serving</text></svg>`,
+
+    cpm: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>CPM cost per mille pricing</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">CPM &amp; Related Pricing Models</text>
+      <rect x="8" y="22" width="56" height="50" rx="5" fill="${blF}" stroke="${bl}" stroke-width="2"/>
+      <text x="36" y="42" text-anchor="middle" font-size="14" font-weight="700" fill="${bl}">CPM</text>
+      <text x="36" y="56" text-anchor="middle" font-size="7" fill="${st}">per 1,000 imps</text>
+      <text x="36" y="66" text-anchor="middle" font-size="7" fill="${bl}">$5–$50 typical</text>
+      <rect x="72" y="22" width="56" height="50" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="100" y="42" text-anchor="middle" font-size="14" font-weight="700" fill="${gr}">CPC</text>
+      <text x="100" y="56" text-anchor="middle" font-size="7" fill="${st}">per click</text>
+      <text x="100" y="66" text-anchor="middle" font-size="7" fill="${gr}">$0.10–$10</text>
+      <rect x="136" y="22" width="56" height="50" rx="5" fill="${orF}" stroke="${or}" stroke-width="1.5"/>
+      <text x="164" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="${or}">CPA</text>
+      <text x="164" y="56" text-anchor="middle" font-size="7" fill="${st}">per action</text>
+      <text x="164" y="66" text-anchor="middle" font-size="7" fill="${or}">conversion</text>
+      <rect x="200" y="22" width="52" height="50" rx="5" fill="${puF}" stroke="${pu}" stroke-width="1.5"/>
+      <text x="226" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="${pu}">CPV</text>
+      <text x="226" y="56" text-anchor="middle" font-size="7" fill="${st}">per view</text>
+      <text x="226" y="66" text-anchor="middle" font-size="7" fill="${pu}">video only</text>
+      <text x="8" y="90" font-size="7" fill="${mu}">CPM formula: (Total Cost ÷ Impressions) × 1,000</text>
+      <text x="8" y="102" font-size="7" fill="${mu}">eCPM: effective CPM, normalizes CPC/CPA to compare</text>
+      <text x="8" y="114" font-size="7" fill="${mu}">Display: $2–8 CPM · Video: $10–30 · CTV: $25–60 · Search: CPC</text></svg>`,
+
+    "open-rtb": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>OpenRTB protocol</title>
+      ${mk("a",pu)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">OpenRTB: The Bid Request/Response Contract</text>
+      <rect x="8" y="20" width="110" height="100" rx="5" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="63" y="33" text-anchor="middle" font-size="7" fill="${pu}" font-weight="700">BidRequest JSON</text>
+      <text x="14" y="45" font-size="6.5" fill="${st}">"id": "abc123"</text>
+      <text x="14" y="56" font-size="6.5" fill="${bl}">"imp": [{banner: {w,h}}</text>
+      <text x="14" y="67" font-size="6.5" fill="${bl}">"site": {domain, cat}</text>
+      <text x="14" y="78" font-size="6.5" fill="${gr}">"user": {id, buyeruid}</text>
+      <text x="14" y="89" font-size="6.5" fill="${or}">"device": {ua, ip, geo}</text>
+      <text x="14" y="100" font-size="6.5" fill="${rd}">"regs": {gdpr, us_privacy}</text>
+      <text x="14" y="111" font-size="6.5" fill="${st}">"tmax": 100 (ms)</text>
+      <rect x="142" y="20" width="110" height="100" rx="5" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="197" y="33" text-anchor="middle" font-size="7" fill="${pu}" font-weight="700">BidResponse JSON</text>
+      <text x="148" y="45" font-size="6.5" fill="${st}">"id": "abc123"</text>
+      <text x="148" y="56" font-size="6.5" fill="${bl}">"seatbid": [{</text>
+      <text x="152" y="67" font-size="6.5" fill="${bl}">"bid": {price: 8.40</text>
+      <text x="152" y="78" font-size="6.5" fill="${gr}">"adm": "&lt;html&gt;..."</text>
+      <text x="152" y="89" font-size="6.5" fill="${gr}">"nurl": "win.pixel"</text>
+      <text x="148" y="100" font-size="6.5" fill="${st}">}]</text>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M118 55 L140 55"/>
+      <text x="129" y="50" text-anchor="middle" font-size="6.5" fill="${pu}">→</text>
+      <path stroke="${pu}" stroke-width="1.2" fill="none" d="M140 80 L118 80"/>
+      <text x="129" y="75" text-anchor="middle" font-size="6.5" fill="${pu}">←</text>
+      <text x="8" y="135" font-size="7" fill="${mu}">IAB Tech Lab maintains the OpenRTB spec (currently v2.6 + v3.0)</text>
+      <text x="8" y="147" font-size="7" fill="${mu}">Timeout: exchanges wait ~80–100ms for DSP responses</text></svg>`,
+
+    pmp: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Private Marketplace deal types</title>
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">PMP vs Open Auction vs PG</text>
+      <rect x="8" y="20" width="74" height="70" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="45" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Open</text>
+      <text x="45" y="47" text-anchor="middle" font-size="7.5" font-weight="600" fill="${blD}">Auction</text>
+      <text x="45" y="60" text-anchor="middle" font-size="7" fill="${st}">100+ DSPs</text>
+      <text x="45" y="71" text-anchor="middle" font-size="7" fill="${st}">compete openly</text>
+      <text x="45" y="82" text-anchor="middle" font-size="7" fill="${st}">lowest CPMs</text>
+      <rect x="90" y="20" width="74" height="70" rx="5" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="127" y="36" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">PMP</text>
+      <text x="127" y="47" text-anchor="middle" font-size="7" fill="${st}">invite-only</text>
+      <text x="127" y="58" text-anchor="middle" font-size="7" fill="${st}">deal ID: 3839</text>
+      <text x="127" y="70" text-anchor="middle" font-size="7" fill="${st}">floor + priority</text>
+      <text x="127" y="82" text-anchor="middle" font-size="7" fill="${st}">mid-range CPM</text>
+      <rect x="172" y="20" width="80" height="70" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="212" y="36" text-anchor="middle" font-size="7.5" font-weight="700" fill="${gr}">Programmatic</text>
+      <text x="212" y="47" text-anchor="middle" font-size="7.5" font-weight="700" fill="${gr}">Guaranteed</text>
+      <text x="212" y="60" text-anchor="middle" font-size="7" fill="${st}">fixed price + vol</text>
+      <text x="212" y="71" text-anchor="middle" font-size="7" fill="${st}">guaranteed</text>
+      <text x="212" y="82" text-anchor="middle" font-size="7" fill="${st}">delivery</text>
+      <text x="8" y="106" font-size="7" fill="${mu}">PMP: publisher sends deal_id in bid request; DSP bids using it</text>
+      <text x="8" y="118" font-size="7" fill="${mu}">PG: no auction — fixed CPM × impression commitment, auto-delivered</text>
+      <text x="8" y="130" font-size="7" fill="${mu}">Preferred deal: fixed price but non-guaranteed volume</text></svg>`,
+
+    dco: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Dynamic Creative Optimization</title>
+      ${mk("a",pu)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">DCO: Assemble Ads From Components</text>
+      <rect x="8" y="20" width="72" height="76" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="44" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Components</text>
+      <text x="44" y="49" text-anchor="middle" font-size="7" fill="${st}">headline variants</text>
+      <text x="44" y="60" text-anchor="middle" font-size="7" fill="${st}">product images</text>
+      <text x="44" y="71" text-anchor="middle" font-size="7" fill="${st}">CTA buttons</text>
+      <text x="44" y="82" text-anchor="middle" font-size="7" fill="${st}">price feed</text>
+      <text x="44" y="93" text-anchor="middle" font-size="7" fill="${st}">audience signal</text>
+      <rect x="94" y="26" width="66" height="34" rx="4" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="127" y="39" text-anchor="middle" font-size="8" font-weight="700" fill="${pu}">DCO Engine</text>
+      <text x="127" y="51" text-anchor="middle" font-size="7" fill="${pu}">picks best combo</text>
+      <rect x="94" y="68" width="66" height="22" rx="4" fill="${orF}" stroke="${or}" stroke-width="1"/>
+      <text x="127" y="80" text-anchor="middle" font-size="7" fill="${or}">User: in-market</text>
+      <text x="127" y="90" text-anchor="middle" font-size="7" fill="${or}">for running shoes</text>
+      <rect x="174" y="20" width="78" height="76" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="213" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Final Ad</text>
+      <text x="213" y="49" text-anchor="middle" font-size="7" fill="${st}">"Nike Air Max"</text>
+      <text x="213" y="60" text-anchor="middle" font-size="7" fill="${st}">shoe image</text>
+      <text x="213" y="71" text-anchor="middle" font-size="7" fill="${st}">"Shop Now $129"</text>
+      <text x="213" y="83" text-anchor="middle" font-size="7" fill="${st}">personalized</text>
+      <text x="213" y="94" text-anchor="middle" font-size="7" fill="${st}">at render time</text>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M80 56 L92 44"/>
+      <path stroke="${pu}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M160 44 L172 38"/>
+      <text x="8" y="112" font-size="7" fill="${mu}">Used for: DPA (Dynamic Product Ads), retargeting, travel pricing</text>
+      <text x="8" y="124" font-size="7" fill="${mu}">Creative served at bid time by creative management platform (CMP)</text></svg>`,
+
+    "brand-safety": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Brand safety protection</title>
+      <text x="8" y="14" font-size="9" fill="${gr}" font-weight="700">Brand Safety: Protect Advertiser Reputation</text>
+      <rect x="8" y="20" width="110" height="90" rx="5" fill="${rdF}" stroke="${rd}" stroke-width="1.5"/>
+      <text x="63" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${rd}">Unsafe Content</text>
+      <text x="63" y="50" text-anchor="middle" font-size="7" fill="${rd}">Adult / explicit</text>
+      <text x="63" y="62" text-anchor="middle" font-size="7" fill="${rd}">Violence / weapons</text>
+      <text x="63" y="74" text-anchor="middle" font-size="7" fill="${rd}">Hate speech</text>
+      <text x="63" y="86" text-anchor="middle" font-size="7" fill="${rd}">Fake news / misinf.</text>
+      <text x="63" y="103" text-anchor="middle" font-size="7" fill="${mu}">BLOCKED by IAS/DV</text>
+      <rect x="136" y="20" width="116" height="90" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="194" y="36" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Safe Content</text>
+      <text x="194" y="50" text-anchor="middle" font-size="7" fill="${gr}">News (non-sensitive)</text>
+      <text x="194" y="62" text-anchor="middle" font-size="7" fill="${gr}">Sports / entertainment</text>
+      <text x="194" y="74" text-anchor="middle" font-size="7" fill="${gr}">Lifestyle / cooking</text>
+      <text x="194" y="86" text-anchor="middle" font-size="7" fill="${gr}">Technology content</text>
+      <text x="194" y="103" text-anchor="middle" font-size="7" fill="${mu}">APPROVED to serve</text>
+      <text x="8" y="124" font-size="7" fill="${mu}">GARM (Global Alliance for Responsible Media): industry standard tiers</text>
+      <text x="8" y="136" font-size="7" fill="${mu}">Pre-bid: block before auction · Post-bid: audit after serving</text>
+      <text x="8" y="148" font-size="7" fill="${mu}">Vendors: IAS · DoubleVerify · Oracle Moat · Integral Ad Science</text></svg>`,
+
+    viewability: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Ad viewability standards</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Viewability: MRC Standard</text>
+      <rect x="8" y="20" width="244" height="80" rx="5" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="130" y="35" text-anchor="middle" font-size="8" fill="${st}">Browser Viewport</text>
+      <rect x="20" y="40" width="100" height="50" rx="4" fill="${blF}" stroke="${bl}" stroke-width="2"/>
+      <text x="70" y="55" text-anchor="middle" font-size="8" font-weight="700" fill="${blD}">Display Ad</text>
+      <text x="70" y="67" text-anchor="middle" font-size="7" fill="${bl}">✓ 50% pixels</text>
+      <text x="70" y="79" text-anchor="middle" font-size="7" fill="${bl}">✓ ≥ 1 second</text>
+      <rect x="140" y="52" width="98" height="38" rx="4" fill="#fef3c7" stroke="${or}" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <text x="189" y="67" text-anchor="middle" font-size="7.5" fill="${or}">Below the fold</text>
+      <text x="189" y="79" text-anchor="middle" font-size="7" fill="${or}">not yet viewable</text>
+      <text x="8" y="118" font-size="7" fill="${mu}">Display MRC: 50% pixels visible for ≥1 continuous second</text>
+      <text x="8" y="130" font-size="7" fill="${mu}">Video MRC: 50% pixels visible for ≥2 continuous seconds</text>
+      <text x="8" y="142" font-size="7" fill="${mu}">Measured by: IAS, DoubleVerify, Moat (OM SDK integration)</text>
+      <text x="8" y="154" font-size="7" fill="${mu}">Avg display viewability ~55%; video ~70%; CTV ~95%+</text></svg>`,
+
+    ctv: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Connected TV advertising</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">CTV: Connected Television Ecosystem</text>
+      <rect x="60" y="20" width="140" height="80" rx="8" fill="${blF}" stroke="${bl}" stroke-width="2"/>
+      <rect x="70" y="28" width="120" height="62" rx="4" fill="#0f172a"/>
+      <text x="130" y="55" text-anchor="middle" font-size="9" font-weight="700" fill="white">Streaming App</text>
+      <text x="130" y="68" text-anchor="middle" font-size="7" fill="#94a3b8">Hulu · Peacock · Paramount+</text>
+      <rect x="108" y="102" width="44" height="8" rx="2" fill="${bl}"/>
+      <text x="8" y="126" font-size="7" fill="${mu}">Devices: Roku · Fire TV · Apple TV · Samsung Smart TV · LG</text>
+      <text x="8" y="138" font-size="7" fill="${mu}">Ad targeting: IP, household demo, ACR viewing history</text>
+      <text x="8" y="150" font-size="7" fill="${mu}">No click: CPM-based, brand awareness + reach campaigns</text></svg>`,
+
+    ssai: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Server-side ad insertion</title>
+      ${mk("a",pu)}
+      <text x="8" y="14" font-size="9" fill="${pu}" font-weight="700">SSAI vs CSAI: How Video Ads Are Stitched</text>
+      <text x="8" y="28" font-size="7.5" fill="${bl}" font-weight="600">Client-Side (CSAI) — old way</text>
+      <rect x="8" y="34" width="55" height="26" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="35" y="50" text-anchor="middle" font-size="7" fill="${bl}">Content</text>
+      <rect x="70" y="34" width="55" height="26" rx="3" fill="${rdF}" stroke="${rd}" stroke-width="1"/>
+      <text x="97" y="50" text-anchor="middle" font-size="7" fill="${rd}">Ad URL fetch</text>
+      <text x="97" y="58" text-anchor="middle" font-size="6.5" fill="${mu}">buffering gap!</text>
+      <rect x="132" y="34" width="55" height="26" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="159" y="50" text-anchor="middle" font-size="7" fill="${bl}">Content</text>
+      <text x="8" y="74" font-size="7.5" fill="${gr}" font-weight="600">Server-Side (SSAI) — modern way</text>
+      <rect x="8" y="80" width="55" height="26" rx="3" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="35" y="96" text-anchor="middle" font-size="7" fill="${gr}">Content</text>
+      <rect x="70" y="80" width="55" height="26" rx="3" fill="${grF}" stroke="${gr}" stroke-width="2"/>
+      <text x="97" y="93" text-anchor="middle" font-size="7" font-weight="600" fill="${gr}">SSAI</text>
+      <text x="97" y="104" text-anchor="middle" font-size="6.5" fill="${gr}">pre-stitched</text>
+      <rect x="132" y="80" width="55" height="26" rx="3" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="159" y="96" text-anchor="middle" font-size="7" fill="${gr}">Content</text>
+      <text x="8" y="120" font-size="7" fill="${mu}">SSAI fetches ad media server-side, re-encodes to match content bitrate</text>
+      <text x="8" y="132" font-size="7" fill="${mu}">Produces stitched HLS/DASH manifest: player never knows it's an ad</text>
+      <text x="8" y="144" font-size="7" fill="${mu}">Vendors: Yospace · Verizon (Yahoo) · AWS Elemental MediaTailor</text></svg>`,
+
+    "frequency-cap": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Frequency capping</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Frequency Cap: Limit Ad Repetition</text>
+      <rect x="8" y="22" width="244" height="60" rx="5" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="14" y="36" font-size="7" fill="${st}" font-weight="600">User journey (cap: 3 per day)</text>
+      <rect x="14" y="42" width="40" height="24" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="34" y="57" text-anchor="middle" font-size="8" fill="${bl}">Ad #1 ✓</text>
+      <rect x="62" y="42" width="40" height="24" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="82" y="57" text-anchor="middle" font-size="8" fill="${bl}">Ad #2 ✓</text>
+      <rect x="110" y="42" width="40" height="24" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="130" y="57" text-anchor="middle" font-size="8" fill="${bl}">Ad #3 ✓</text>
+      <rect x="158" y="42" width="40" height="24" rx="3" fill="${rdF}" stroke="${rd}" stroke-width="1.5"/>
+      <text x="178" y="54" text-anchor="middle" font-size="7" font-weight="700" fill="${rd}">BLOCKED</text>
+      <text x="178" y="64" text-anchor="middle" font-size="6.5" fill="${rd}">cap reached</text>
+      <rect x="206" y="42" width="40" height="24" rx="3" fill="${rdF}" stroke="${rd}" stroke-width="1.5"/>
+      <text x="226" y="54" text-anchor="middle" font-size="7" font-weight="700" fill="${rd}">BLOCKED</text>
+      <text x="226" y="64" text-anchor="middle" font-size="6.5" fill="${rd}">cap reached</text>
+      <text x="8" y="100" font-size="7" fill="${mu}">Stored in: DSP bid logic, cookie, device ID lookup, identity service</text>
+      <text x="8" y="112" font-size="7" fill="${mu}">Without caps: users see same ad 50+ times → brand damage</text>
+      <text x="8" y="124" font-size="7" fill="${mu}">Cross-device capping needs identity graph to link phone + desktop</text>
+      <text x="8" y="136" font-size="7" fill="${mu}">CTV caps enforced server-side (no cookies) via IP + device ID</text></svg>`,
+
+    "programmatic-guaranteed": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Programmatic guaranteed deal</title>
+      ${mk("a",gr)}
+      <text x="8" y="14" font-size="9" fill="${gr}" font-weight="700">Programmatic Guaranteed: Direct Deal, Auto-Delivery</text>
+      <rect x="8" y="22" width="90" height="60" rx="5" fill="${blF}" stroke="${bl}" stroke-width="1.5"/>
+      <text x="53" y="40" text-anchor="middle" font-size="8" font-weight="600" fill="${blD}">Advertiser</text>
+      <text x="53" y="53" text-anchor="middle" font-size="7" fill="${st}">commits: 1M imps</text>
+      <text x="53" y="65" text-anchor="middle" font-size="7" fill="${st}">@ $25 CPM fixed</text>
+      <rect x="110" y="22" width="40" height="60" rx="4" fill="${grF}" stroke="${gr}" stroke-width="2"/>
+      <text x="130" y="46" text-anchor="middle" font-size="8" font-weight="700" fill="${gr}">Deal</text>
+      <text x="130" y="58" text-anchor="middle" font-size="7" fill="${gr}">auto</text>
+      <text x="130" y="70" text-anchor="middle" font-size="7" fill="${gr}">execute</text>
+      <rect x="162" y="22" width="90" height="60" rx="5" fill="${grF}" stroke="${gr}" stroke-width="1.5"/>
+      <text x="207" y="40" text-anchor="middle" font-size="8" font-weight="600" fill="${gr}">Publisher</text>
+      <text x="207" y="53" text-anchor="middle" font-size="7" fill="${st}">holds: 1M imps</text>
+      <text x="207" y="65" text-anchor="middle" font-size="7" fill="${st}">guaranteed deliv.</text>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M98 52 L108 52"/>
+      <path stroke="${gr}" stroke-width="1.5" fill="none" marker-end="url(#a)" d="M150 52 L160 52"/>
+      <text x="8" y="98" font-size="7" fill="${mu}">PG vs PMP: PG guarantees volume; PMP does not</text>
+      <text x="8" y="110" font-size="7" fill="${mu}">Pricing: fixed CPM negotiated offline, deal ID in bid stream</text>
+      <text x="8" y="122" font-size="7" fill="${mu}">Use case: brand campaigns needing reach + premium placement</text>
+      <text x="8" y="134" font-size="7" fill="${mu}">No auction: DSP auto-wins if targeting matches &amp; cap allows</text></svg>`,
+
+    "quality-score": `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Google Quality Score</title>
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Quality Score: Google Search Ad Ranking</text>
+      <circle cx="50" cy="72" r="42" fill="${puF}" stroke="${pu}" stroke-width="2"/>
+      <text x="50" y="66" text-anchor="middle" font-size="28" font-weight="700" fill="${pu}">7</text>
+      <text x="50" y="82" text-anchor="middle" font-size="8" fill="${pu}">out of 10</text>
+      <text x="100" y="36" font-size="8" font-weight="700" fill="${st}">3 Components:</text>
+      <rect x="100" y="42" width="152" height="18" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="106" y="54" font-size="7" fill="${blD}" font-weight="600">1. Expected CTR</text>
+      <text x="200" y="54" font-size="7" fill="${st}">historical click rate</text>
+      <rect x="100" y="64" width="152" height="18" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="106" y="76" font-size="7" fill="${blD}" font-weight="600">2. Ad Relevance</text>
+      <text x="200" y="76" font-size="7" fill="${st}">keyword match</text>
+      <rect x="100" y="86" width="152" height="18" rx="3" fill="${blF}" stroke="${bl}" stroke-width="1"/>
+      <text x="106" y="98" font-size="7" fill="${blD}" font-weight="600">3. Landing Page Exp</text>
+      <text x="200" y="98" font-size="7" fill="${st}">relevance + speed</text>
+      <text x="8" y="126" font-size="7" fill="${mu}">Ad Rank = Max CPC bid × QS × auction-time factors + ad extensions</text>
+      <text x="8" y="138" font-size="7" fill="${mu}">High QS = lower actual CPC charged (auction mechanics)</text>
+      <text x="8" y="150" font-size="7" fill="${mu}">Scale: 1–10 (shown in Google Ads UI per keyword/ad combo)</text></svg>`,
   };
   return svgs[id] || svgs.yield;
 };
