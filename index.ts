@@ -727,6 +727,87 @@ function linkTerms(html: string): string {
   return processed.join("");
 }
 
+// ── Satirical top banners ──────────────────────────────────────────────────
+
+const funnyBanners = [
+  {
+    headline: "Your Attention Is Worth $0.0047 Per Impression",
+    sub: "But combined with 312 million others, we're doing quite well. Thanks for your service.",
+    cta: "Keep Scrolling",
+    brand: "ProgrammaticYou™",
+  },
+  {
+    headline: "This Ad Slot Was Auctioned in 47ms While You Blinked",
+    sub: "You had no say in this. Neither did the publisher, really. Welcome to RTB.",
+    cta: "Accept Fate",
+    brand: "OpenRTB Corp.",
+  },
+  {
+    headline: "We Know You're Thinking About Kayaks",
+    sub: "We're not saying how. We're just saying. The kayak knows.",
+    cta: "Buy The Kayak",
+    brand: "RetargetingMaster™",
+  },
+  {
+    headline: "Congratulations! You're in the 'Likely Purchaser' Segment",
+    sub: "Don't fight it. Our third-party data has 94% confidence. The other 6% is also you.",
+    cta: "Resistance Is Futile",
+    brand: "AudienceFactory™",
+  },
+  {
+    headline: "Third-Party Cookie Reporting for Duty 🍪",
+    sub: "Expiring soon in Chrome. Buying memories of you while we still can.",
+    cta: "Farewell, Old Friend",
+    brand: "CookieDeprecation.io",
+  },
+  {
+    headline: "Your CPM Is $4.20 Today — A New Personal Best",
+    sub: "Premium context. High viewability. Someone paid real money to show you this right now.",
+    cta: "Feel Valued",
+    brand: "YieldMax Pro",
+  },
+  {
+    headline: "Brand Safe! Verified by 3 Different Vendors Simultaneously",
+    sub: "This content has been declared 100% suitable for your breakfast cereal campaign.",
+    cta: "IAS & DV Approved ✓",
+    brand: "DoubleVerified LLC",
+  },
+  {
+    headline: "Frequency Cap Reached: This Is Your 4th Impression Today",
+    sub: "Technically we should stop. But the campaign has leftover budget. One more can't hurt.",
+    cta: "Please. Just. Click.",
+    brand: "FrequencyIgnore™",
+  },
+  {
+    headline: "You Have Been Placed in 847 Audience Segments Since Breakfast",
+    sub: "In-market for cars, possibly moving, moderate income, and apparently afraid of spiders.",
+    cta: "See My Dossier",
+    brand: "DataBroker™ Premier",
+  },
+  {
+    headline: "This Ad Was Dynamically Optimized Just For You",
+    sub: "Out of 32 possible creative variants, our ML chose this one. You're welcome, apparently.",
+    cta: "Blame The Algorithm",
+    brand: "DCO Unlimited™",
+  },
+];
+
+const renderTopBanner = (): string => {
+  const b = funnyBanners[Math.floor(Math.random() * funnyBanners.length)]!;
+  return `<div class='top-banner'>
+  <span class='top-banner-ad-label'>Ad</span>
+  <div class='top-banner-content'>
+    <div class='top-banner-headline'>${b.headline}</div>
+    <div class='top-banner-sub'>${b.sub}</div>
+  </div>
+  <div class='top-banner-right'>
+    <span class='top-banner-brand'>${b.brand}</span>
+    <a class='top-banner-cta' href='#' onclick='return false;'>${b.cta}</a>
+    <a class='top-banner-why' href='/topic/buy-side'>Why this ad?</a>
+  </div>
+</div>`;
+};
+
 const baseStyles = `
   :root {
     --bg: #050816;
@@ -1577,6 +1658,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     "</head>",
     "<body>",
     "  <div class='app-shell'>",
+    renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>Concept Overview</h2>",
@@ -1647,6 +1729,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "</head>",
     "<body>",
     "  <div class='app-shell'>",
+    renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>What you see &amp; why</h2>",
@@ -1769,9 +1852,75 @@ const homeStyles = `
     margin-bottom: var(--space-xs);
   }
 
+  /* ── Funny top banner ── */
+  .top-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+  }
+  .top-banner-ad-label {
+    flex-shrink: 0;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+  }
+  .top-banner-content { flex: 1; min-width: 0; }
+  .top-banner-headline {
+    font-weight: 700;
+    color: #92400e;
+    font-size: 0.78rem;
+    line-height: 1.3;
+  }
+  .top-banner-sub {
+    color: #b45309;
+    font-size: 0.7rem;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .top-banner-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .top-banner-brand {
+    font-size: 0.65rem;
+    color: #b45309;
+    font-style: italic;
+  }
+  .top-banner-cta {
+    background: #f59e0b;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .top-banner-cta:hover { background: #d97706; }
+  .top-banner-why {
+    font-size: 0.65rem;
+    color: #92400e;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
+
   .phone {
     width: 100%;
-    max-width: min(600px, 100%);
+    max-width: min(420px, 100vw - 32px);
     background: var(--card);
     border-radius: 26px;
     border: 1px solid var(--border-subtle);
@@ -1793,7 +1942,7 @@ const homeStyles = `
   }
 
   .phone-header-icon {
-    width: 28px;
+    min-width: 28px;
     height: 28px;
     border-radius: 999px;
     border: 1px solid var(--border-subtle);
@@ -1802,6 +1951,25 @@ const homeStyles = `
     justify-content: center;
     color: var(--text-soft);
     font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .menu-btn-wide {
+    padding: 0 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    gap: 4px;
+    background: #f0f9ff;
+    border-color: #bae6fd;
+    color: #0284c7;
+  }
+  .menu-btn-wide:hover { background: #e0f2fe; }
+
+  @media (min-width: 900px) {
+    .phone { max-width: min(600px, 100%); }
+    .app-shell { padding: 0 var(--space-md); }
+  }
+  @media (min-width: 1280px) {
+    .phone { max-width: 100%; }
   }
 
   .phone-body {
@@ -1853,33 +2021,37 @@ const homeStyles = `
     flex-wrap: wrap;
   }
 
+  /* Navigation pills — go to a new page */
   .ecosystem-pill {
-    flex: 1 1 0;
-    min-width: 0;
-    border-radius: 999px;
+    flex: 0 0 auto;
+    border-radius: 8px;
     border: 1px solid var(--border-subtle);
-    padding: 6px 8px;
-    font-size: 0.78rem;
-    color: var(--text-main);
-    background: #f9fafb;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    background: #f3f4f6;
     text-align: center;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 4px;
+    cursor: default;
+    pointer-events: none;
   }
 
-  .ecosystem-pill span {
-    white-space: nowrap;
-  }
+  .ecosystem-pill span { white-space: nowrap; }
 
+  /* Primary nav pill — the actual clickable destination */
   .ecosystem-pill-primary {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    color: #1d4ed8;
-    font-weight: 600;
+    background: #0284c7;
+    border-color: #0284c7;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 8px;
+    pointer-events: auto;
+    cursor: pointer;
   }
+  .ecosystem-pill-primary:hover { background: #0369a1; border-color: #0369a1; }
 
   .ecosystem-section-label {
     font-size: 0.8rem;
@@ -2113,30 +2285,49 @@ const homeStyles = `
     text-decoration: none;
   }
 
+  /* Filter tabs — stay on same page, change view */
   .example-tabs {
     display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: 0;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f4f4f5;
+  }
+  .example-tabs::before {
+    content: "View:";
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid var(--border-subtle);
+    white-space: nowrap;
   }
 
   .example-tab {
     flex: 1 1 auto;
     min-width: max-content;
-    border-radius: 999px;
-    border: 1px solid var(--border-subtle);
-    padding: 4px 8px;
-    font-size: 0.74rem;
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--border-subtle);
+    padding: 5px 9px;
+    font-size: 0.73rem;
     color: var(--text-soft);
-    background: #f4f4f5;
+    background: transparent;
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
   }
+  .example-tab:last-child { border-right: none; }
 
   .example-tab.active {
-    border-color: #bfdbfe;
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: #0284c7;
+    color: #fff;
     font-weight: 600;
   }
 
@@ -5214,6 +5405,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "</head>",
     "<body>",
     "  <div class='app-shell'>",
+    renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>Glossary</h2>",
@@ -5470,12 +5662,13 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     "</head>",
     "<body>",
     "  <div class='app-shell'>",
+    renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>Ecosystem Overview</h2>",
     "        <article class='phone phone-ecosystem' aria-label='Ad tech ecosystem map'>",
     "          <header class='phone-header'>",
-    "            <button class='phone-header-icon' id='menu-btn' aria-label='Open menu'>☰</button>",
+    "            <button class='phone-header-icon menu-btn-wide' id='menu-btn' aria-label='Open menu'>☰ Menu</button>",
     "            <div class='phone-header-center'>Ad Tech Ecosystem</div>",
     "            <button class='phone-header-icon' id='search-btn' aria-label='Search'>🔍</button>",
     "          </header>",
