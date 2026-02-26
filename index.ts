@@ -651,6 +651,82 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
   },
 };
 
+// --- Glossary auto-linking ---
+
+const GLOSS_TERM_DEFS: Array<{ pattern: RegExp; id: GlossaryId }> = [
+  // Multi-word terms first so they're tokenized before single-word patterns run
+  { pattern: /\bOpenRTB\b/g, id: "open-rtb" },
+  { pattern: /\bheader[ -]bidding\b/gi, id: "header-bidding" },
+  { pattern: /\bprogrammatic[ -]guaranteed\b/gi, id: "programmatic-guaranteed" },
+  { pattern: /\bprivate marketplace\b/gi, id: "pmp" },
+  { pattern: /\bbrand[ -]safety\b/gi, id: "brand-safety" },
+  { pattern: /\bfrequency[ -]caps?\b/gi, id: "frequency-cap" },
+  { pattern: /\bfrequency[ -]capping\b/gi, id: "frequency-cap" },
+  { pattern: /\bdynamic creative optimization\b/gi, id: "dco" },
+  { pattern: /\bclean rooms?\b/gi, id: "clean-room" },
+  { pattern: /\bidentity graphs?\b/gi, id: "identity-graph" },
+  { pattern: /\bdata lakes?\b/gi, id: "data-lake" },
+  { pattern: /\bquality scores?\b/gi, id: "quality-score" },
+  { pattern: /\bconnected TV\b/g, id: "ctv" },
+  { pattern: /\bserver-side ad insertion\b/gi, id: "ssai" },
+  // Single-word / acronyms
+  { pattern: /\bDSPs?\b/g, id: "dsp" },
+  { pattern: /\bSSPs?\b/g, id: "ssp" },
+  { pattern: /\bRTB\b/g, id: "rtb" },
+  { pattern: /\beCPMs?\b/g, id: "cpm" },
+  { pattern: /\bvCPMs?\b/g, id: "cpm" },
+  { pattern: /\bCPMs?\b/g, id: "cpm" },
+  { pattern: /\bVAST\b/g, id: "vast" },
+  { pattern: /\bVMAP\b/g, id: "vast" },
+  { pattern: /\bSSAI\b/g, id: "ssai" },
+  { pattern: /\bCTV\b/g, id: "ctv" },
+  { pattern: /\bPMP\b/g, id: "pmp" },
+  { pattern: /\bDCO\b/g, id: "dco" },
+  { pattern: /\bviewabilit(?:y|ies)\b/gi, id: "viewability" },
+  { pattern: /\battribution\b/gi, id: "attribution" },
+  { pattern: /\bupfronts?\b/gi, id: "upfronts" },
+  { pattern: /\bpixels?\b/gi, id: "pixel" },
+  { pattern: /\byield\b/gi, id: "yield" },
+  { pattern: /\binventory\b/gi, id: "inventory" },
+];
+
+function linkTerms(html: string): string {
+  // Split into alternating text-node / HTML-tag segments
+  const parts = html.split(/(<[^>]+>)/);
+  let insideLink = 0;
+  let insideCode = 0;
+
+  const processed = parts.map((part) => {
+    if (/^<a[\s>]/i.test(part)) { insideLink++; return part; }
+    if (/^<\/a>/i.test(part)) { insideLink = Math.max(0, insideLink - 1); return part; }
+    if (/^<code[\s>]/i.test(part)) { insideCode++; return part; }
+    if (/^<\/code>/i.test(part)) { insideCode = Math.max(0, insideCode - 1); return part; }
+    if (part.startsWith("<")) return part;
+    if (insideLink > 0 || insideCode > 0) return part;
+
+    // Two-pass: first tokenise every match (prevents overlapping replacements),
+    // then substitute tokens with anchor tags.
+    const tokens: Array<{ orig: string; id: GlossaryId }> = [];
+    let text = part;
+
+    for (const { pattern, id } of GLOSS_TERM_DEFS) {
+      text = text.replace(pattern, (m) => {
+        const idx = tokens.length;
+        tokens.push({ orig: m, id });
+        return `\x00G${idx}\x00`;
+      });
+    }
+
+    return text.replace(/\x00G(\d+)\x00/g, (_, i) => {
+      const tok = tokens[Number(i)]!;
+      const tip = glossary[tok.id].shortDefinition.replace(/"/g, "&quot;");
+      return `<a class="gloss-link" href="/glossary?term=${tok.id}" title="${tip}">${tok.orig}</a>`;
+    });
+  });
+
+  return processed.join("");
+}
+
 const baseStyles = `
   :root {
     --bg: #050816;
@@ -1456,11 +1532,11 @@ const renderTopicPage = (topicId: TopicId): string => {
   const topic = topics[topicId];
 
   const overviewItems = topic.overview
-    .map((line) => `<li>${line}</li>`)
+    .map((line) => `<li>${linkTerms(line)}</li>`)
     .join("\n");
 
   const technicalItems = topic.technical
-    .map((line) => `<li>${line}</li>`)
+    .map((line) => `<li>${linkTerms(line)}</li>`)
     .join("\n");
 
   const companiesHtml =
@@ -1481,7 +1557,7 @@ const renderTopicPage = (topicId: TopicId): string => {
           "<details class='deep-dive-section'>",
           "  <summary>Deep dive: advanced technical details</summary>",
           "  <ul class='topic-bullets'>",
-          topic.deepDive.map((line) => `    <li>${line}</li>`).join("\n"),
+          topic.deepDive.map((line) => `    <li>${linkTerms(line)}</li>`).join("\n"),
           "  </ul>",
           "</details>",
         ].join("\n")
@@ -1514,12 +1590,12 @@ const renderTopicPage = (topicId: TopicId): string => {
     `            <h1 class='ecosystem-title'>${topic.label}</h1>`,
     `            <p class='ecosystem-subtitle'>${topic.shortDescription}</p>`,
     companiesHtml,
+    renderTopicDiagram(topicId),
     "            <div class='topic-section-heading'>Overview</div>",
     "            <ul class='topic-bullets'>",
     overviewItems,
     "            </ul>",
     renderTopicFakeAd(topicId),
-    renderTopicDiagram(topicId),
     renderTopicReferences(topicId),
     "          </div>",
     "        </article>",
@@ -1528,6 +1604,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     "        <h2 class='canvas-heading'>Under the Hood</h2>",
     "        <article class='phone'>",
     "          <div class='phone-body'>",
+    "            <div class='example-flow-diagram diagram-zoomable'>" + renderTopicFlowDiagram(topicId) + "</div>",
     "            <h1 class='ecosystem-title'>Data &amp; Engineering View</h1>",
     "            <p class='ecosystem-subtitle'>How this part of the ecosystem shows up in schemas, pipelines, services, and code.</p>",
     "            <div class='topic-section-heading'>Technical Details</div>",
@@ -1535,7 +1612,6 @@ const renderTopicPage = (topicId: TopicId): string => {
     technicalItems,
     "            </ul>",
     deepDiveHtml,
-    "            <div class='example-flow-diagram diagram-zoomable'>" + renderTopicFlowDiagram(topicId) + "</div>",
     "          </div>",
     "        </article>",
     "      </section>",
@@ -1552,9 +1628,9 @@ const renderTopicPage = (topicId: TopicId): string => {
 const renderExamplePage = (exampleId: ExampleId): string => {
   const example = examples[exampleId];
 
-  const story = example.story.map((line) => `<li>${line}</li>`).join("\n");
+  const story = example.story.map((line) => `<li>${linkTerms(line)}</li>`).join("\n");
   const technicalFlow = example.technicalFlow
-    .map((line) => `<li>${line}</li>`)
+    .map((line) => `<li>${linkTerms(line)}</li>`)
     .join("\n");
 
   const html = [
@@ -1583,6 +1659,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "          <div class='phone-body'>",
     `            <h1 class='ecosystem-title'>${example.label}</h1>`,
     `            <p class='ecosystem-subtitle'><strong>Surface:</strong> ${example.surface}</p>`,
+    renderExampleDiagram(exampleId),
     "            <div class='topic-section-heading'>The User Experience</div>",
     "            <ul class='topic-bullets'>",
     story,
@@ -1592,7 +1669,6 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "            <ul class='topic-bullets'>",
     technicalFlow,
     "            </ul>",
-    renderExampleDiagram(exampleId),
     renderExampleReferences(exampleId),
     "          </div>",
     "        </article>",
@@ -1600,8 +1676,8 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>Ad surface &amp; data flow</h2>",
     "        <article class='phone'>",
-    renderExampleSurfaceFrame(exampleId),
     "        <div class='example-flow-diagram diagram-zoomable'>" + renderExampleFlowDiagram(exampleId) + "</div>",
+    renderExampleSurfaceFrame(exampleId),
     "        </article>",
     "      </section>",
     "    </div>",
@@ -2469,6 +2545,18 @@ const homeStyles = `
   .topic-bullets li {
     margin-bottom: var(--space-sm);
     line-height: var(--line-height-body);
+  }
+
+  .gloss-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted #0284c7;
+    cursor: help;
+    font-weight: inherit;
+  }
+  .gloss-link:hover {
+    background: #e0f2fe;
+    border-radius: 2px;
   }
 
   .insight-card {
