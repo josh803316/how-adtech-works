@@ -1535,12 +1535,13 @@ const renderTopicPage = (topicId: TopicId): string => {
     technicalItems,
     "            </ul>",
     deepDiveHtml,
-    "            <div class='example-flow-diagram'>" + renderTopicFlowDiagram(topicId) + "</div>",
+    "            <div class='example-flow-diagram diagram-zoomable'>" + renderTopicFlowDiagram(topicId) + "</div>",
     "          </div>",
     "        </article>",
     "      </section>",
     "    </div>",
     "  </div>",
+    diagramLightboxHtml,
     "</body>",
     "</html>",
   ].join("\n");
@@ -1600,11 +1601,12 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "        <h2 class='canvas-heading'>Ad surface &amp; data flow</h2>",
     "        <article class='phone'>",
     renderExampleSurfaceFrame(exampleId),
-    "        <div class='example-flow-diagram'>" + renderExampleFlowDiagram(exampleId) + "</div>",
+    "        <div class='example-flow-diagram diagram-zoomable'>" + renderExampleFlowDiagram(exampleId) + "</div>",
     "        </article>",
     "      </section>",
     "    </div>",
     "  </div>",
+    diagramLightboxHtml,
     "</body>",
     "</html>",
   ].join("\n");
@@ -3053,7 +3055,127 @@ const homeStyles = `
     border-radius: 8px;
     padding: 10px 12px;
   }
+
+  /* ── Diagram zoom ── */
+  .diagram-zoomable {
+    position: relative;
+    cursor: zoom-in;
+  }
+  .diagram-zoomable:hover::after {
+    content: "⤢ tap to zoom";
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #0284c7;
+    background: rgba(240,249,255,0.92);
+    border: 1px solid #bae6fd;
+    border-radius: 4px;
+    padding: 2px 6px;
+    pointer-events: none;
+  }
+
+  /* Lightbox overlay */
+  #diag-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15,23,42,0.88);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    cursor: zoom-out;
+  }
+  #diag-overlay.open {
+    display: flex;
+  }
+  #diag-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 20px;
+    max-width: min(96vw, 1100px);
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    cursor: default;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  }
+  #diag-box svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  #diag-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    margin: -8px -8px 8px 8px;
+    background: #0284c7;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    cursor: pointer;
+    z-index: 2;
+    line-height: 1.6;
+  }
+  #diag-close:hover { background: #0369a1; }
+  #diag-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0284c7;
+    margin-bottom: 12px;
+    padding-right: 60px;
+  }
 `;
+
+// Lightbox HTML injected once per page before </body>
+const diagramLightboxHtml = `
+<div id="diag-overlay" role="dialog" aria-modal="true" aria-label="Diagram zoom">
+  <div id="diag-box">
+    <button id="diag-close" aria-label="Close zoom">✕ Close</button>
+    <div id="diag-title"></div>
+    <div id="diag-content"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var overlay = document.getElementById('diag-overlay');
+  var box = document.getElementById('diag-box');
+  var titleEl = document.getElementById('diag-title');
+  var contentEl = document.getElementById('diag-content');
+  function open(el) {
+    var title = el.querySelector('.flow-title');
+    titleEl.textContent = title ? title.textContent : '';
+    var svg = el.querySelector('svg');
+    contentEl.innerHTML = svg ? svg.outerHTML : el.innerHTML;
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('diag-close').focus();
+  }
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.diagram-zoomable').forEach(function(el){
+    el.addEventListener('click', function(){ open(el); });
+    el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(el); } });
+    el.setAttribute('tabindex','0');
+    el.setAttribute('role','button');
+    el.setAttribute('aria-label','Click to zoom diagram');
+  });
+  document.getElementById('diag-close').addEventListener('click', function(e){ e.stopPropagation(); close(); });
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+})();
+<\/script>`;
 
 type FakeAdFormat = "banner" | "native" | "search" | "video" | "audio";
 
@@ -4929,7 +5051,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "        <h2 class='canvas-heading'>Definition</h2>",
     "        <article class='phone'>",
     "          <div class='phone-body'>",
-    "            <div class='glossary-illustration'>" + getGlossaryIllustration(active.id) + "</div>",
+    "            <div class='glossary-illustration diagram-zoomable'>" + getGlossaryIllustration(active.id) + "</div>",
     `            <div class='glossary-term'>${active.term}</div>`,
     `            <p class='ecosystem-subtitle'>${active.shortDefinition}</p>`,
     "            <ul class='topic-bullets'>",
@@ -4941,6 +5063,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "      </section>",
     "    </div>",
     "  </div>",
+    diagramLightboxHtml,
     "</body>",
     "</html>",
   ].join("\n");
