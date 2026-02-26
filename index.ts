@@ -2347,7 +2347,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
   const pad = 8;
 
   if (id === "buy-side") {
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
+    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
     return (
       "<div class='flow-title'>Buying path</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2363,7 +2363,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
   }
 
   if (id === "sell-side") {
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
+    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
     return (
       "<div class='flow-title'>Inventory flow</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2379,7 +2379,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
   }
 
   if (id === "data") {
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
+    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
     return (
       "<div class='flow-title'>Data pipeline</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2395,7 +2395,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
   }
 
   if (id === "third-parties") {
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
+    const xs: [number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad)];
     return (
       "<div class='flow-title'>Partner integrations</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2412,7 +2412,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
 
   if (id === "ad-serving-rtb") {
     const nw5 = 52;
-    const xs = [pad, pad + nw5 + pad, pad + 2 * (nw5 + pad), pad + 3 * (nw5 + pad), pad + 4 * (nw5 + pad)];
+    const xs: [number, number, number, number, number] = [pad, pad + nw5 + pad, pad + 2 * (nw5 + pad), pad + 3 * (nw5 + pad), pad + 4 * (nw5 + pad)];
     return (
       "<div class='flow-title'>RTB lifecycle</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2431,7 +2431,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
 
   if (id === "measurement-currency") {
     const nw4 = 68;
-    const xs = [pad, pad + nw4 + pad, pad + 2 * (nw4 + pad), pad + 3 * (nw4 + pad)];
+    const xs: [number, number, number, number] = [pad, pad + nw4 + pad, pad + 2 * (nw4 + pad), pad + 3 * (nw4 + pad)];
     return (
       "<div class='flow-title'>Measurement &amp; currency flow</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2745,7 +2745,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
     const nh = 42;
     const y = (H - nh) / 2;
     const pad = 10;
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
+    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
     return (
       "<div class='flow-title'>How feed ads are chosen</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2767,7 +2767,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
     const nh = 42;
     const y = (H - nh) / 2;
     const pad = 8;
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
+    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
     return (
       "<div class='flow-title'>Pre-roll systems flow</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
@@ -2789,7 +2789,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
     const nh = 42;
     const y = (H - nh) / 2;
     const pad = 6;
-    const xs = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
+    const xs: [number, number, number, number, number] = [pad, pad + nw + pad, pad + 2 * (nw + pad), pad + 3 * (nw + pad), pad + 4 * (nw + pad)];
     return (
       "<div class='flow-title'>Display banner systems flow</div>" +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${defs}` +
