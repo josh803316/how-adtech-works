@@ -3082,57 +3082,67 @@ const homeStyles = `
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(15,23,42,0.88);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    align-items: center;
+    background: rgba(8,12,24,0.96);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    align-items: flex-start;
     justify-content: center;
-    padding: 16px;
+    padding: 8px;
     cursor: zoom-out;
+    overflow-y: auto;
   }
   #diag-overlay.open {
     display: flex;
   }
   #diag-box {
-    background: #f0f9ff;
+    background: #fff;
     border: 1px solid #bae6fd;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: min(96vw, 1100px);
-    max-height: 90vh;
-    overflow: auto;
+    border-radius: 12px;
+    padding: 12px 16px 16px;
+    width: calc(100vw - 16px);
+    min-height: calc(100vh - 16px);
     position: relative;
     cursor: default;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    box-shadow: 0 0 80px rgba(2,132,199,0.25);
+    display: flex;
+    flex-direction: column;
+  }
+  #diag-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   #diag-box svg {
     display: block;
     width: 100%;
     height: auto;
+    max-height: calc(100vh - 80px);
   }
   #diag-close {
-    position: sticky;
-    top: 0;
-    float: right;
-    margin: -8px -8px 8px 8px;
+    position: absolute;
+    top: 10px;
+    right: 12px;
     background: #0284c7;
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    padding: 4px 10px;
+    padding: 6px 14px;
     cursor: pointer;
     z-index: 2;
     line-height: 1.6;
+    white-space: nowrap;
   }
   #diag-close:hover { background: #0369a1; }
   #diag-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #0284c7;
-    margin-bottom: 12px;
-    padding-right: 60px;
+    margin-bottom: 10px;
+    padding-right: 90px;
+    min-height: 24px;
   }
 `;
 
