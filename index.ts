@@ -1977,6 +1977,7 @@ const homeStyles = `
     border-radius: 18px;
     border: 1px solid var(--border-subtle);
     padding: var(--space-md) var(--space-md) var(--space-lg);
+    overflow: hidden;
   }
 
   .ecosystem-title {
@@ -2599,25 +2600,29 @@ const homeStyles = `
 
   .diagram-rail {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
 
   .diagram-rail.stack {
     flex-direction: column;
+    flex-wrap: nowrap;
   }
 
   .diagram-node {
-    flex: 1 1 0;
-    min-width: max-content;
-    border-radius: 999px;
+    flex: 1 1 auto;
+    min-width: min(120px, 100%);
+    max-width: 100%;
+    border-radius: 12px;
     border: 1px solid var(--border-subtle);
     background: #f9fafb;
     padding: 6px 10px;
     font-size: 0.74rem;
     color: var(--text-soft);
     text-align: center;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .diagram-node strong {
@@ -2774,6 +2779,8 @@ const homeStyles = `
     background: linear-gradient(180deg, #f0f9ff 0%, #f9fafb 100%);
     border-radius: 16px;
     border: 1px solid #bae6fd;
+    overflow: hidden;
+    max-width: 100%;
   }
 
   .example-flow-diagram .flow-title {
