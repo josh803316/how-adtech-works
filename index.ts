@@ -59,7 +59,24 @@ type GlossaryId =
   | "ssai"
   | "frequency-cap"
   | "programmatic-guaranteed"
-  | "quality-score";
+  | "quality-score"
+  | "impression"
+  | "publisher"
+  | "advertiser"
+  | "agency"
+  | "campaign"
+  | "segment"
+  | "ad-server"
+  | "exchange"
+  | "floor-price"
+  | "fill-rate"
+  | "first-party-data"
+  | "third-party-data"
+  | "retargeting"
+  | "prebid"
+  | "gam"
+  | "walled-garden"
+  | "dmp";
 
 type GlossaryEntry = {
   id: GlossaryId;
@@ -78,7 +95,7 @@ const topics: Record<TopicId, Topic> = {
       "How advertisers, agencies, and DSPs decide which impressions to buy — and the technology that executes billions of bid decisions per day.",
     companies: ["The Trade Desk", "Google DV360", "Amazon DSP", "Microsoft Xandr", "Yahoo DSP", "MediaMath"],
     overview: [
-      "<strong>The buy side</strong> is everything from an advertiser deciding they want to reach customers, through agencies that plan and buy media, to the software platforms called <strong>Demand-Side Platforms (DSPs)</strong> that execute billions of ad auctions every day. When you see an ad anywhere on the internet, the buy side already decided — in milliseconds — that you were worth showing it to.",
+      "<strong>The buy side</strong> is the demand side of digital advertising: everyone involved in deciding <em>which</em> ads to show and <em>how much to pay</em>. It spans the <strong>advertiser</strong> (the brand paying for ads), the <strong>agency</strong> (which plans and buys on their behalf), and the <strong>Demand-Side Platform (DSP)</strong> — the software that actually submits bids in real-time auctions. When you see an ad anywhere on the internet, the buy side has already decided, in under 100 milliseconds, that you were worth showing it to and at what price.",
       "<strong>Advertisers</strong> are the brands and companies paying for ads: Nike, a local restaurant, a SaaS startup. They define campaign goals (brand awareness, app installs, e-commerce purchases), budgets, flight dates, and targeting requirements. Most advertisers don’t operate DSPs directly — they work through agencies or managed service teams.",
       "<strong>Agencies</strong> (WPP’s GroupM, Publicis, IPG Mediabrands, Havas) act as expert intermediaries. They handle media planning (which channels reach my audience?), buying (negotiating rates and setting up programmatic campaigns), creative trafficking, and performance reporting. Holding-company agencies often operate their own trading desks that centralize DSP access across many clients.",
       "A <strong>Demand-Side Platform (DSP)</strong> is the core technology that connects advertiser budgets and targeting rules to the actual ad auction. The DSP receives a bid request from an exchange (describing an available impression), evaluates it against active campaigns in milliseconds, and either passes or returns a bid with a price and creative. The biggest independent DSP is <strong>The Trade Desk</strong>. Other major players include <strong>Google DV360</strong>, <strong>Amazon DSP</strong>, <strong>Microsoft Xandr</strong>, and <strong>Yahoo DSP</strong>.",
@@ -104,7 +121,7 @@ const topics: Record<TopicId, Topic> = {
       "How publishers and SSPs package inventory, run header bidding, and maximize revenue from every ad slot.",
     companies: ["Magnite", "PubMatic", "OpenX", "Index Exchange", "TripleLift", "Sharethrough", "Google Ad Manager"],
     overview: [
-      "<strong>The sell side</strong> is the other half of programmatic: publishers who own ad-bearing surfaces (websites, apps, streaming services, games) and the technology stack that helps them sell those surfaces to the highest bidder. Publishers are paid in CPM (cost per thousand impressions), so their goal is to maximize both fill rate (percentage of slots filled) and CPM.",
+      "<strong>The sell side</strong> is the supply side of programmatic advertising: <strong>publishers</strong> who own the places where ads appear (websites, apps, streaming services, games) and the technology that helps them sell those slots to the highest bidder. Publishers are paid in <strong>CPM</strong> (cost per thousand impressions), so their goal is to maximize both <strong>fill rate</strong> (what percentage of slots get a paid ad) and the price per impression — a balance of volume and <strong>yield</strong>.",
       "A <strong>publisher</strong> can be a massive media company (The New York Times, Spotify, Disney Streaming) or a small blog running Google AdSense. Their ad inventory is their product — slots in their layout where ads can appear. The quality of inventory (brand safety, viewability, audience) determines what CPM it can command.",
       "A <strong>Supply-Side Platform (SSP)</strong> is the publisher-facing technology that connects ad slots to many demand sources simultaneously. The SSP’s job is yield optimization: maximizing CPM for every impression while respecting the publisher’s business rules (advertiser category blocks, competitor exclusions, floor prices). Top SSPs include <strong>Magnite</strong> (the largest independent, formed by merging Rubicon Project and Telaria), <strong>PubMatic</strong>, <strong>OpenX</strong>, <strong>Index Exchange</strong>, and <strong>TripleLift</strong> (native ads specialist).",
       "Before 2015, publishers used a ‘waterfall’ — calling demand sources one at a time until one filled the slot. If the top-ranked demand partner didn’t fill it, the next was called, and so on. This was slow, left money on the table, and favored incumbents. <strong>Header bidding</strong> was the industry’s solution: running auctions in parallel across many demand partners so publishers could take the highest bid from all of them simultaneously. This dramatically increased publisher revenue (often 30–60% uplift).",
@@ -129,7 +146,7 @@ const topics: Record<TopicId, Topic> = {
       "How signals about users and context are collected, stored, resolved across devices, and activated for targeting and measurement.",
     companies: ["LiveRamp", "The Trade Desk (UID2)", "Segment", "Snowflake", "Databricks", "Google Privacy Sandbox"],
     overview: [
-      "Data is the fuel of ad tech. Every ad impression comes with signals: who is this user likely to be, what page are they on, what have they done before, what device are they using? These signals drive targeting (finding the right person), bidding (deciding how much to pay), and measurement (proving the ad worked). Without data pipelines working correctly, none of the economics of programmatic advertising function.",
+      "Data is the fuel of ad tech. Every <strong>impression</strong> comes with signals: who is this user likely to be, what page or app are they on, what have they done before, what device are they using? These signals drive <strong>targeting</strong> (finding the right person), <strong>bidding</strong> (deciding how much to pay), and <strong>measurement</strong> (proving the ad worked). Without data pipelines and <strong>identity resolution</strong> working correctly, none of the economics of programmatic advertising function.",
       "<strong>First-party data</strong> is collected directly by a company from its own users — purchase history, app behavior, email engagement, loyalty records. It’s the most valuable and privacy-safe because the user has a direct relationship with the company. A retailer’s purchase history or a streaming service’s viewing data are prime examples. With third-party cookies dying, first-party data is now the industry’s primary targeting signal.",
       "<strong>Second-party data</strong> is first-party data from another company, shared directly (e.g., an airline sharing frequent-flyer profiles with a hotel chain they partner with). <strong>Third-party data</strong> is audience data aggregated and sold by data brokers (Oracle’s BlueKai, Experian, Acxiom, Lotame) — demographic segments, purchase-intent signals, behavioral categories. Third-party cookie-based data is collapsing due to browser restrictions and privacy laws.",
       "<strong>Privacy regulations</strong> have fundamentally reshaped data in ad tech. GDPR (EU, 2018) requires explicit consent before collecting or processing personal data — affecting any site with European visitors. CCPA (California, 2020) gives California residents the right to opt out of data sales. Apple’s ATT (App Tracking Transparency, 2021) requires iOS apps to ask permission before tracking users across apps — this effectively eliminated IDFA (Apple’s ad ID) as a targeting signal for most apps, devastating mobile advertising accuracy.",
@@ -649,12 +666,222 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     ],
     related: ["rtb", "attribution"],
   },
+  impression: {
+    id: "impression",
+    term: "Impression",
+    category: "Marketplace",
+    shortDefinition:
+      "A single opportunity to show an ad to a user — the basic unit of programmatic buying and pricing.",
+    definition: [
+      "An impression is counted when an ad is requested, served, or displayed depending on context. In programmatic, pricing is typically per thousand impressions (CPM). Not every impression is viewable; verification vendors measure viewable impressions separately.",
+      "Impressions flow through the pipeline: ad request → auction → win → creative served → impression pixel fires. Billing and reporting aggregate impressions by campaign, placement, and audience.",
+    ],
+    related: ["cpm", "inventory", "viewability"],
+  },
+  publisher: {
+    id: "publisher",
+    term: "Publisher",
+    category: "Marketplace",
+    shortDefinition:
+      "A company or property that owns ad inventory and sells it to advertisers, often via an SSP.",
+    definition: [
+      "Publishers are the supply side of ad tech: they own the surfaces where ads appear (websites, apps, streaming services, games). From The New York Times to a small blog using Google AdSense, publishers monetize their audience by selling ad slots.",
+      "Publishers use ad servers (e.g. Google Ad Manager) to manage direct-sold and programmatic demand, set floor prices, and maximize yield. Quality of inventory — brand safety, viewability, audience — determines CPMs.",
+    ],
+    related: ["inventory", "yield", "ssp"],
+  },
+  advertiser: {
+    id: "advertiser",
+    term: "Advertiser",
+    category: "Marketplace",
+    shortDefinition:
+      "The brand or business paying for ads to reach target audiences.",
+    definition: [
+      "Advertisers are the demand side: they define campaign goals (awareness, conversions, sales), budgets, and targeting. Most work through agencies or managed-service teams that operate DSPs on their behalf.",
+      "Advertisers provide creatives, set bids, and use measurement and attribution to judge whether spend drove the desired outcomes.",
+    ],
+    related: ["dsp", "campaign", "attribution"],
+  },
+  agency: {
+    id: "agency",
+    term: "Agency",
+    category: "Marketplace",
+    shortDefinition:
+      "An intermediary that plans, buys, and manages ad campaigns on behalf of advertisers.",
+    definition: [
+      "Agencies (e.g. GroupM, Publicis, IPG Mediabrands) handle media planning, programmatic buying, creative trafficking, and reporting. Holding-company agencies often run trading desks that centralize DSP access across many clients.",
+      "They negotiate rates, set up campaigns in DSPs, and ensure brand safety and performance targets are met.",
+    ],
+    related: ["advertiser", "dsp", "campaign"],
+  },
+  campaign: {
+    id: "campaign",
+    term: "Campaign",
+    category: "Marketplace",
+    shortDefinition:
+      "A structured set of ads with a budget, goal, flight dates, and targeting rules.",
+    definition: [
+      "Inside a DSP, campaigns contain line items (targeting rules, bids) and creatives. The hierarchy is typically Account → Campaign → Line Item → Creative. Campaigns define the objective (e.g. conversions, reach) and budget pacing.",
+      "Reporting and attribution are usually at campaign level; optimization happens at line item and creative level.",
+    ],
+    related: ["dsp", "attribution", "inventory"],
+  },
+  segment: {
+    id: "segment",
+    term: "Audience Segment",
+    category: "Data",
+    shortDefinition:
+      "A group of users sharing traits used for targeting (e.g. in-market, demographic, behavioral).",
+    definition: [
+      "Segments are built from first-party, second-party, or third-party data and stored in identity graphs or DMPs. At bid time, the DSP checks whether the user ID is in the segment and applies bid multipliers or targeting rules.",
+      "Examples: 'luxury car intenders', 'lapsed purchasers', 'camping enthusiasts'. Cross-device segments require identity resolution.",
+    ],
+    related: ["identity-graph", "dsp", "first-party-data"],
+  },
+  "ad-server": {
+    id: "ad-server",
+    term: "Ad Server",
+    category: "Marketplace",
+    shortDefinition:
+      "System that stores, selects, and serves ad creatives and tracks impressions and clicks.",
+    definition: [
+      "Buy-side ad servers (e.g. Google Campaign Manager 360) store creatives, fire impression/click pixels, and handle redirect chains for attribution. Sell-side ad servers (e.g. Google Ad Manager) decide which demand source wins each slot and serve the creative.",
+      "Ad servers are the systems that actually deliver the ad markup to the user's browser or app.",
+    ],
+    related: ["creative", "pixel", "gam"],
+  },
+  exchange: {
+    id: "exchange",
+    term: "Ad Exchange",
+    category: "Marketplace",
+    shortDefinition:
+      "A marketplace that runs real-time auctions connecting publisher inventory to buyer bids.",
+    definition: [
+      "Exchanges receive bid requests from SSPs (or directly from publishers), fan them out to DSPs, run the auction, and return the winning creative. OpenRTB is the standard protocol. Google AdX, Xandr, and Index Exchange are major exchanges.",
+      "Exchanges may take a fee on clearing price; they are the 'marketplace' layer between supply and demand.",
+    ],
+    related: ["rtb", "ssp", "dsp"],
+  },
+  "floor-price": {
+    id: "floor-price",
+    term: "Floor Price",
+    category: "Marketplace",
+    shortDefinition:
+      "The minimum CPM a publisher will accept for an impression.",
+    definition: [
+      "Publishers set floor prices to avoid selling inventory below a threshold. SSPs may apply dynamic floors using ML to predict clearing prices. Higher floors can raise CPM but reduce fill rate; publishers balance the two for maximum yield.",
+      "Deal IDs in PMPs often have negotiated floor prices.",
+    ],
+    related: ["yield", "inventory", "pmp"],
+  },
+  "fill-rate": {
+    id: "fill-rate",
+    term: "Fill Rate",
+    category: "Marketplace",
+    shortDefinition:
+      "The percentage of ad requests that are filled with a paid ad.",
+    definition: [
+      "Fill rate = (Filled impressions / Requested impressions) × 100. Low fill rate means many slots go empty; publishers optimize demand mix and floors to maximize revenue (fill rate × CPM).",
+      "Header bidding improved fill rates by letting multiple demand sources compete for each impression.",
+    ],
+    related: ["inventory", "yield", "header-bidding"],
+  },
+  "first-party-data": {
+    id: "first-party-data",
+    term: "First-Party Data",
+    category: "Data",
+    shortDefinition:
+      "Data collected directly by a company from its own users.",
+    definition: [
+      "First-party data includes purchase history, site behavior, app usage, and login profiles. It's the most valuable and privacy-safe because the user has a direct relationship with the company. With third-party cookies declining, first-party data is the primary targeting signal.",
+      "Publishers use it for audience segments; advertisers use CRM and site data for retargeting and lookalikes.",
+    ],
+    related: ["segment", "identity-graph", "third-party-data"],
+  },
+  "third-party-data": {
+    id: "third-party-data",
+    term: "Third-Party Data",
+    category: "Data",
+    shortDefinition:
+      "Audience data aggregated and sold by data brokers, historically cookie-based.",
+    definition: [
+      "Third-party data comes from data brokers (e.g. Oracle BlueKai, Experian) — demographic segments, purchase-intent signals, behavioral categories. It was activated via third-party cookies; as browsers restrict cookies, this data is declining. DMPs were built around it.",
+      "Second-party data is another company's first-party data shared in a direct partnership.",
+    ],
+    related: ["first-party-data", "dmp", "segment"],
+  },
+  retargeting: {
+    id: "retargeting",
+    term: "Retargeting",
+    category: "Data",
+    shortDefinition:
+      "Showing ads to users who previously visited or engaged with a brand.",
+    definition: [
+      "A pixel or tag on the advertiser's site fires when a user visits; that user ID is added to a retargeting segment. The DSP then bids higher on that user across the open web. Retargeting typically has higher conversion rates because the user already showed intent.",
+      "Cross-device retargeting requires identity resolution (e.g. UID2, RampID) when cookies are unavailable.",
+    ],
+    related: ["pixel", "segment", "dsp"],
+  },
+  prebid: {
+    id: "prebid",
+    term: "Prebid",
+    category: "Marketplace",
+    shortDefinition:
+      "Open-source header bidding library that runs auctions before the ad server.",
+    definition: [
+      "Prebid.js runs in the publisher's page, sends bid requests to multiple SSPs in parallel, collects bids, and passes the highest to Google Ad Manager (or another ad server) as key-values. Prebid Server moves the auction to a server to reduce latency.",
+      "Prebid is the de facto standard for client-side header bidding and dramatically increased publisher yield.",
+    ],
+    related: ["header-bidding", "gam", "ssp"],
+  },
+  gam: {
+    id: "gam",
+    term: "Google Ad Manager (GAM)",
+    category: "Marketplace",
+    shortDefinition:
+      "The dominant publisher ad server (formerly DoubleClick for Publishers / DFP).",
+    definition: [
+      "GAM manages direct-sold and programmatic demand, ad slot definitions, creative trafficking, and reporting. Publishers use GAM as the central decision engine: it compares header bidding results, direct campaigns, and programmatic line items and serves the highest-yield creative.",
+      "Unified auction in GAM lets all demand compete in one auction.",
+    ],
+    related: ["ad-server", "header-bidding", "yield"],
+  },
+  "walled-garden": {
+    id: "walled-garden",
+    term: "Walled Garden",
+    category: "Marketplace",
+    shortDefinition:
+      "A closed platform that owns inventory, data, and buying (e.g. Meta, Google, Amazon).",
+    definition: [
+      "Walled gardens don't expose inventory via open OpenRTB; advertisers buy through their own interfaces (Meta Ads Manager, Google Ads, Amazon DSP). They combine first-party data, owned inventory, and proprietary auctions — creating scale and targeting others can't match, but also antitrust and transparency concerns.",
+      "Independent DSPs and the open programmatic ecosystem sit outside walled gardens.",
+    ],
+    related: ["dsp", "first-party-data", "exchange"],
+  },
+  dmp: {
+    id: "dmp",
+    term: "Data Management Platform (DMP)",
+    category: "Data",
+    shortDefinition:
+      "Software that aggregated audience segments for activation; declining as third-party cookies disappear.",
+    definition: [
+      "DMPs (Oracle BlueKai, Salesforce DMP, Lotame) collected and organized third-party and second-party segments for use in DSPs. As cookies are deprecated, segments keyed on cookies don't persist; CDPs and first-party identity solutions are replacing DMPs for many use cases.",
+      "Clean rooms and identity graphs now handle audience matching and activation in a privacy-first way.",
+    ],
+    related: ["segment", "third-party-data", "clean-room"],
+  },
 };
 
 // --- Glossary auto-linking ---
 
 const GLOSS_TERM_DEFS: Array<{ pattern: RegExp; id: GlossaryId }> = [
   // Multi-word terms first so they're tokenized before single-word patterns run
+  { pattern: /\bfirst[ -]party data\b/gi, id: "first-party-data" },
+  { pattern: /\bthird[ -]party data\b/gi, id: "third-party-data" },
+  { pattern: /\bwalled gardens?\b/gi, id: "walled-garden" },
+  { pattern: /\bfloor prices?\b/gi, id: "floor-price" },
+  { pattern: /\bfill rates?\b/gi, id: "fill-rate" },
+  { pattern: /\bad servers?\b/gi, id: "ad-server" },
   { pattern: /\bOpenRTB\b/g, id: "open-rtb" },
   { pattern: /\bheader[ -]bidding\b/gi, id: "header-bidding" },
   { pattern: /\bprogrammatic[ -]guaranteed\b/gi, id: "programmatic-guaranteed" },
@@ -664,14 +891,18 @@ const GLOSS_TERM_DEFS: Array<{ pattern: RegExp; id: GlossaryId }> = [
   { pattern: /\bfrequency[ -]capping\b/gi, id: "frequency-cap" },
   { pattern: /\bdynamic creative optimization\b/gi, id: "dco" },
   { pattern: /\bclean rooms?\b/gi, id: "clean-room" },
-  { pattern: /\bidentity graphs?\b/gi, id: "identity-graph" },
+  { pattern: /\bidentity (?:graphs?|resolution)\b/gi, id: "identity-graph" },
   { pattern: /\bdata lakes?\b/gi, id: "data-lake" },
   { pattern: /\bquality scores?\b/gi, id: "quality-score" },
   { pattern: /\bconnected TV\b/g, id: "ctv" },
   { pattern: /\bserver-side ad insertion\b/gi, id: "ssai" },
+  { pattern: /\bData Management Platform\b/gi, id: "dmp" },
   // Single-word / acronyms
+  { pattern: /\bPrebid\b/g, id: "prebid" },
+  { pattern: /\bGAM\b/g, id: "gam" },
   { pattern: /\bDSPs?\b/g, id: "dsp" },
   { pattern: /\bSSPs?\b/g, id: "ssp" },
+  { pattern: /\bDMPs?\b/g, id: "dmp" },
   { pattern: /\bRTB\b/g, id: "rtb" },
   { pattern: /\beCPMs?\b/g, id: "cpm" },
   { pattern: /\bvCPMs?\b/g, id: "cpm" },
@@ -688,6 +919,17 @@ const GLOSS_TERM_DEFS: Array<{ pattern: RegExp; id: GlossaryId }> = [
   { pattern: /\bpixels?\b/gi, id: "pixel" },
   { pattern: /\byield\b/gi, id: "yield" },
   { pattern: /\binventory\b/gi, id: "inventory" },
+  { pattern: /\bimpressions?\b/gi, id: "impression" },
+  { pattern: /\bpublishers?\b/gi, id: "publisher" },
+  { pattern: /\badvertisers?\b/gi, id: "advertiser" },
+  { pattern: /\bagencies\b/gi, id: "agency" },
+  { pattern: /\bagency\b/gi, id: "agency" },
+  { pattern: /\bcampaigns?\b/gi, id: "campaign" },
+  { pattern: /\bsegments?\b/gi, id: "segment" },
+  { pattern: /\bexchanges?\b/gi, id: "exchange" },
+  { pattern: /\bretargeting\b/gi, id: "retargeting" },
+  { pattern: /\bcreatives?\b/gi, id: "creative" },
+  { pattern: /\bGoogle Ad Manager\b/gi, id: "gam" },
 ];
 
 function linkTerms(html: string): string {
@@ -821,6 +1063,11 @@ const baseStyles = `
     --border-subtle: rgba(148, 163, 184, 0.4);
     --radius-lg: 20px;
     --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+    --font-sans: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: "Source Serif 4", Georgia, serif;
+    --line-height-body: 1.65;
+    --line-height-tight: 1.35;
+    --content-max: 75ch;
   }
 
   * {
@@ -829,16 +1076,38 @@ const baseStyles = `
     padding: 0;
   }
 
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: #0f172a;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    outline: 3px solid #e0f2fe;
+    outline-offset: 3px;
+  }
+
   body {
     min-height: 100vh;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-      "Inter", sans-serif;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: var(--line-height-body);
     background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
     color: var(--text);
     display: flex;
     align-items: stretch;
     justify-content: center;
-    padding: 24px 12px 28px;
+    padding: 28px 16px 32px;
   }
 
   .shell {
@@ -848,7 +1117,7 @@ const baseStyles = `
     border-radius: 24px;
     border: 1px solid var(--border-subtle);
     box-shadow: var(--shadow-soft);
-    padding: 18px 18px 22px;
+    padding: 24px 24px 28px;
     position: relative;
     overflow: hidden;
   }
@@ -932,10 +1201,11 @@ const baseStyles = `
   }
 
   .subtitle {
-    margin-top: 4px;
-    font-size: 0.86rem;
+    margin-top: 6px;
+    font-size: 0.9375rem;
+    line-height: var(--line-height-body);
     color: var(--muted);
-    max-width: 640px;
+    max-width: var(--content-max);
   }
 
   nav {
@@ -951,6 +1221,10 @@ const baseStyles = `
     color: var(--muted);
     text-decoration: none;
     background: rgba(15, 23, 42, 0.9);
+  }
+  .nav-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .nav-link-primary {
@@ -1136,6 +1410,10 @@ const baseStyles = `
       rgba(15, 23, 42, 0.96)
     );
   }
+  .topic-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 
   .topic-link-icon {
     font-size: 0.9rem;
@@ -1171,6 +1449,10 @@ const baseStyles = `
     font-size: 0.78rem;
     color: var(--text);
     text-decoration: none;
+  }
+  .ad-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .ad-card-header {
@@ -1411,15 +1693,20 @@ const renderLayout = (opts: {
     "<head>",
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
+    "  <meta name='theme-color' content='#050816' />",
     `  <title>${title}</title>`,
     description
       ? `  <meta name='description' content='${description}' />`
       : "",
+    "  <link rel='preconnect' href='https://fonts.googleapis.com' />",
+    "  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />",
+    "  <link href='https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap' rel='stylesheet' />",
     "  <style>",
     baseStyles,
     "  </style>",
     "</head>",
     "<body>",
+    "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
     "  <div class='shell'>",
     "    <header>",
     "      <div class='brand'>",
@@ -1471,7 +1758,7 @@ const renderHome = (): string => {
     .join("\n");
 
   const body = [
-    "<main>",
+    "<main id='main-content'>",
     "  <section class='panel'>",
     "    <div class='panel-header'>",
     "      <div>",
@@ -1657,7 +1944,8 @@ const renderTopicPage = (topicId: TopicId): string => {
     "  </style>",
     "</head>",
     "<body>",
-    "  <div class='app-shell'>",
+    "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
@@ -1728,7 +2016,8 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "  </style>",
     "</head>",
     "<body>",
-    "  <div class='app-shell'>",
+    "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
@@ -1774,6 +2063,26 @@ const renderExamplePage = (exampleId: ExampleId): string => {
 };
 
 const homeStyles = `
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    outline: 3px solid #e0f2fe;
+    outline-offset: 3px;
+  }
+
   :root {
     --bg: #f4f4f5;
     --bg-alt: #e5e7eb;
@@ -2755,6 +3064,11 @@ const homeStyles = `
   }
   .gloss-link:hover {
     background: #e0f2fe;
+    border-radius: 2px;
+  }
+  .gloss-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
     border-radius: 2px;
   }
 
@@ -5380,7 +5694,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     .join("\n");
 
   const definitionList = active.definition
-    .map((line) => `<li>${line}</li>`)
+    .map((line) => `<li>${linkTerms(line)}</li>`)
     .join("\n");
 
   const related =
@@ -5411,7 +5725,8 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "  </style>",
     "</head>",
     "<body>",
-    "  <div class='app-shell'>",
+    "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
     "      <section class='canvas-column'>",
