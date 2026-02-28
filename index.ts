@@ -5117,7 +5117,13 @@ const getGlossaryIllustration = (id: GlossaryId): string => {
   const mk = (mid: string, c: string) =>
     `<defs><marker id="${mid}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${c}"/></marker></defs>`;
 
-  const svgs: Record<GlossaryId, string> = {
+  const defaultSvg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Term</title>
+      ${mk("a",bl)}
+      <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Glossary term</text>
+      <rect x="10" y="25" width="240" height="100" rx="6" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
+      <text x="130" y="80" text-anchor="middle" font-size="8" fill="${mu}">See definition for details</text></svg>`;
+
+  const svgs: Partial<Record<GlossaryId, string>> = {
     yield: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Yield optimization curve</title>
       ${mk("a",bl)}
       <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Yield = Revenue / Available Inventory</text>
@@ -5669,7 +5675,7 @@ const getGlossaryIllustration = (id: GlossaryId): string => {
       <text x="8" y="138" font-size="7" fill="${mu}">High QS = lower actual CPC charged (auction mechanics)</text>
       <text x="8" y="150" font-size="7" fill="${mu}">Scale: 1–10 (shown in Google Ads UI per keyword/ad combo)</text></svg>`,
   };
-  return svgs[id] || svgs.yield;
+  return svgs[id] ?? defaultSvg;
 };
 
 const renderGlossaryPage = (selected?: GlossaryId): string => {
