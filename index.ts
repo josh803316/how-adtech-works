@@ -1,4 +1,8 @@
 import { Elysia } from "elysia";
+import { FAVICON_BASE64 } from "./favicon-data";
+
+// Favicon: PNG embedded as data URL so it always shows (no extra request, works in Safari).
+const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,${FAVICON_BASE64}" /><link rel="shortcut icon" href="data:image/png;base64,${FAVICON_BASE64}" />`;
 
 type TopicId =
   | "buy-side"
@@ -1691,6 +1695,7 @@ const renderLayout = (opts: {
     "<!doctype html>",
     "<html lang='en'>",
     "<head>",
+    "  " + FAVICON_LINK,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     "  <meta name='theme-color' content='#050816' />",
@@ -1935,6 +1940,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     "<!doctype html>",
     "<html lang='en'>",
     "<head>",
+    "  " + FAVICON_LINK,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${topic.label} – Ad Tech Deep Dive</title>`,
@@ -2007,6 +2013,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "<!doctype html>",
     "<html lang='en'>",
     "<head>",
+    "  " + FAVICON_LINK,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${example.label} – End-to-end ad tech breakdown</title>`,
@@ -5722,6 +5729,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "<!doctype html>",
     "<html lang='en'>",
     "<head>",
+    "  " + FAVICON_LINK,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     "  <title>Ad Tech Glossary</title>",
@@ -5980,6 +5988,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     "<!doctype html>",
     "<html lang='en'>",
     "<head>",
+    "  " + FAVICON_LINK,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     "  <title>Ad Tech Ecosystem – Overview</title>",
