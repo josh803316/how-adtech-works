@@ -4,9 +4,15 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch index.ts"
+    "dev": "bun run --watch index.ts",
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "fmt": "prettier -wu",
+    "format": "prettier -wu .",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@josh803316/shared-config": "^1.1.0",
     "@types/bun": "latest",
     "sharp": "^0.34.5"
   },
@@ -15,5 +21,13 @@
   },
   "dependencies": {
     "elysia": "^1.4.26"
+  },
+  "trustedDependencies": [
+    "@josh803316/shared-config",
+    "esbuild",
+    "sharp"
+  ],
+  "engines": {
+    "npm": "****** PLEASE USE 'bun install', NPM IS NOT SUPPORTED ******"
   }
 }

@@ -1,4 +1,5 @@
 name: Release
+
 on:
   push:
     branches:
@@ -9,8 +10,18 @@ permissions:
   packages: read
 
 jobs:
+  deploy:
+    uses: josh803316/shared-ci-workflows/.github/workflows/vercel-production.yml@main
+    with:
+      app-name: how-adtech-works
+      vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
+      vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
+      build-command: 'bun run build'
+    secrets: inherit
+
   release:
     name: Release
+    needs: deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
