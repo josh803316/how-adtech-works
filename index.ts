@@ -2561,6 +2561,26 @@ const homeStyles = `
     text-decoration: none;
   }
 
+  .players-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--text-main);
+  }
+  .players-callout:hover { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+  .players-callout-left { display: flex; align-items: center; gap: 10px; }
+  .players-callout-icon { font-size: 1.3rem; }
+  .players-callout-title { font-size: 0.88rem; font-weight: 700; color: #92400e; }
+  .players-callout-sub { font-size: 0.75rem; color: #a16207; margin-top: 1px; }
+  .players-callout-arrow { font-size: 1rem; color: #d97706; flex-shrink: 0; }
+
   .topic-list {
     display: flex;
     flex-direction: column;
@@ -6622,6 +6642,14 @@ const renderHomeOverlays = (): string => {
       url: `/glossary?term=${g.id}`,
       tags: g.category.toLowerCase(),
     })),
+    {
+      type: 'guide',
+      icon: '💰',
+      title: 'Players & Incentives',
+      desc: 'Who wants what, how they make money, and where $10 of ad spend actually goes.',
+      url: '/players',
+      tags: 'advertiser agency dsp ssp publisher money incentives goals economics follow the money',
+    },
   ]);
 
   const topicLinks = Object.values(topics)
@@ -6654,6 +6682,7 @@ const renderHomeOverlays = (): string => {
       <div class="nav-section-label">Ad Examples</div>
       ${exampleLinks}
       <div class="nav-section-label">Reference</div>
+      <a class="nav-item" href="/players">Players &amp; Incentives — who wants what &amp; where the money goes</a>
       <a class="nav-item" href="/glossary">Glossary (all terms)</a>
       <div class="nav-section-label">Interview prep</div>
       <a class="nav-item" href="/#interview-prep">How to use this site</a>
@@ -6866,6 +6895,16 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '              </div>',
     "              <p class='ecosystem-row-label' style='margin-top:4px;font-size:0.68rem;'>Magnite · PubMatic · OpenX · Index Exchange · TripleLift</p>",
     '            </div>',
+    "            <a class='players-callout' href='/players'>",
+    "              <div class='players-callout-left'>",
+    "                <div class='players-callout-icon'>💰</div>",
+    '                <div>',
+    "                  <div class='players-callout-title'>Players &amp; Incentives</div>",
+    "                  <div class='players-callout-sub'>Who wants what — and where does the money actually go?</div>",
+    '                </div>',
+    '              </div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
     "            <div class='ecosystem-section-label'>",
     '              <span>Key Topics</span>',
     "              <a href='/glossary'>Glossary →</a>",
@@ -6907,16 +6946,6 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '                  <div>',
     "                    <div class='topic-title'>Measurement &amp; Currency</div>",
     "                    <div class='topic-caption'>TV currency, attribution, clean rooms, CTV</div>",
-    '                  </div>',
-    '                </div>',
-    "                <div class='topic-arrow'>›</div>",
-    '              </a>',
-    "              <a class='topic-card' href='/players' style='border-color:#bae6fd;background:linear-gradient(135deg,#f0f9ff,#fff);'>",
-    "                <div class='topic-card-main'>",
-    "                  <div class='topic-icon' aria-hidden='true'>💰</div>",
-    '                  <div>',
-    "                    <div class='topic-title'>Players &amp; Incentives</div>",
-    "                    <div class='topic-caption'>Who wants what, and where does the money go?</div>",
     '                  </div>',
     '                </div>',
     "                <div class='topic-arrow'>›</div>",
