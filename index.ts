@@ -1967,6 +1967,7 @@ const renderLayout = (opts: {title: string; description?: string; body: string})
     "        <a class='nav-link nav-link-primary' href='/'>Overview</a>",
     "        <a class='nav-link' href='/topic/ad-serving-rtb'>RTB Flow</a>",
     "        <a class='nav-link' href='/topic/data'>Data & Pipelines</a>",
+    "        <a class='nav-link' href='/players'>Players & $$$</a>",
     '      </nav>',
     '    </header>',
     body,
@@ -6910,6 +6911,16 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '                </div>',
     "                <div class='topic-arrow'>›</div>",
     '              </a>',
+    "              <a class='topic-card' href='/players' style='border-color:#bae6fd;background:linear-gradient(135deg,#f0f9ff,#fff);'>",
+    "                <div class='topic-card-main'>",
+    "                  <div class='topic-icon' aria-hidden='true'>💰</div>",
+    '                  <div>',
+    "                    <div class='topic-title'>Players &amp; Incentives</div>",
+    "                    <div class='topic-caption'>Who wants what, and where does the money go?</div>",
+    '                  </div>',
+    '                </div>',
+    "                <div class='topic-arrow'>›</div>",
+    '              </a>',
     '            </div>',
     renderHowToUseAndInterviewPrep(),
     renderFakeBannerAd('banner-buy-side'),
@@ -6928,6 +6939,624 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
   ].join('\n');
 
   return html;
+};
+
+const renderPlayersPage = (): string => {
+  const playersStyles = `
+  :root {
+    --bg: #f4f4f5;
+    --bg-alt: #e5e7eb;
+    --card: #ffffff;
+    --card-soft: #f9fafb;
+    --border-subtle: #e5e7eb;
+    --border-strong: #d4d4d8;
+    --accent: #0ea5e9;
+    --accent-soft: #e0f2fe;
+    --accent-strong: #0284c7;
+    --text-main: #111827;
+    --text-soft: #6b7280;
+    --text-muted: #9ca3af;
+    --radius-lg: 22px;
+    --shadow-phone: 0 18px 40px rgba(15, 23, 42, 0.18);
+    --line-height-body: 1.55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, #e4e4e7 1px, transparent 0), radial-gradient(circle, #e4e4e7 1px, transparent 0);
+    background-size: 18px 18px;
+    background-position: 0 0, 9px 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    color: var(--text-main);
+    line-height: var(--line-height-body);
+  }
+  .skip-link {
+    position: absolute; left: -9999px; z-index: 999;
+    padding: 12px 20px; background: var(--accent); color: #0f172a;
+    font-weight: 600; font-size: 0.95rem; border-radius: 8px; text-decoration: none;
+  }
+  .skip-link:focus { left: 50%; top: 12px; transform: translateX(-50%); outline: 3px solid #e0f2fe; outline-offset: 3px; }
+  .page-shell {
+    width: 100%; max-width: 820px;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .page-top-nav {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .page-back { font-size: 0.82rem; color: var(--text-soft); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 20px; background: var(--card); }
+  .page-back:hover { color: var(--text-main); border-color: var(--accent); }
+  .breadcrumb-sep { color: var(--text-muted); font-size: 0.8rem; }
+  .breadcrumb-current { font-size: 0.82rem; color: var(--text-soft); }
+  .page-hero { margin-bottom: 32px; }
+  .page-hero-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-strong); background: var(--accent-soft); padding: 4px 10px; border-radius: 20px; margin-bottom: 12px;
+  }
+  .page-hero h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); margin-bottom: 12px; }
+  .page-hero p { font-size: 1rem; color: var(--text-soft); max-width: 65ch; line-height: 1.6; }
+  .page-section-heading {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);
+  }
+  /* Player cards */
+  .player-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+  .player-card {
+    background: var(--card); border: 1px solid var(--border-subtle); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .player-card summary {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px; cursor: pointer; list-style: none; user-select: none;
+    transition: background 0.15s;
+  }
+  .player-card summary:hover { background: var(--card-soft); }
+  .player-card summary::-webkit-details-marker { display: none; }
+  .player-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; flex-shrink: 0;
+  }
+  .player-summary-text { flex: 1; min-width: 0; }
+  .player-name { font-size: 1rem; font-weight: 700; color: var(--text-main); }
+  .player-tagline { font-size: 0.82rem; color: var(--text-soft); margin-top: 2px; }
+  .player-summary-meta {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;
+  }
+  .player-money-badge {
+    font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-pays { background: #fef3c7; color: #92400e; }
+  .badge-earns { background: #d1fae5; color: #065f46; }
+  .badge-both { background: #ede9fe; color: #5b21b6; }
+  .player-expand-icon { color: var(--text-muted); font-size: 0.9rem; margin-left: 4px; transition: transform 0.2s; }
+  .player-card[open] .player-expand-icon { transform: rotate(180deg); }
+  .player-body { padding: 0 20px 20px; border-top: 1px solid var(--border-subtle); }
+  .player-plain-english {
+    font-size: 0.88rem; color: var(--text-soft); line-height: 1.6;
+    padding: 14px 0 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 16px;
+  }
+  .player-plain-english strong { color: var(--text-main); }
+  .player-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .player-sections { grid-template-columns: 1fr; } }
+  .player-section-title {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 6px;
+  }
+  .player-section-body { font-size: 0.84rem; color: var(--text-soft); line-height: 1.55; }
+  .player-section-body strong { color: var(--text-main); }
+  .player-section-body ul { padding-left: 16px; }
+  .player-section-body li { margin-bottom: 3px; }
+  .player-fear {
+    background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px;
+    padding: 10px 14px; margin-top: 4px;
+  }
+  .player-fear-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #c2410c; margin-bottom: 4px; }
+  .player-fear-text { font-size: 0.84rem; color: #7c2d12; line-height: 1.5; }
+  .player-links { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .player-link { font-size: 0.75rem; color: var(--accent-strong); text-decoration: none; padding: 3px 8px; border: 1px solid #bae6fd; border-radius: 20px; background: var(--accent-soft); }
+  .player-link:hover { background: #bae6fd; }
+  /* Money flow section */
+  .money-flow-section { margin-bottom: 48px; }
+  .money-flow-intro { font-size: 0.9rem; color: var(--text-soft); margin-bottom: 20px; line-height: 1.6; }
+  .money-flow-intro strong { color: var(--text-main); }
+  .money-flow-card {
+    background: var(--card); border: 1px solid var(--border-subtle); border-radius: 16px;
+    padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .money-flow-title { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+  .money-flow-subtitle { font-size: 0.82rem; color: var(--text-soft); margin-bottom: 20px; }
+  .money-flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .money-step {
+    display: grid; grid-template-columns: 120px 1fr auto;
+    gap: 12px; align-items: center; padding: 12px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .money-step:last-child { border-bottom: none; }
+  @media (max-width: 500px) { .money-step { grid-template-columns: 1fr; gap: 4px; } }
+  .money-step-actor { font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
+  .money-step-desc { font-size: 0.82rem; color: var(--text-soft); }
+  .money-step-amount {
+    font-size: 0.9rem; font-weight: 700; text-align: right; white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .money-step-amount.keeps { color: #059669; }
+  .money-step-amount.passes { color: var(--text-soft); }
+  .money-step-amount.earns { color: #d97706; }
+  .money-flow-arrow {
+    text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 4px 0; grid-column: 1 / -1;
+  }
+  .money-flow-summary {
+    margin-top: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px;
+  }
+  .money-flow-summary-title { font-size: 0.8rem; font-weight: 700; color: #065f46; margin-bottom: 8px; }
+  .money-flow-summary-row { display: flex; justify-content: space-between; font-size: 0.82rem; color: #064e3b; padding: 3px 0; }
+  /* Tensions section */
+  .tensions-section { margin-bottom: 48px; }
+  .tension-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .tension-grid { grid-template-columns: 1fr; } }
+  .tension-card {
+    background: var(--card); border: 1px solid var(--border-subtle); border-radius: 12px;
+    padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .tension-vs { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+  .tension-parties { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+  .tension-desc { font-size: 0.82rem; color: var(--text-soft); line-height: 1.5; }
+  /* Takeaway */
+  .page-takeaway {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe; border-radius: 16px; padding: 24px;
+    margin-bottom: 32px;
+  }
+  .page-takeaway-title { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin-bottom: 10px; }
+  .page-takeaway-body { font-size: 0.88rem; color: #1e3a5f; line-height: 1.6; }
+  .page-takeaway-body p { margin-bottom: 8px; }
+  .page-takeaway-body p:last-child { margin-bottom: 0; }
+  `;
+
+  const players = [
+    {
+      icon: '🏢',
+      iconBg: '#dbeafe',
+      name: 'The Advertiser',
+      examples: 'Nike, a local plumber, a SaaS startup, Amazon',
+      tagline: 'The one with something to sell',
+      badge: {text: 'Pays for ads', cls: 'badge-pays'},
+      plainEnglish:
+        'An advertiser is any company or person who wants to reach an audience. They pay for the ads you see. Their goal is simple on the surface — <strong>spend money, get customers</strong> — but the challenge is knowing whether the money actually worked.',
+      goals: `<ul>
+        <li>Reach the right people at the right moment</li>
+        <li>Drive a measurable action: a sale, a signup, a store visit</li>
+        <li>Build awareness for a new product or brand</li>
+        <li>Pay as little as possible per customer acquired</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>ROAS</strong> — Return on Ad Spend (revenue ÷ ad cost)</li>
+        <li><strong>CPA</strong> — Cost per Acquisition (cost ÷ conversions)</li>
+        <li><strong>CPM</strong> — Cost per 1,000 impressions</li>
+        <li><strong>Reach &amp; Frequency</strong> — who saw it and how often</li>
+        <li><strong>Brand Lift</strong> — did awareness actually improve?</li>
+      </ul>`,
+      economics: `<strong>Pays:</strong> Anywhere from $1–3 CPM for low-quality open-web display ads up to $20–50 CPM for premium video or connected TV. A national brand might spend $50M–$500M/year. A small business might spend $500/month on Google Ads.<br/><br/><strong>Agency fee:</strong> If they use an agency, ~10–15% of their media budget goes to the agency before a single ad is shown.`,
+      fear: 'Paying for ads nobody saw, ads appearing next to brand-damaging content, having no idea if any of it worked, or being overcharged because the supply chain is opaque.',
+      links: [{label: 'Buy Side →', href: '/topic/buy-side'}],
+    },
+    {
+      icon: '🤝',
+      iconBg: '#fef9c3',
+      name: 'The Ad Agency',
+      examples: 'GroupM, Dentsu, Havas, a boutique media shop',
+      tagline: 'The expert middleman between brand and media',
+      badge: {text: 'Earns % of spend', cls: 'badge-earns'},
+      plainEnglish:
+        'Agencies plan and buy advertising on behalf of brands. They know which TV channels, websites, and apps reach which audiences. They negotiate rates, run the campaigns, and report back on what happened. <strong>They get paid a percentage of whatever the brand spends</strong>, which creates interesting incentives.',
+      goals: `<ul>
+        <li>Win new clients; grow existing accounts</li>
+        <li>Achieve better performance than the brand could on its own</li>
+        <li>Negotiate favorable rates (volume buys buy cheaper)</li>
+        <li>Protect and grow their margin while proving value</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Campaign performance</strong> vs. benchmarks</li>
+        <li><strong>Billable media spend</strong> managed</li>
+        <li><strong>Client retention rate</strong></li>
+        <li><strong>Trading desk margin</strong> (internal)</li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> Traditionally 10–15% commission on all media spend placed. A $100M client generates $10–15M in agency revenue before any production or service fees. Some agencies also operate their own DSPs (trading desks) and earn additional margin on programmatic buys — sometimes without the client fully knowing how much.<br/><br/>Trend: brands increasingly going "in-house" and cutting agencies out of programmatic buying.`,
+      fear: 'Advertisers discovering they can go direct to platforms (Google, Meta) or set up an in-house programmatic team. Also: clients auditing the trading desk and finding undisclosed margins.',
+      links: [{label: 'Buy Side →', href: '/topic/buy-side'}],
+    },
+    {
+      icon: '⚡',
+      iconBg: '#ede9fe',
+      name: 'The DSP',
+      examples: 'The Trade Desk, Google DV360, Amazon DSP, Xandr',
+      tagline: 'The bidding engine for advertisers',
+      badge: {text: 'Earns ~15–20% of spend', cls: 'badge-earns'},
+      plainEnglish:
+        "A Demand-Side Platform is the software that actually places bids in the ad auction. When you visit a web page, that page silently runs an auction in under 100 milliseconds, and the DSP is the system submitting the bid. It knows what audiences the advertiser cares about, what they're willing to pay, and decides in real time whether this particular user, on this particular page, is worth bidding for.",
+      goals: `<ul>
+        <li>Win the right impressions for clients (not just any impressions)</li>
+        <li>Grow total platform spend (GMV)</li>
+        <li>Deliver better performance than competing DSPs</li>
+        <li>Expand into new formats: CTV, DOOH, audio</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Platform spend / GMV</strong></li>
+        <li><strong>Win rate</strong> in auctions</li>
+        <li><strong>Campaign ROAS</strong> for clients</li>
+        <li><strong>p99 bid latency</strong> (must be under 100ms)</li>
+        <li><strong>Unique reach</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> The Trade Desk charges roughly 21% platform fee on all spend run through it — so for every $100 an advertiser allocates, $21 goes to TTD and $79 goes toward actual media.<br/><br/>Google DV360 fees vary by deal type but are in the same range. Some DSPs charge a flat CPM (e.g., $0.35–1.00 per 1,000 impressions) instead of a percentage.`,
+      fear: 'Being disintermediated — either by advertisers going direct to walled gardens (Google, Meta) or by publishers creating private deal structures that bypass the open exchange.',
+      links: [
+        {label: 'Buy Side →', href: '/topic/buy-side'},
+        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
+      ],
+    },
+    {
+      icon: '🏛️',
+      iconBg: '#d1fae5',
+      name: 'The Ad Exchange',
+      examples: 'Google AdX, Xandr (Microsoft), OpenX, Amazon Publisher Services',
+      tagline: 'The stock market for ad impressions',
+      badge: {text: 'Earns per transaction', cls: 'badge-earns'},
+      plainEnglish:
+        "An ad exchange is the neutral marketplace where DSPs (buyers) and SSPs (sellers) meet to trade ad impressions in real-time auctions. Think of it like a stock exchange — it doesn't own the inventory, it just runs the market. Every time a page loads with an ad slot, the exchange runs an auction in milliseconds, picks the winner, and facilitates the transaction.",
+      goals: `<ul>
+        <li>Maximize auction volume (more transactions = more fees)</li>
+        <li>Attract both buyers (DSPs) and sellers (SSPs/publishers)</li>
+        <li>Ensure auction integrity and fight fraud</li>
+        <li>Grow into premium formats (video, CTV)</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Gross marketplace volume (GMV)</strong></li>
+        <li><strong>Fill rate</strong> — % of auctions that find a buyer</li>
+        <li><strong>Average clearing price (CPM)</strong></li>
+        <li><strong>Invalid traffic rate</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> Usually 5–20% of transaction value as a "take rate." Google AdX is estimated to earn 20%+ on many transactions. On a $10 CPM impression, the exchange might keep $1–2, passing $8–9 to the SSP/publisher.<br/><br/>Google is dominant here — AdX processes a disproportionate share of global display auctions, which is central to their antitrust case.`,
+      fear: 'Regulatory breakup (the DOJ sued Google over its exchange dominance), private marketplaces cutting out the open exchange, and fraud eroding trust in the marketplace.',
+      links: [
+        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
+        {label: 'Sell Side →', href: '/topic/sell-side'},
+      ],
+    },
+    {
+      icon: '📡',
+      iconBg: '#fce7f3',
+      name: 'The SSP',
+      examples: 'Magnite, PubMatic, Index Exchange, TripleLift',
+      tagline: "The publisher's agent in the auction",
+      badge: {text: 'Earns 10–20% of publisher revenue', cls: 'badge-earns'},
+      plainEnglish:
+        'A Supply-Side Platform helps publishers (websites, apps, streaming services) sell their ad inventory as efficiently as possible. The SSP connects the publisher to dozens of demand sources simultaneously — running a mini auction called "header bidding" that finds the highest willing buyer for each impression. Without an SSP, a publisher would have to negotiate individually with every advertiser, which is impossible at scale.',
+      goals: `<ul>
+        <li>Maximize CPM for each publisher impression</li>
+        <li>Connect publishers to as many demand sources as possible</li>
+        <li>Win "supply path optimization" battles (stay on DSPs' preferred paths)</li>
+        <li>Grow publisher relationships and exclusive inventory</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Publisher RPM</strong> (revenue per 1,000 pageviews)</li>
+        <li><strong>Fill rate</strong></li>
+        <li><strong>Unique demand sources connected</strong></li>
+        <li><strong>Win rate vs. floor prices</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> 10–20% of the publisher's ad revenue. If the exchange clears an impression at $8 CPM, the SSP might keep $0.80–1.60 and pass $6.40–7.20 to the publisher.<br/><br/>Multiple SSPs often compete for the same impression (header bidding), each taking a fee. It's possible the same impression routes through 2–3 SSPs and an exchange before reaching the publisher — each one skimming a cut.`,
+      fear: 'DSPs reducing SSP connections via Supply Path Optimization (SPO) — if a DSP decides to only route through 5 SSPs instead of 20, the other 15 lose most of their revenue.',
+      links: [
+        {label: 'Sell Side →', href: '/topic/sell-side'},
+        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
+      ],
+    },
+    {
+      icon: '📰',
+      iconBg: '#ecfdf5',
+      name: 'The Publisher',
+      examples: 'The New York Times, ESPN, a food blog, Spotify, an app developer',
+      tagline: 'Owns the audience and the ad slots',
+      badge: {text: 'Earns ~40–60¢ of each $1 spent', cls: 'badge-earns'},
+      plainEnglish:
+        "Publishers create content — articles, videos, podcasts, apps — that attract an audience. They monetize that audience primarily through ads. The publisher is at the end of the value chain: they deliver the impression the advertiser paid for, but they're also the most dependent on everyone else in the ecosystem to get paid fairly.",
+      goals: `<ul>
+        <li>Maximize revenue per visitor (RPM)</li>
+        <li>Protect the user experience (too many ads = users leave)</li>
+        <li>Build first-party data to reduce dependence on third-party cookies</li>
+        <li>Move high-value inventory to direct deals (higher CPMs, no middleman fees)</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>RPM</strong> — revenue per 1,000 pageviews</li>
+        <li><strong>CPM</strong> — what the winning ad pays per 1,000 impressions</li>
+        <li><strong>Fill rate</strong> — % of ad slots sold</li>
+        <li><strong>Ad revenue as % of total revenue</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> The publisher receives what's left after every middleman takes a cut. A $10 advertiser CPM might yield $4–6 for the publisher after exchange, SSP, and data fees.<br/><br/>Premium publishers (NYT, ESPN) with direct sales teams can earn $15–50 CPM. Long-tail publishers relying entirely on programmatic open market might earn $0.50–3 CPM. Ad blocking costs publishers an estimated $10B/year globally.`,
+      fear: 'Traffic collapse (Google algorithm update, social platform deprioritizing links), ad blocking, Google killing third-party cookies eroding their targeting value, and the entire middleman stack eating most of the revenue they generate.',
+      links: [{label: 'Sell Side →', href: '/topic/sell-side'}],
+    },
+    {
+      icon: '🗂️',
+      iconBg: '#fef3c7',
+      name: 'The Data Provider',
+      examples: 'LiveRamp, Oracle Advertising, Nielsen, Acxiom',
+      tagline: 'Sells knowledge about who the audience really is',
+      badge: {text: 'Earns CPM data fees', cls: 'badge-earns'},
+      plainEnglish:
+        'Data providers enrich ad targeting by adding knowledge that neither the publisher nor the advertiser has on their own. They collect demographic, behavioral, purchase, and location data from thousands of sources — retail loyalty programs, app usage, surveys, offline purchase data — and package it into "segments" that advertisers can buy to improve their targeting.',
+      goals: `<ul>
+        <li>License data to as many advertisers and DSPs as possible</li>
+        <li>Prove data improves campaign performance (justify the CPM premium)</li>
+        <li>Build privacy-compliant data products as cookies phase out</li>
+        <li>Expand into identity resolution (matching data across devices)</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Data segment match rate</strong></li>
+        <li><strong>CPM uplift</strong> when using their data vs. no data</li>
+        <li><strong>Revenue per segment activated</strong></li>
+        <li><strong>Identity graph scale</strong> (how many users they can identify)</li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> Data fees are typically layered on top of media CPMs. Buying a "luxury auto intender" segment might cost $1–3 additional CPM on top of the media cost. On a $10 total CPM, $1–3 might go to the data provider.<br/><br/>LiveRamp's identity resolution service (RampID) is embedded in billions of transactions per day, generating hundreds of millions in annual revenue.`,
+      fear: "Privacy regulation (GDPR, CCPA) eliminating third-party data collection. Apple's App Tracking Transparency and Google's deprecation of third-party cookies have already materially impacted this business.",
+      links: [{label: 'Data & Identity →', href: '/topic/data'}],
+    },
+    {
+      icon: '🔬',
+      iconBg: '#e0e7ff',
+      name: 'The Measurement Vendor',
+      examples: 'Nielsen, DoubleVerify, IAS (Integral Ad Science), comScore',
+      tagline: 'The independent referee of the ecosystem',
+      badge: {text: 'Earns SaaS + per-impression fees', cls: 'badge-earns'},
+      plainEnglish:
+        'Measurement vendors answer the hard question: <em>did this ad actually work, and was it real?</em> They verify that ads were viewable (not buried below the fold), served to real humans (not bots), appeared in brand-safe contexts, and reached the claimed audience. Without them, the ecosystem would be operating on the honor system — and "marking your own homework" doesn\'t inspire confidence.',
+      goals: `<ul>
+        <li>Become the mandatory verification layer on every campaign</li>
+        <li>Expand from digital into CTV and streaming measurement</li>
+        <li>Replace legacy TV currency (Nielsen is fighting to stay relevant)</li>
+        <li>Develop attention metrics beyond simple viewability</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>% of industry spend measured</strong></li>
+        <li><strong>Invalid traffic (IVT) detected</strong></li>
+        <li><strong>MRC accreditation</strong> status</li>
+        <li><strong>Client retention</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> A combination of annual SaaS contracts and per-impression measurement fees (roughly $0.01–0.05 per 1,000 impressions). IAS and DoubleVerify each generate $400–500M+ in annual revenue. Nielsen has historically earned hundreds of millions annually from TV measurement licensing.<br/><br/>The measurement industry is under pressure as platforms (Google, Meta) increasingly offer their own measurement tools — leading to "marking your own homework" concerns.`,
+      fear: 'Platforms self-reporting replacing independent measurement, the transition from panel-based (Nielsen) to always-on digital measurement losing them relevance, and streaming services refusing to grant measurement access.',
+      links: [
+        {label: '3rd-Party Providers →', href: '/topic/third-parties'},
+        {label: 'Measurement →', href: '/topic/measurement-currency'},
+      ],
+    },
+    {
+      icon: '👤',
+      iconBg: '#f3f4f6',
+      name: 'The User',
+      examples: 'You. Anyone browsing, watching, scrolling',
+      tagline: 'The product being sold',
+      badge: {text: 'Gets free content; gives attention & data', cls: 'badge-both'},
+      plainEnglish:
+        "The user is the person all of this is actually about — and yet they have the least visibility into what's happening. Every scroll, click, and purchase you make is data that flows back into this ecosystem. You're not the customer — you're the product. The \"payment\" is access to free content (news, social media, video) in exchange for your attention and data.",
+      goals: `<ul>
+        <li>Consume content without friction</li>
+        <li>See relevant ads (not creepy, not irrelevant)</li>
+        <li>Maintain some privacy and control over personal data</li>
+        <li>Not be manipulated</li>
+      </ul>`,
+      measures: `<ul>
+        <li>Not formally measured by you — <em>you are what others measure</em></li>
+        <li>Your behavior feeds DSP bid models, SSP floor prices, attribution reports</li>
+        <li>Your email is hashed and used for identity matching</li>
+        <li>Your purchases are tracked via pixels and conversion APIs</li>
+      </ul>`,
+      economics: `<strong>The deal:</strong> You receive free or subsidized content (Google Search, Instagram, news articles, Spotify's free tier) in exchange for seeing ads. The average American user generates approximately $50–80/year in digital ad revenue for the platforms they use.<br/><br/>You are not charged. But you do "pay" in attention, behavioral data, and some portion of your privacy. Privacy regulations like GDPR and CCPA give users opt-out rights — but very few exercise them.`,
+      fear: 'Feeling surveilled, targeted ads crossing the line from helpful to creepy, your data being sold without meaningful consent, and increasingly — algorithmic content curation that affects what information you see.',
+      links: [],
+    },
+  ];
+
+  const playerCardsHtml = players
+    .map(
+      (p) => `
+    <details class='player-card'>
+      <summary>
+        <div class='player-icon' style='background:${p.iconBg};'>${p.icon}</div>
+        <div class='player-summary-text'>
+          <div class='player-name'>${p.name}</div>
+          <div class='player-tagline'>${p.tagline}</div>
+        </div>
+        <div class='player-summary-meta'>
+          <span class='player-money-badge ${p.badge.cls}'>${p.badge.text}</span>
+        </div>
+        <span class='player-expand-icon' aria-hidden='true'>▾</span>
+      </summary>
+      <div class='player-body'>
+        <div class='player-plain-english'>${p.plainEnglish}</div>
+        <div class='player-sections'>
+          <div>
+            <div class='player-section-title'>Goals &amp; Motivations</div>
+            <div class='player-section-body'>${p.goals}</div>
+          </div>
+          <div>
+            <div class='player-section-title'>What They Measure</div>
+            <div class='player-section-body'>${p.measures}</div>
+          </div>
+          <div>
+            <div class='player-section-title'>Economics</div>
+            <div class='player-section-body'>${p.economics}</div>
+          </div>
+          <div>
+            <div class='player-fear'>
+              <div class='player-fear-label'>Biggest Fear</div>
+              <div class='player-fear-text'>${p.fear}</div>
+            </div>
+          </div>
+        </div>
+        ${
+          p.links.length
+            ? `<div class='player-links'>${p.links.map((l) => `<a class='player-link' href='${l.href}'>${l.label}</a>`).join('')}</div>`
+            : ''
+        }
+      </div>
+    </details>`,
+    )
+    .join('\n');
+
+  const tensionCards = [
+    {
+      a: 'Advertiser',
+      b: 'Agency',
+      desc: 'The advertiser wants efficiency and transparency; the agency earns a % of spend, so higher spend (not efficiency) maximizes their revenue. This creates a quiet conflict of interest, especially in programmatic trading.',
+    },
+    {
+      a: 'DSP',
+      b: 'Publisher',
+      desc: 'The DSP wants to win impressions as cheaply as possible (bid shading). The publisher wants to sell impressions as expensively as possible (floor prices). They never meet directly — they fight through auction mechanics.',
+    },
+    {
+      a: 'SSP',
+      b: 'Ad Exchange',
+      desc: 'SSPs and exchanges often overlap in function and both take a fee from the same transaction. Header bidding lets publishers route the same impression through multiple SSPs simultaneously, creating fierce competition.',
+    },
+    {
+      a: 'Advertiser',
+      b: 'User',
+      desc: 'The advertiser wants maximum data and targeting precision; the user wants privacy and relevance. Privacy regulation (GDPR, CCPA, ATT) is essentially the legal formalization of this tension.',
+    },
+    {
+      a: 'Publisher',
+      b: 'Ad Tech Stack',
+      desc: 'The publisher creates all the value (the audience, the content) but nets only 40–60¢ of every dollar spent. The combined "ad tech tax" of exchange, SSP, DSP, and data fees consumes the rest.',
+    },
+    {
+      a: 'Measurement Vendor',
+      b: 'Walled Gardens',
+      desc: 'Google and Meta prefer self-measurement ("trust us, your ads worked"). Independent vendors like IAS and Nielsen push for third-party verification. The tension is fundamentally about who controls the truth.',
+    },
+  ];
+
+  const tensionCardsHtml = tensionCards
+    .map(
+      (t) => `
+    <div class='tension-card'>
+      <div class='tension-vs'>Tension</div>
+      <div class='tension-parties'>${t.a} vs ${t.b}</div>
+      <div class='tension-desc'>${t.desc}</div>
+    </div>`,
+    )
+    .join('\n');
+
+  const moneyFlowSteps = [
+    {actor: 'Advertiser', desc: 'Sets a $10.00 CPM budget', amount: '−$10.00', cls: 'passes'},
+    {actor: 'Agency', desc: 'Takes ~15% commission before placing the buy', amount: '−$1.50', cls: 'keeps'},
+    {actor: 'DSP', desc: 'Takes ~20% platform fee on remaining $8.50', amount: '−$1.70', cls: 'keeps'},
+    {actor: 'Ad Exchange', desc: 'Takes ~15% on the $6.80 clearing bid', amount: '−$1.02', cls: 'keeps'},
+    {actor: 'SSP', desc: 'Takes ~12% on revenue passed from exchange', amount: '−$0.70', cls: 'keeps'},
+    {actor: 'Data Provider', desc: 'Audience segment fee layered on the buy', amount: '−$0.50', cls: 'keeps'},
+    {actor: 'Measurement', desc: 'Verification fee (DV, IAS, Nielsen)', amount: '−$0.10', cls: 'keeps'},
+    {actor: 'Publisher', desc: "Receives what's left after all fees", amount: '$4.48', cls: 'earns'},
+  ];
+
+  const moneyFlowHtml = moneyFlowSteps
+    .map(
+      (s) => `
+    <div class='money-step'>
+      <div class='money-step-actor'>${s.actor}</div>
+      <div class='money-step-desc'>${s.desc}</div>
+      <div class='money-step-amount ${s.cls}'>${s.amount}</div>
+    </div>`,
+    )
+    .join('\n');
+
+  return `<!doctype html>
+<html lang='en'>
+<head>
+  ${FAVICON_LINK}
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <title>Players & Incentives — Ad Tech Ecosystem</title>
+  <meta name='description' content='Who are the players in digital advertising, what do they want, and how do they make money? A plain-English guide to incentives, goals, and economics.' />
+  <style>${playersStyles}</style>
+</head>
+<body>
+  <a href='#main-content' class='skip-link'>Skip to main content</a>
+  <div class='page-shell' id='main-content'>
+
+    <nav class='page-top-nav'>
+      <a class='page-back' href='/'>← Overview</a>
+      <span class='breadcrumb-sep'>/</span>
+      <span class='breadcrumb-current'>Players &amp; Incentives</span>
+    </nav>
+
+    <div class='page-hero'>
+      <div class='page-hero-label'>Plain-English Guide</div>
+      <h1>Who's Playing &amp; What They Want</h1>
+      <p>Every time you see an ad, at least 6–8 different businesses had a role in it — each with their own goals, their own metrics, and their own cut of the money. This guide explains each player in plain English: what they're trying to accomplish, how they make money, and where their interests conflict.</p>
+    </div>
+
+    <div class='page-section-heading'>The Players — click to expand any card</div>
+    <div class='player-grid'>
+      ${playerCardsHtml}
+    </div>
+
+    <div class='money-flow-section'>
+      <div class='page-section-heading'>Follow the Money</div>
+      <div class='money-flow-intro'>
+        <strong>Here's the uncomfortable truth:</strong> for every dollar an advertiser spends, the publisher who actually delivered the impression — the one who created the content and built the audience — often receives less than half. The rest is distributed across the technology stack. This is sometimes called the "ad tech tax."
+        The example below traces a <strong>$10 CPM</strong> (cost per 1,000 impressions) through a typical programmatic campaign.
+      </div>
+      <div class='money-flow-card'>
+        <div class='money-flow-title'>Where does $10 of ad spend actually go?</div>
+        <div class='money-flow-subtitle'>Tracing a $10 CPM through a typical open programmatic campaign</div>
+        <div class='money-flow-steps'>
+          ${moneyFlowHtml}
+        </div>
+        <div class='money-flow-summary'>
+          <div class='money-flow-summary-title'>Summary: out of $10.00 spent by the advertiser…</div>
+          <div class='money-flow-summary-row'><span>Technology &amp; intermediary fees</span><span><strong>$5.52 (55%)</strong></span></div>
+          <div class='money-flow-summary-row'><span>Publisher (content creator) receives</span><span><strong>$4.48 (45%)</strong></span></div>
+          <div style='margin-top:10px;font-size:0.78rem;color:#065f46;'>
+            Note: these percentages vary widely. A direct deal between advertiser and publisher with no intermediaries can result in 100% reaching the publisher. A complex programmatic chain with multiple SSPs and data layers can leave publishers with less than 30%.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='tensions-section'>
+      <div class='page-section-heading'>Where Interests Collide</div>
+      <div class='tension-grid'>
+        ${tensionCardsHtml}
+      </div>
+    </div>
+
+    <div class='page-takeaway'>
+      <div class='page-takeaway-title'>The Big Picture</div>
+      <div class='page-takeaway-body'>
+        <p>Digital advertising works because it solves a hard problem: connecting millions of advertisers with billions of users across millions of websites and apps, in real time, at scale. No single company could do this alone.</p>
+        <p>But each layer of the stack adds a fee. Each intermediary extracts value. The result is a system that works — it efficiently matches supply and demand — but one where the people creating value at the edges (advertisers paying, publishers creating content) often see the worst economics.</p>
+        <p>The ongoing consolidation (Google owning the exchange, DSP, and browser; Amazon owning the DSP and the retail data) is partly a response to this: vertically integrated players can eliminate the tax by owning the whole chain. The trade-off is less competition and more power concentrated in fewer hands.</p>
+      </div>
+    </div>
+
+    <div style='font-size:0.8rem;color:var(--text-muted);text-align:center;padding-bottom:8px;'>
+      Go deeper: <a href='/topic/buy-side' style='color:var(--accent-strong);'>Buy Side</a> ·
+      <a href='/topic/sell-side' style='color:var(--accent-strong);'>Sell Side</a> ·
+      <a href='/topic/data' style='color:var(--accent-strong);'>Data &amp; Identity</a> ·
+      <a href='/topic/measurement-currency' style='color:var(--accent-strong);'>Measurement</a> ·
+      <a href='/glossary' style='color:var(--accent-strong);'>Glossary</a>
+    </div>
+
+  </div>
+</body>
+</html>`;
 };
 
 const app = new Elysia();
@@ -6971,6 +7600,12 @@ app
     }
 
     const html = renderExamplePage(id);
+    return new Response(html, {
+      headers: {'content-type': 'text/html; charset=utf-8'},
+    });
+  })
+  .get('/players', () => {
+    const html = renderPlayersPage();
     return new Response(html, {
       headers: {'content-type': 'text/html; charset=utf-8'},
     });
