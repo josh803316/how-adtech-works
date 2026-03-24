@@ -12,7 +12,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@josh803316/shared-config": "^1.1.0",
+    "@josh803316/shared-config": "^2.0.0",
     "@types/bun": "latest",
     "sharp": "^0.34.5"
   },
@@ -20,7 +20,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "elysia": "^1.4.26"
+    "elysia": "^1.4.28"
   },
   "trustedDependencies": [
     "@josh803316/shared-config",
