@@ -2215,6 +2215,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     `            <h1 class='ecosystem-title'>${example.label}</h1>`,
     `            <p class='ecosystem-subtitle'><strong>Surface:</strong> ${example.surface}</p>`,
     exampleInOneSentenceHtml,
+    `<button class="viz-flow-btn" onclick="openFov('${exampleId}')">&#9654; Visualize Ad Flow</button>`,
     renderExampleDiagram(exampleId),
     "            <div class='topic-section-heading'>The User Experience</div>",
     "            <ul class='topic-bullets'>",
@@ -2240,6 +2241,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     '      </section>',
     '    </div>',
     '  </div>',
+    renderAdFlowOverlay(exampleId),
     diagramLightboxHtml,
     '</body>',
     '</html>',
@@ -4342,6 +4344,125 @@ const homeStyles = `
 
   body.study-mode .phone-header { opacity: 0.9; }
   body.study-mode .fake-ad-container { opacity: 0.6; }
+
+  /* ---- Ad Flow Overlay ---- */
+  .fov {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fov[hidden] { display: none; }
+  .fov-bd {
+    position: absolute; inset: 0;
+    background: rgba(2,8,20,0.88); backdrop-filter: blur(4px);
+    cursor: pointer;
+  }
+  .fov-panel {
+    position: relative; z-index: 1;
+    background: #0f172a; border: 1px solid #1e3a5f;
+    border-radius: 16px; width: min(900px, 96vw);
+    padding: 24px; box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .fov-hdr {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .fov-htitle { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+  .fov-hsub { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+  .fov-close {
+    background: none; border: 1px solid #334155; color: #94a3b8;
+    width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .fov-close:hover { border-color: #64748b; color: #f1f5f9; }
+  .fov-legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-size: 0.7rem; margin-bottom: 10px; color: #94a3b8;
+    font-family: var(--font-mono, monospace);
+  }
+  .fov-svg-wrap {
+    background: #040d1a; border-radius: 10px;
+    padding: 6px; margin-bottom: 12px;
+    border: 1px solid #1e3a5f; overflow: hidden;
+  }
+  .fov-svg { width: 100%; height: auto; display: block; }
+  .fov-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 72px;
+    margin-bottom: 12px;
+    background: #0c1929;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid #1e3a5f;
+  }
+  .fov-info-top {
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .fov-stepnum {
+    font-size: 0.65rem; color: #3b82f6;
+    font-family: var(--font-mono, monospace);
+    white-space: nowrap; flex-shrink: 0;
+    background: #0f2a52; padding: 2px 7px;
+    border-radius: 4px; border: 1px solid #1d4ed8;
+  }
+  .fov-stitle {
+    font-size: 0.95rem; color: #e2e8f0; display: block;
+    font-weight: 700;
+  }
+  .fov-trail {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 4px;
+    min-height: 20px;
+  }
+  .fov-sdesc {
+    font-size: 0.76rem; color: #94a3b8;
+    line-height: 1.55; display: block;
+  }
+  .fov-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .fov-pips { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+  .fov-pip {
+    width: 26px; height: 5px; border-radius: 3px;
+    background: #1e3a5f; border: none; cursor: pointer;
+    transition: background 0.2s; padding: 0;
+  }
+  .fov-pip:hover { background: #2563eb; }
+  .fov-pip-on { background: #3b82f6 !important; }
+  .fov-ctrl { display: flex; gap: 7px; }
+  .fov-btn {
+    background: #1e293b; border: 1px solid #334155;
+    color: #94a3b8; padding: 6px 13px; border-radius: 7px;
+    cursor: pointer; font-size: 0.75rem; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .fov-btn:hover { background: #273549; color: #f1f5f9; border-color: #475569; }
+  .fov-playbtn { color: #60a5fa; border-color: #1d4ed8; }
+  .fov-playbtn:hover { background: #1e3a5f; color: #93c5fd; }
+
+  /* "Visualize Ad Flow" trigger button */
+  .viz-flow-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #1a2e4a 100%);
+    border: 1.5px solid #2563eb; color: #60a5fa;
+    padding: 10px 20px; border-radius: 9px; cursor: pointer;
+    font-size: 0.85rem; font-weight: 600; margin: 14px 0 8px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.2);
+    font-family: inherit;
+  }
+  .viz-flow-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    color: #fff; border-color: #3b82f6;
+    box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+    transform: translateY(-1px);
+  }
+  .viz-flow-btn--home {
+    width: 100%; justify-content: center;
+    margin: 10px 0 6px;
+  }
 `;
 
 // Lightbox HTML injected once per page before </body>
@@ -5441,7 +5562,8 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     "                <p class='insight-text-sub'>Follow the full data and decision path for this surface, from request to logs, on the detailed example page.</p>",
     '              </div>',
     '            </div>',
-    "            <a class='insight-link' href='" + learnHref + "'>Open the " + label + ' example →</a>',
+    `            <button class="viz-flow-btn viz-flow-btn--home" onclick="openFov('${id}')">&#9654; Visualize Ad Flow</button>`,
+    "            <a class='insight-link' href='" + learnHref + "'>Full technical breakdown →</a>",
     '          </div>',
     '        </article>',
   ].join('\n');
@@ -5688,6 +5810,559 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
   }
 
   return '';
+};
+
+// ============================================================
+// Ad Flow Overlay — animated step-through visualization
+// ============================================================
+
+type AdFlowNode = {id: string; label: string; sub: string; x: number; y: number; cat: string};
+type AdFlowEdge = {id: string; from: string; to: string; label: string; d?: string};
+type AdFlowStep = {title: string; desc: string; nodes: string[]; edges: string[]};
+type AdFlowDef = {subtitle: string; nodes: AdFlowNode[]; edges: AdFlowEdge[]; steps: AdFlowStep[]};
+
+const adFlowDefs: Record<ExampleId, AdFlowDef> = {
+  instagram: {
+    subtitle: 'From feed scroll to CAPI conversion signal',
+    nodes: [
+      {id: 'user', label: "User's Phone", sub: 'Instagram App', x: 55, y: 80, cat: 'user'},
+      {id: 'sdk', label: 'Meta SDK', sub: 'Pixel + Events API', x: 195, y: 80, cat: 'pub'},
+      {id: 'auc', label: 'Advantage+', sub: 'Ad Auction', x: 345, y: 80, cat: 'exchange'},
+      {id: 'mldco', label: 'ML Ranking', sub: 'p(action) \u00d7 bid', x: 495, y: 80, cat: 'exchange'},
+      {id: 'imp', label: 'Ad Renders', sub: 'Impression Fires', x: 650, y: 80, cat: 'measure'},
+      {id: 'capi', label: 'Conv. API', sub: 'Server-Side Signal', x: 495, y: 255, cat: 'measure'},
+      {id: 'model', label: 'Bid Model', sub: 'Auto-Updated', x: 345, y: 255, cat: 'exchange'},
+    ],
+    edges: [
+      {id: 'e0', from: 'user', to: 'sdk', label: 'scroll'},
+      {id: 'e1', from: 'sdk', to: 'auc', label: 'slot req'},
+      {id: 'e2', from: 'auc', to: 'mldco', label: 'candidates'},
+      {id: 'e3', from: 'mldco', to: 'imp', label: 'winner'},
+      {id: 'e4', from: 'imp', to: 'capi', label: 'event', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'capi', to: 'model', label: 'signal', d: 'M445 255 L395 255'},
+      {id: 'e6', from: 'model', to: 'auc', label: 'feedback', d: 'M295 255 C230 255 230 80 295 80'},
+    ],
+    steps: [
+      {
+        title: 'Feed Slot Opens',
+        desc: "You scroll Instagram. The app detects a position eligible for an ad. Meta's SDK records scroll velocity, dwell time, and content context.",
+        nodes: ['user', 'sdk'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Ad Request Sent',
+        desc: 'The SDK sends an ad request to Advantage+. The request includes your hashed user ID, content topic, device type, and recent engagement signals.',
+        nodes: ['sdk', 'auc'],
+        edges: ['e1'],
+      },
+      {
+        title: 'Auction Runs',
+        desc: 'Advantage+ runs an instant auction among all campaigns targeting users like you. Hundreds of advertisers compete in milliseconds for this single impression.',
+        nodes: ['auc', 'mldco'],
+        edges: ['e2'],
+      },
+      {
+        title: 'ML Scores & Selects',
+        desc: "Meta's ML model scores every candidate: predicted probability of your action \u00d7 advertiser's bid. Highest expected value wins. DCO may personalize the creative variant.",
+        nodes: ['mldco', 'imp'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Ad Renders',
+        desc: 'The winning ad appears in your feed. An impression event fires immediately: user ID, campaign ID, creative ID, timestamp, predicted relevance, and slot position are all logged.',
+        nodes: ['imp'],
+        edges: [],
+      },
+      {
+        title: 'Conversion Signal',
+        desc: "You click and purchase. The advertiser's server sends a Conversions API (CAPI) signal server-to-server \u2014 bypassing iOS 14+ App Tracking Transparency restrictions.",
+        nodes: ['imp', 'capi'],
+        edges: ['e4'],
+      },
+      {
+        title: 'Signal Processed',
+        desc: 'CAPI receives the conversion event. Meta matches it to the ad impression via its server-side ID graph \u2014 no browser cookies or device IDs required.',
+        nodes: ['capi', 'model'],
+        edges: ['e5'],
+      },
+      {
+        title: 'Feedback Loop Closes',
+        desc: "The conversion data updates Advantage+'s bid model. Meta now knows this creative converted this user profile. Future bids for similar users are automatically adjusted.",
+        nodes: ['model', 'auc'],
+        edges: ['e6'],
+      },
+    ],
+  },
+  youtube: {
+    subtitle: 'From video play to view-through attribution',
+    nodes: [
+      {id: 'vid', label: 'Video Plays', sub: 'Content + Player', x: 55, y: 80, cat: 'pub'},
+      {id: 'ima', label: 'IMA SDK', sub: 'Ad Request Layer', x: 195, y: 80, cat: 'pub'},
+      {id: 'gam', label: 'Google Ad Mgr', sub: 'Inventory + Auction', x: 345, y: 80, cat: 'exchange'},
+      {id: 'vast', label: 'VAST Response', sub: 'Winning Creative URL', x: 495, y: 80, cat: 'buy'},
+      {id: 'preroll', label: 'Pre-Roll Ad', sub: 'Plays in Player', x: 650, y: 80, cat: 'measure'},
+      {id: 'quartile', label: 'Quartile Events', sub: '0%\u2192100% Beacons', x: 495, y: 255, cat: 'measure'},
+      {id: 'attr', label: 'Attribution', sub: 'View-Through Credit', x: 345, y: 255, cat: 'measure'},
+    ],
+    edges: [
+      {id: 'e0', from: 'vid', to: 'ima', label: 'video starts'},
+      {id: 'e1', from: 'ima', to: 'gam', label: 'ad request'},
+      {id: 'e2', from: 'gam', to: 'vast', label: 'winning bid'},
+      {id: 'e3', from: 'vast', to: 'preroll', label: 'VAST + creative'},
+      {id: 'e4', from: 'preroll', to: 'quartile', label: 'playback events', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'quartile', to: 'attr', label: 'view data', d: 'M445 255 L395 255'},
+    ],
+    steps: [
+      {
+        title: 'Video Starts Playing',
+        desc: 'You start watching a YouTube video. The player initializes and the IMA (Interactive Media Ads) SDK activates, waiting for an ad slot opportunity.',
+        nodes: ['vid', 'ima'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Ad Request Sent',
+        desc: 'The IMA SDK sends an ad request to Google Ad Manager (GAM). The request includes content metadata, user signals, device type, and ad slot configuration (pre-roll, mid-roll, etc.).',
+        nodes: ['ima', 'gam'],
+        edges: ['e1'],
+      },
+      {
+        title: 'Auction Runs in GAM',
+        desc: 'GAM first checks direct-sold campaigns (higher priority). If none qualifies, it runs an OpenRTB auction with Authorized Buyers (DV360, agency DSPs). Highest bid wins.',
+        nodes: ['gam', 'vast'],
+        edges: ['e2'],
+      },
+      {
+        title: 'VAST URL Returned',
+        desc: 'The winning bid includes a VAST (Video Ad Serving Template) XML URL. The player fetches it to get the media file URL, tracking pixels, and playback instructions.',
+        nodes: ['vast', 'preroll'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Pre-Roll Ad Plays',
+        desc: "The ad plays. After 5 seconds a 'Skip Ad' button may appear. The advertiser is charged only if the viewer watches 30+ seconds or the full ad \u2014 whichever comes first.",
+        nodes: ['preroll'],
+        edges: [],
+      },
+      {
+        title: 'Quartile Beacons Fire',
+        desc: 'As playback progresses, tracking pixels fire at 0%, 25%, 50%, 75%, and 100% completion. These beacons verify genuine video views and feed DSP frequency/reach reporting.',
+        nodes: ['preroll', 'quartile'],
+        edges: ['e4'],
+      },
+      {
+        title: 'Attribution Credited',
+        desc: "View-through attribution is applied: if you later visit the advertiser's site or convert, it may be credited to this ad exposure. DV360/Google Ads updates campaign performance metrics.",
+        nodes: ['quartile', 'attr'],
+        edges: ['e5'],
+      },
+    ],
+  },
+  'web-display': {
+    subtitle: 'From page load to programmatic impression',
+    nodes: [
+      {id: 'page', label: 'Page Loads', sub: 'Prebid.js Fires', x: 55, y: 80, cat: 'pub'},
+      {id: 'prebid', label: 'Header Bidding', sub: 'Parallel SSP Requests', x: 195, y: 80, cat: 'pub'},
+      {id: 'bids', label: 'RTB Bids', sub: '<80ms Timeout', x: 345, y: 80, cat: 'exchange'},
+      {id: 'gam', label: 'GAM Decision', sub: 'Direct vs Programmatic', x: 495, y: 80, cat: 'exchange'},
+      {id: 'iframe', label: 'Creative Loads', sub: 'Sandboxed iFrame', x: 650, y: 80, cat: 'buy'},
+      {id: 'viewab', label: 'Viewability', sub: 'IAS / Moat Checks', x: 495, y: 255, cat: 'measure'},
+      {id: 'conv', label: 'Conversion Px', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure'},
+      {id: 'attr', label: 'Attribution', sub: 'Impressions + ROAS', x: 195, y: 255, cat: 'measure'},
+    ],
+    edges: [
+      {id: 'e0', from: 'page', to: 'prebid', label: 'page loads'},
+      {id: 'e1', from: 'prebid', to: 'bids', label: '10+ SSPs'},
+      {id: 'e2', from: 'bids', to: 'gam', label: 'highest bid wins'},
+      {id: 'e3', from: 'gam', to: 'iframe', label: 'creative loads'},
+      {id: 'e4', from: 'iframe', to: 'viewab', label: '1s in view?', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'iframe', to: 'conv', label: 'user clicks', d: 'M650 105 C650 325 345 325 345 230'},
+      {id: 'e6', from: 'conv', to: 'attr', label: 'goal signal', d: 'M295 255 L245 255'},
+    ],
+    steps: [
+      {
+        title: 'Page Load \u2014 Prebid.js Runs',
+        desc: 'The browser loads the page. Before almost anything else, Prebid.js executes in the <head> and opens simultaneous connections to 10+ SSPs. This is header bidding.',
+        nodes: ['page', 'prebid'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Parallel Bid Requests',
+        desc: 'Prebid sends parallel OpenRTB bid requests to Magnite, PubMatic, Index Exchange, Amazon TAM, and others simultaneously. All bids must return within an 80\u2013100ms timeout.',
+        nodes: ['prebid', 'bids'],
+        edges: ['e1'],
+      },
+      {
+        title: 'Bids Collected & Winner',
+        desc: 'All returned bids are ranked. Say the highest is $7.10 CPM from a travel advertiser via The Trade Desk / Magnite. This bid passes to GAM as a key-value pair.',
+        nodes: ['bids', 'gam'],
+        edges: ['e2'],
+      },
+      {
+        title: 'GAM Makes Final Decision',
+        desc: 'Google Ad Manager checks: does a direct-sold campaign (e.g. a guaranteed $12 CPM deal) outrank the $7.10 programmatic bid? If not, the programmatic ad wins.',
+        nodes: ['gam', 'iframe'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Creative Loads in iFrame',
+        desc: 'The ad creative loads in a sandboxed iFrame. The 300\u00d7250 (or other IAB size) banner renders. Sandbox isolation prevents the ad from accessing page data or user keystrokes.',
+        nodes: ['iframe'],
+        edges: [],
+      },
+      {
+        title: 'Viewability Measured',
+        desc: "An IAS or Moat tag checks: are \u226550% of the ad's pixels visible for \u22651 continuous second? (The MRC standard.) Only viewable impressions are typically billable.",
+        nodes: ['iframe', 'viewab'],
+        edges: ['e4'],
+      },
+      {
+        title: 'User Clicks the Ad',
+        desc: "You click the ad, which redirects through a click tracker to the advertiser's landing page. A conversion pixel was pre-loaded; it fires on the thank-you page when a purchase completes.",
+        nodes: ['iframe', 'conv'],
+        edges: ['e5'],
+      },
+      {
+        title: 'Attribution Report',
+        desc: 'The DSP, advertiser ad server (CM360), and publisher all receive conversion data. Last-touch attribution credits this impression. ROAS and CPA metrics update in the platform dashboards.',
+        nodes: ['conv', 'attr'],
+        edges: ['e6'],
+      },
+    ],
+  },
+  search: {
+    subtitle: 'From keyword auction to Smart Bidding feedback',
+    nodes: [
+      {id: 'query', label: 'Search Query', sub: 'Keywords Tokenized', x: 55, y: 80, cat: 'user'},
+      {id: 'match', label: 'Keyword Match', sub: 'Campaign Lookup', x: 195, y: 80, cat: 'exchange'},
+      {id: 'qs', label: 'Quality Score', sub: '1\u201310 Rating', x: 345, y: 80, cat: 'exchange'},
+      {id: 'rank', label: 'Ad Rank', sub: 'bid \u00d7 QS \u00d7 context', x: 495, y: 80, cat: 'exchange'},
+      {id: 'serp', label: 'SERP Renders', sub: 'Sponsored Results', x: 650, y: 80, cat: 'measure'},
+      {id: 'click', label: 'Click + CPC', sub: 'Vickrey Pricing', x: 495, y: 255, cat: 'measure'},
+      {id: 'goal', label: 'Conversion', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure'},
+      {id: 'smart', label: 'Smart Bidding', sub: 'Model Updates', x: 195, y: 255, cat: 'buy'},
+    ],
+    edges: [
+      {id: 'e0', from: 'query', to: 'match', label: 'keyword'},
+      {id: 'e1', from: 'match', to: 'qs', label: 'candidates'},
+      {id: 'e2', from: 'qs', to: 'rank', label: 'QS scores'},
+      {id: 'e3', from: 'rank', to: 'serp', label: 'positions'},
+      {id: 'e4', from: 'serp', to: 'click', label: 'user clicks', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'click', to: 'goal', label: 'gclid match', d: 'M445 255 L395 255'},
+      {id: 'e6', from: 'goal', to: 'smart', label: 'signal', d: 'M295 255 L245 255'},
+      {id: 'e7', from: 'smart', to: 'rank', label: 'bid adjusted', d: 'M195 230 C160 230 160 80 445 80'},
+    ],
+    steps: [
+      {
+        title: 'Search Query Submitted',
+        desc: 'You search for "best noise canceling headphones". Google tokenizes the query, classifies intent (commercial investigation), and looks up all eligible advertisers.',
+        nodes: ['query', 'match'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Keyword Matching',
+        desc: 'Google finds all campaigns whose keywords match your query (exact, phrase, or broad match). Negative keywords filter irrelevant campaigns. All eligible ads are assembled.',
+        nodes: ['match', 'qs'],
+        edges: ['e1'],
+      },
+      {
+        title: 'Quality Score Calculated',
+        desc: 'For each eligible ad: Quality Score (1\u201310) = Expected CTR \u00d7 Ad Relevance \u00d7 Landing Page Experience. Higher QS = better ad position at a lower cost-per-click.',
+        nodes: ['qs', 'rank'],
+        edges: ['e2'],
+      },
+      {
+        title: 'Ad Rank Determined',
+        desc: 'Ad Rank = CPC bid \u00d7 Quality Score \u00d7 auction-time factors (device, location, time, extensions). The top 3\u20134 ads by Ad Rank win positions above the organic results.',
+        nodes: ['rank', 'serp'],
+        edges: ['e3'],
+      },
+      {
+        title: 'SERP Renders Ads',
+        desc: "Sponsored results appear at the top of the page. Position 1 doesn't need the highest bid \u2014 it needs the highest Ad Rank. A high Quality Score can win with a lower bid.",
+        nodes: ['serp'],
+        edges: [],
+      },
+      {
+        title: 'User Clicks \u2014 CPC Charged',
+        desc: "You click an ad. The CPC = (next competitor's Ad Rank \u00f7 your QS) + $0.01 \u2014 a Vickrey-style formula that rewards relevance. The advertiser's landing page loads.",
+        nodes: ['serp', 'click'],
+        edges: ['e4'],
+      },
+      {
+        title: 'Conversion Tracked',
+        desc: 'You complete a purchase. The Goal Tag fires and sends a gclid (Google Click ID) match + conversion value back to Google Ads. Attribution is confirmed.',
+        nodes: ['click', 'goal'],
+        edges: ['e5'],
+      },
+      {
+        title: 'Smart Bidding Updates',
+        desc: "Google's Smart Bidding ingests the signal. It updates bid multipliers for this device, location, query intent, and audience segment. The loop tightens with every conversion.",
+        nodes: ['goal', 'smart', 'rank'],
+        edges: ['e6', 'e7'],
+      },
+    ],
+  },
+  'video-player': {
+    subtitle: 'From SCTE-35 cue to household attribution',
+    nodes: [
+      {id: 'stream', label: 'Content Stream', sub: 'HLS/DASH Playing', x: 55, y: 80, cat: 'pub'},
+      {id: 'scte', label: 'SCTE-35 Cue', sub: 'Ad Break Signal', x: 195, y: 80, cat: 'pub'},
+      {id: 'ads', label: 'Ad Decision', sub: 'OpenRTB CTV Auction', x: 345, y: 80, cat: 'exchange'},
+      {id: 'ssai', label: 'SSAI Server', sub: 'Stitches Manifest', x: 495, y: 80, cat: 'exchange'},
+      {id: 'player', label: 'Seamless Play', sub: 'No Buffering Gap', x: 650, y: 80, cat: 'buy'},
+      {id: 'beacon', label: 'Server Beacons', sub: 'Quartile Events', x: 495, y: 255, cat: 'measure'},
+      {id: 'acr', label: 'ACR Matching', sub: 'Content Overlap', x: 345, y: 255, cat: 'measure'},
+      {id: 'attr', label: 'HH Attribution', sub: 'Tune-in / Lift', x: 195, y: 255, cat: 'measure'},
+    ],
+    edges: [
+      {id: 'e0', from: 'stream', to: 'scte', label: 'content plays'},
+      {id: 'e1', from: 'scte', to: 'ads', label: 'break detected'},
+      {id: 'e2', from: 'ads', to: 'ssai', label: 'winning ad'},
+      {id: 'e3', from: 'ssai', to: 'player', label: 'stitched stream'},
+      {id: 'e4', from: 'player', to: 'beacon', label: 'playback events', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'beacon', to: 'acr', label: 'exposure data', d: 'M445 255 L395 255'},
+      {id: 'e6', from: 'acr', to: 'attr', label: 'show overlap', d: 'M295 255 L245 255'},
+    ],
+    steps: [
+      {
+        title: 'Content Streams to Device',
+        desc: 'The viewer watches on Roku, Fire TV, or Apple TV. The player receives an HLS/DASH manifest \u2014 a playlist of short video segments delivered from a CDN.',
+        nodes: ['stream', 'scte'],
+        edges: ['e0'],
+      },
+      {
+        title: 'SCTE-35 Cue Detected',
+        desc: 'A SCTE-35 cue point embedded in the stream signals an ad break. The Ad Decision Server receives a request with break duration, content metadata, device ID, and geo.',
+        nodes: ['scte', 'ads'],
+        edges: ['e1'],
+      },
+      {
+        title: 'CTV Auction Runs',
+        desc: 'The Ad Decision Server runs OpenRTB with CTV parameters: household IP, device type (Roku/Fire), content genre, and RDID. Advertisers bid for the household impression.',
+        nodes: ['ads', 'ssai'],
+        edges: ['e2'],
+      },
+      {
+        title: 'Ad Stitched into Stream',
+        desc: "The SSAI server fetches the winning ad, transcode-matches it to the content's bitrate and resolution, then stitches the ad segments directly into the HLS manifest.",
+        nodes: ['ssai', 'player'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Ad Plays Seamlessly',
+        desc: 'The player plays the ad as if it were regular content \u2014 same codec, same buffer, no separate ad request, no loading spinner. SSAI is completely transparent to the player.',
+        nodes: ['player'],
+        edges: [],
+      },
+      {
+        title: 'Server-Side Beacons Fire',
+        desc: 'The SSAI server fires quartile beacons (0%, 25%, 50%, 75%, 100%) server-to-server. No client-side pixel required \u2014 more reliable and immune to ad blockers on smart TVs.',
+        nodes: ['player', 'beacon'],
+        edges: ['e4'],
+      },
+      {
+        title: 'ACR Correlates Exposure',
+        desc: 'ACR technology (Samsung, LG, Samba TV) analyzes on-screen pixels to identify which ads were shown. Exposure data is matched against household content viewing history.',
+        nodes: ['beacon', 'acr'],
+        edges: ['e5'],
+      },
+      {
+        title: 'Household Attribution',
+        desc: 'Measurement companies (iSpot.tv, VideoAmp, Nielsen ONE) measure outcomes: did the household tune in to the advertised show? Did anyone in the household buy the product?',
+        nodes: ['acr', 'attr'],
+        edges: ['e6'],
+      },
+    ],
+  },
+};
+
+const renderAdFlowOverlay = (id: ExampleId): string => {
+  const data = adFlowDefs[id];
+  const ex = examples[id];
+  const NW = 100,
+    NH = 50,
+    W = 780,
+    H = 340;
+  const nodeMap = new Map(data.nodes.map((n) => [n.id, n]));
+
+  const getPath = (e: AdFlowEdge): string => {
+    if (e.d) {return e.d;}
+    const f = nodeMap.get(e.from)!;
+    const t = nodeMap.get(e.to)!;
+    return `M${f.x + NW / 2} ${f.y} L${t.x - NW / 2} ${t.y}`;
+  };
+
+  const getLabelPos = (e: AdFlowEdge): {lx: number; ly: number} => {
+    const f = nodeMap.get(e.from)!;
+    const t = nodeMap.get(e.to)!;
+    return {lx: (f.x + t.x) / 2, ly: (f.y + t.y) / 2 - 10};
+  };
+
+  const catColor: Record<string, string> = {
+    user: '#0ea5e9',
+    pub: '#06b6d4',
+    exchange: '#8b5cf6',
+    buy: '#f59e0b',
+    measure: '#10b981',
+  };
+  const catLabel: Record<string, string> = {
+    user: 'USER',
+    pub: 'PUBLISHER',
+    exchange: 'EXCHANGE',
+    buy: 'BUY SIDE',
+    measure: 'MEASUREMENT',
+  };
+
+  const svgEdges = data.edges
+    .map((e) => {
+      const d = getPath(e);
+      const {lx, ly} = getLabelPos(e);
+      const fc = catColor[nodeMap.get(e.from)?.cat ?? ''] ?? '#64748b';
+      return `<g class="fadge" data-id="${e.id}">
+      <path class="fe-bg" d="${d}" fill="none" stroke="#1e3a5f" stroke-width="1.5" marker-end="url(#fmk-dim)"/>
+      <path class="fe-flow" d="${d}" fill="none" stroke="${fc}" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#fmk-bright)"/>
+      <circle class="fe-packet" r="5" fill="${fc}"><animateMotion dur="1.1s" repeatCount="indefinite" path="${d}"/></circle>
+      <text class="fe-lbl" x="${lx}" y="${ly}" text-anchor="middle" font-size="7" fill="#475569">${e.label}</text>
+    </g>`;
+    })
+    .join('\n');
+
+  const svgNodes = data.nodes
+    .map((n) => {
+      const x = n.x - NW / 2,
+        y = n.y - NH / 2;
+      const c = catColor[n.cat] ?? '#64748b';
+      const cl = catLabel[n.cat] ?? '';
+      return `<g class="fnode" data-id="${n.id}" data-cat="${n.cat}">
+      <text x="${n.x}" y="${y - 4}" text-anchor="middle" font-size="5.5" fill="${c}" opacity="0.5" letter-spacing="0.07em">${cl}</text>
+      <rect x="${x}" y="${y}" width="${NW}" height="${NH}" rx="7" fill="#1a2540" stroke="${c}" stroke-width="1.5"/>
+      <text x="${n.x}" y="${n.y - 6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${c}">${n.label}</text>
+      <text x="${n.x}" y="${n.y + 9}" text-anchor="middle" font-size="7" fill="#94a3b8">${n.sub}</text>
+    </g>`;
+    })
+    .join('\n');
+
+  const stepsJson = JSON.stringify(data.steps);
+
+  return `<div id="fov-${id}" class="fov" hidden aria-hidden="true">
+  <div class="fov-bd" onclick="closeFov('${id}')"></div>
+  <div class="fov-panel">
+    <div class="fov-hdr">
+      <div>
+        <div class="fov-htitle">Ad Flow: ${ex.label}</div>
+        <div class="fov-hsub">${data.subtitle}</div>
+      </div>
+      <button class="fov-close" onclick="closeFov('${id}')" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="fov-legend">
+      <span style="color:#0ea5e9">&#9679; User</span>
+      <span style="color:#06b6d4">&#9679; Publisher</span>
+      <span style="color:#8b5cf6">&#9679; Exchange</span>
+      <span style="color:#f59e0b">&#9679; Buy Side</span>
+      <span style="color:#10b981">&#9679; Measurement</span>
+    </div>
+    <div class="fov-svg-wrap">
+      <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="fov-svg">
+        <defs>
+          <marker id="fmk-dim" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="#1e3a5f"/></marker>
+          <marker id="fmk-bright" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="white"/></marker>
+          <style>
+            @keyframes fdash { to { stroke-dashoffset: -28; } }
+            .fnode { opacity: 0.3; transition: opacity 0.3s; }
+            .fnode.factive { opacity: 1; }
+            .fnode.factive rect { fill: #0d2040; stroke-width: 2.5; }
+            .fadge .fe-flow { opacity: 0; transition: opacity 0.3s; }
+            .fadge.factive .fe-flow { opacity: 1; animation: fdash 0.7s linear infinite; }
+            .fadge .fe-packet { opacity: 0; transition: opacity 0.2s; }
+            .fadge.factive .fe-packet { opacity: 1; }
+          </style>
+        </defs>
+        ${svgEdges}
+        ${svgNodes}
+      </svg>
+    </div>
+    <div class="fov-info">
+      <div class="fov-info-top">
+        <span class="fov-stepnum" id="fsnum-${id}">Step 1 / ${data.steps.length}</span>
+        <strong class="fov-stitle" id="fstitle-${id}"></strong>
+      </div>
+      <div class="fov-trail" id="ftrail-${id}"></div>
+      <span class="fov-sdesc" id="fsdesc-${id}"></span>
+    </div>
+    <div class="fov-foot">
+      <div class="fov-pips" id="fpips-${id}">
+        ${data.steps.map((_, i) => `<button class="fov-pip" data-i="${i}" onclick="setFovStep('${id}',${i})" aria-label="Step ${i + 1}"></button>`).join('')}
+      </div>
+      <div class="fov-ctrl">
+        <button class="fov-btn" onclick="fovPrev('${id}')">&#8592; Prev</button>
+        <button class="fov-btn fov-playbtn" id="fplay-${id}" onclick="fovToggle('${id}')">&#9646;&#9646; Pause</button>
+        <button class="fov-btn" onclick="fovNext('${id}')">Next &#8594;</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+var _s=${stepsJson};
+var _c={i:0,play:true,t:null};
+function _go(id,i){
+  _c.i=Math.max(0,Math.min(i,_s.length-1));
+  var s=_s[_c.i];
+  var svg=document.querySelector('#fov-'+id+' .fov-svg');
+  if(!svg)return;
+  svg.querySelectorAll('.fnode').forEach(function(el){
+    el.classList.toggle('factive',s.nodes.indexOf(el.getAttribute('data-id'))!==-1);
+  });
+  svg.querySelectorAll('.fadge').forEach(function(el){
+    el.classList.toggle('factive',s.edges.indexOf(el.getAttribute('data-id'))!==-1);
+  });
+  var sn=document.getElementById('fsnum-'+id);if(sn)sn.textContent='Step '+(_c.i+1)+' / '+_s.length;
+  var st=document.getElementById('fstitle-'+id);if(st)st.textContent=s.title;
+  var sd=document.getElementById('fsdesc-'+id);if(sd)sd.textContent=s.desc;
+  var tr=document.getElementById('ftrail-'+id);
+  if(tr&&svg){
+    var seen={},cats=[];
+    s.nodes.forEach(function(nid){var ne=svg.querySelector('.fnode[data-id="'+nid+'"]');var cat=ne&&ne.getAttribute('data-cat');if(cat&&!seen[cat]){seen[cat]=1;cats.push(cat);}});
+    var cc={'user':'#0ea5e9','pub':'#06b6d4','exchange':'#8b5cf6','buy':'#f59e0b','measure':'#10b981'};
+    var cl={'user':'User','pub':'Publisher','exchange':'Exchange','buy':'Buy Side','measure':'Measurement'};
+    tr.innerHTML=cats.map(function(c){return '<span style="color:'+cc[c]+';background:'+cc[c]+'18;padding:1px 8px;border-radius:10px;border:1px solid '+cc[c]+'30;font-size:0.65rem">'+cl[c]+'</span>';}).join('<span style="color:#334155;margin:0 3px">\u2192</span>');
+  }
+  document.querySelectorAll('#fpips-'+id+' .fov-pip').forEach(function(p,j){p.classList.toggle('fov-pip-on',j===_c.i);});
+}
+function _tick(id){if(_c.t)clearInterval(_c.t);_c.t=setInterval(function(){_go(id,(_c.i+1)%_s.length);},3500);}
+var _kh=null;
+window.openFov=function(id){
+  var el=document.getElementById('fov-'+id);if(!el)return;
+  el.removeAttribute('hidden');el.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  _c.play=true;_go(id,0);_tick(id);
+  document.getElementById('fplay-'+id).innerHTML='&#9646;&#9646; Pause';
+  if(_kh)document.removeEventListener('keydown',_kh);
+  _kh=function(e){
+    if(e.key==='Escape'){closeFov(id);}
+    else if(e.key==='ArrowRight'){fovNext(id);}
+    else if(e.key==='ArrowLeft'){fovPrev(id);}
+    else if(e.key===' '){e.preventDefault();fovToggle(id);}
+  };
+  document.addEventListener('keydown',_kh);
+};
+window.closeFov=function(id){
+  var el=document.getElementById('fov-'+id);
+  if(el){el.setAttribute('hidden','');el.setAttribute('aria-hidden','true');}
+  document.body.style.overflow='';
+  if(_c.t)clearInterval(_c.t);
+  if(_kh){document.removeEventListener('keydown',_kh);_kh=null;}
+};
+window.setFovStep=function(id,i){_go(id,i);if(_c.play)_tick(id);};
+window.fovPrev=function(id){_go(id,(_c.i-1+_s.length)%_s.length);if(_c.play)_tick(id);};
+window.fovNext=function(id){_go(id,(_c.i+1)%_s.length);if(_c.play)_tick(id);};
+window.fovToggle=function(id){
+  _c.play=!_c.play;
+  document.getElementById('fplay-'+id).innerHTML=_c.play?'&#9646;&#9646; Pause':'&#9654; Play';
+  if(_c.play)_tick(id);else if(_c.t)clearInterval(_c.t);
+};
+})();
+</script>`;
 };
 
 const renderExampleSurfaceFrame = (id: ExampleId): string => {
@@ -6966,6 +7641,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '      </section>',
     '    </div>',
     '  </div>',
+    renderAdFlowOverlay(exampleId),
     renderHomeOverlays(),
     '</body>',
     '</html>',
