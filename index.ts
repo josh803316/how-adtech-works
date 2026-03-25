@@ -1302,6 +1302,114 @@ const renderTopBanner = (): string => {
 </div>`;
 };
 
+const sidebarStyles = `
+  .ide-sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 220px;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--card, #fff);
+    border-right: 1px solid var(--border-subtle, #e5e7eb);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong, #d4d4d8) transparent;
+  }
+  .ide-sidebar::-webkit-scrollbar { width: 4px; }
+  .ide-sidebar::-webkit-scrollbar-thumb { background: var(--border-strong, #d4d4d8); border-radius: 2px; }
+  @media (min-width: 901px) {
+    .ide-sidebar { display: flex; }
+    body { padding-left: 220px !important; }
+  }
+  .ide-logo {
+    padding: 15px 14px 13px;
+    border-bottom: 1px solid var(--border-subtle, #e5e7eb);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text-main, #111827);
+    font-weight: 700;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+  .ide-logo:hover { background: var(--bg-alt, #f3f4f6); }
+  .ide-logo-icon {
+    width: 22px; height: 22px;
+    border-radius: 5px;
+    background: radial-gradient(circle at 30% 20%, #e0f2fe, #38bdf8 50%, #0ea5e9);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(14,165,233,0.35);
+  }
+  .ide-section {
+    padding: 11px 10px 3px;
+    font-size: 0.59rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted, #9ca3af);
+    font-weight: 600;
+  }
+  .ide-link {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    color: var(--text-soft, #6b7280);
+    text-decoration: none;
+    font-size: 0.79rem;
+    line-height: 1.45;
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ide-link:hover { background: var(--bg-alt, #f3f4f6); color: var(--text-main, #111827); }
+  .ide-link.active {
+    border-left-color: var(--accent, #0ea5e9);
+    background: var(--accent-soft, #e0f2fe);
+    color: var(--accent-strong, #0284c7);
+    font-weight: 500;
+  }
+  .ide-link-icon { font-size: 0.75em; flex-shrink: 0; }
+`;
+
+const renderSidebar = (currentPath: string): string => {
+  const link = (href: string, icon: string, label: string): string => {
+    const active = currentPath === href ? ' active' : '';
+    return `  <a class='ide-link${active}' href='${href}'><span class='ide-link-icon'>${icon}</span>${label}</a>`;
+  };
+  return [
+    "<nav class='ide-sidebar' aria-label='Site navigation'>",
+    "  <a class='ide-logo' href='/'>",
+    "    <div class='ide-logo-icon'></div>",
+    '    <span>Ad Tech Guide</span>',
+    '  </a>',
+    "  <div class='ide-section'>Overview</div>",
+    link('/', '🏠', 'Home'),
+    "  <div class='ide-section'>Topics</div>",
+    link('/topic/ad-serving-rtb', '⚡', 'Ad Serving &amp; RTB'),
+    link('/topic/buy-side', '📈', 'Buy Side'),
+    link('/topic/sell-side', '📡', 'Sell Side'),
+    link('/topic/data', '📊', 'Data &amp; Identity'),
+    link('/topic/third-parties', '🔗', '3rd-Party Providers'),
+    link('/topic/measurement-currency', '📺', 'Measurement &amp; Currency'),
+    "  <div class='ide-section'>Examples</div>",
+    link('/example/instagram', '📱', 'Instagram'),
+    link('/example/youtube', '▶️', 'YouTube'),
+    link('/example/web-display', '🌐', 'Web Display'),
+    link('/example/search', '🔍', 'Search'),
+    link('/example/video-player', '📹', 'Video Player'),
+    "  <div class='ide-section'>Reference</div>",
+    link('/players', '💰', 'Players &amp; Incentives'),
+    link('/glossary', '📖', 'Glossary'),
+    '</nav>',
+  ].join('\n');
+};
+
 const baseStyles = `
   :root {
     --bg: #050816;
@@ -2094,6 +2202,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     '</head>',
     '<body>',
     "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    renderSidebar('/topic/' + topicId),
     "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -2200,6 +2309,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     '</head>',
     '<body>',
     "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    renderSidebar('/example/' + exampleId),
     "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -4463,6 +4573,7 @@ const homeStyles = `
     width: 100%; justify-content: center;
     margin: 10px 0 6px;
   }
+${sidebarStyles}
 `;
 
 // Lightbox HTML injected once per page before </body>
@@ -6186,7 +6297,9 @@ const renderAdFlowOverlay = (id: ExampleId): string => {
   const nodeMap = new Map(data.nodes.map((n) => [n.id, n]));
 
   const getPath = (e: AdFlowEdge): string => {
-    if (e.d) {return e.d;}
+    if (e.d) {
+      return e.d;
+    }
     const f = nodeMap.get(e.from)!;
     const t = nodeMap.get(e.to)!;
     return `M${f.x + NW / 2} ${f.y} L${t.x - NW / 2} ${t.y}`;
@@ -7192,6 +7305,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     '</head>',
     '<body>',
     "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
+    renderSidebar('/glossary'),
     "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -7532,6 +7646,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '  </style>',
     '</head>',
     '<body>',
+    renderSidebar('/'),
     "  <div class='app-shell'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -8193,10 +8308,11 @@ const renderPlayersPage = (): string => {
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>Players & Incentives — Ad Tech Ecosystem</title>
   <meta name='description' content='Who are the players in digital advertising, what do they want, and how do they make money? A plain-English guide to incentives, goals, and economics.' />
-  <style>${playersStyles}</style>
+  <style>${playersStyles}${sidebarStyles}</style>
 </head>
 <body>
   <a href='#main-content' class='skip-link'>Skip to main content</a>
+  ${renderSidebar('/players')}
   <div class='page-shell' id='main-content'>
 
     <nav class='page-top-nav'>
