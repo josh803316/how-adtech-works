@@ -1375,7 +1375,38 @@ const sidebarStyles = `
     font-weight: 500;
   }
   .ide-link-icon { font-size: 0.75em; flex-shrink: 0; }
+  .ide-sidebar-footer {
+    margin-top: auto;
+    padding: 10px 10px 14px;
+    border-top: 1px solid var(--border-subtle, #e5e7eb);
+    flex-shrink: 0;
+  }
+  .ide-theme-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle, #e5e7eb);
+    background: var(--bg-alt, #f3f4f6);
+    color: var(--text-soft, #6b7280);
+    font-size: 0.77rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ide-theme-toggle:hover { background: var(--border-subtle, #e5e7eb); color: var(--text-main, #111827); }
 `;
+
+const themeScript = `<script>
+(function(){
+  var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>`;
 
 const renderSidebar = (currentPath: string): string => {
   const link = (href: string, icon: string, label: string): string => {
@@ -1406,7 +1437,26 @@ const renderSidebar = (currentPath: string): string => {
     "  <div class='ide-section'>Reference</div>",
     link('/players', '💰', 'Players &amp; Incentives'),
     link('/glossary', '📖', 'Glossary'),
+    "  <div class='ide-sidebar-footer'>",
+    "    <button class='ide-theme-toggle' id='theme-toggle' onclick='toggleTheme()'></button>",
+    '  </div>',
     '</nav>',
+    `<script>
+function toggleTheme(){
+  var html=document.documentElement;
+  var next=html.getAttribute('data-theme')==='dark'?'light':'dark';
+  html.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+  updateThemeBtn();
+}
+function updateThemeBtn(){
+  var btn=document.getElementById('theme-toggle');
+  if(!btn)return;
+  var dark=document.documentElement.getAttribute('data-theme')==='dark';
+  btn.textContent=dark?'☀️  Light mode':'🌙  Dark mode';
+}
+updateThemeBtn();
+</script>`,
   ].join('\n');
 };
 
@@ -2196,6 +2246,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${topic.label} – Ad Tech Deep Dive</title>`,
     `  <meta name='description' content='${topic.shortDescription}' />`,
+    themeScript,
     '  <style>',
     homeStyles,
     '  </style>',
@@ -2303,6 +2354,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${example.label} – End-to-end ad tech breakdown</title>`,
     "  <meta name='description' content='End-to-end view of how this ad is targeted, auctioned, served, and measured.' />",
+    themeScript,
     '  <style>',
     homeStyles,
     '  </style>',
@@ -4573,6 +4625,76 @@ const homeStyles = `
     width: 100%; justify-content: center;
     margin: 10px 0 6px;
   }
+
+  /* ── Dark mode overrides ── */
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --bg-alt: #1a1b26;
+    --card: #1e2030;
+    --card-soft: #181926;
+    --border-subtle: rgba(148,163,184,0.15);
+    --border-strong: rgba(148,163,184,0.28);
+    --accent: #38bdf8;
+    --accent-soft: rgba(56,189,248,0.12);
+    --accent-strong: #7dd3fc;
+    --text-main: #e2e8f0;
+    --text-soft: #94a3b8;
+    --text-muted: #64748b;
+    --shadow-phone: 0 18px 40px rgba(0,0,0,0.55);
+  }
+  [data-theme="dark"] body {
+    background-image:
+      radial-gradient(circle, #1e2030 1px, transparent 0),
+      radial-gradient(circle, #1e2030 1px, transparent 0);
+  }
+  [data-theme="dark"] .top-banner { background: #1c1810; border-color: #78350f; }
+  [data-theme="dark"] .top-banner-headline { color: #fcd34d; }
+  [data-theme="dark"] .top-banner-sub,
+  [data-theme="dark"] .top-banner-brand,
+  [data-theme="dark"] .top-banner-why { color: #f59e0b; }
+  [data-theme="dark"] .ecosystem-card { background: var(--card); }
+  [data-theme="dark"] .ecosystem-pill { background: var(--bg-alt); color: var(--text-soft); }
+  [data-theme="dark"] .topic-card { background: var(--card); color: var(--text-main); }
+  [data-theme="dark"] .topic-icon { background: rgba(56,189,248,0.1); }
+  [data-theme="dark"] .instagram-card,
+  [data-theme="dark"] .insight-card { background: var(--card); }
+  [data-theme="dark"] .insight-icon { background: rgba(56,189,248,0.1); }
+  [data-theme="dark"] .example-tabs { background: var(--card); }
+  [data-theme="dark"] .example-tab.active { background: var(--accent-strong); color: #0f172a; }
+  [data-theme="dark"] .menu-btn-wide {
+    background: rgba(56,189,248,0.08);
+    border-color: rgba(56,189,248,0.25);
+    color: #7dd3fc;
+  }
+  [data-theme="dark"] .menu-btn-wide:hover { background: rgba(56,189,248,0.15); }
+  [data-theme="dark"] .players-callout {
+    background: linear-gradient(135deg, #1c1810, #1a1600);
+    border-color: #78350f;
+  }
+  [data-theme="dark"] .players-callout:hover { background: linear-gradient(135deg, #221d0e, #1e1a00); }
+  [data-theme="dark"] .players-callout-title { color: #fcd34d; }
+  [data-theme="dark"] .players-callout-sub,
+  [data-theme="dark"] .players-callout-arrow { color: #f59e0b; }
+  [data-theme="dark"] .key-term-chip {
+    background: var(--bg-alt);
+    border-color: var(--border-strong);
+    color: var(--accent-strong);
+  }
+  [data-theme="dark"] .company-chip {
+    background: var(--bg-alt);
+    border-color: var(--border-strong);
+    color: var(--text-soft);
+  }
+  [data-theme="dark"] .glossary-item { color: var(--text-soft); }
+  [data-theme="dark"] .glossary-item.active {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-color: var(--accent);
+  }
+  [data-theme="dark"] details summary { color: var(--text-main); }
+  [data-theme="dark"] .in-one-sentence { color: var(--text-main); }
+  [data-theme="dark"] a { color: var(--accent-strong); }
+  [data-theme="dark"] .topic-bullets li { color: var(--text-main); }
 ${sidebarStyles}
 `;
 
@@ -7299,6 +7421,7 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     '  <title>Ad Tech Glossary</title>',
     "  <meta name='description' content='Plain-language glossary for core ad tech, data, and marketplace terms.' />",
+    themeScript,
     '  <style>',
     homeStyles,
     '  </style>',
@@ -7641,6 +7764,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     '  <title>Ad Tech Ecosystem – Overview</title>',
     "  <meta name='description' content='Visual guide to how modern ad tech, data pipelines, and real-time bidding work, using Instagram and other ad surfaces as examples.' />",
+    themeScript,
     '  <style>',
     homeStyles,
     '  </style>',
@@ -7943,6 +8067,47 @@ const renderPlayersPage = (): string => {
   .page-takeaway-body { font-size: 0.88rem; color: #1e3a5f; line-height: 1.6; }
   .page-takeaway-body p { margin-bottom: 8px; }
   .page-takeaway-body p:last-child { margin-bottom: 0; }
+
+  /* ── Dark mode overrides ── */
+  [data-theme="dark"] {
+    --bg: #0f1117;
+    --bg-alt: #1a1b26;
+    --card: #1e2030;
+    --card-soft: #181926;
+    --border-subtle: rgba(148,163,184,0.15);
+    --border-strong: rgba(148,163,184,0.28);
+    --accent: #38bdf8;
+    --accent-soft: rgba(56,189,248,0.12);
+    --accent-strong: #7dd3fc;
+    --text-main: #e2e8f0;
+    --text-soft: #94a3b8;
+    --text-muted: #64748b;
+  }
+  [data-theme="dark"] body {
+    background-image:
+      radial-gradient(circle, #1e2030 1px, transparent 0),
+      radial-gradient(circle, #1e2030 1px, transparent 0);
+  }
+  [data-theme="dark"] .player-card { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .player-card-header { border-color: var(--border-subtle); }
+  [data-theme="dark"] .player-name { color: var(--text-main); }
+  [data-theme="dark"] .player-tagline { color: var(--text-soft); }
+  [data-theme="dark"] .player-body { color: var(--text-main); }
+  [data-theme="dark"] .money-flow-card { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .money-flow-title { color: var(--text-main); }
+  [data-theme="dark"] .money-flow-subtitle { color: var(--text-soft); }
+  [data-theme="dark"] .money-step { border-color: var(--border-subtle); }
+  [data-theme="dark"] .money-step-actor { color: var(--text-main); }
+  [data-theme="dark"] .money-step-desc { color: var(--text-soft); }
+  [data-theme="dark"] .tension-card { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .tension-parties { color: var(--text-main); }
+  [data-theme="dark"] .tension-desc { color: var(--text-soft); }
+  [data-theme="dark"] .page-takeaway { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .page-takeaway-title { color: var(--accent-strong); }
+  [data-theme="dark"] .page-takeaway-body { color: var(--text-main); }
+  [data-theme="dark"] .page-top-nav { background: transparent; }
+  [data-theme="dark"] .page-back { color: var(--accent-strong); }
+  [data-theme="dark"] a { color: var(--accent-strong); }
   `;
 
   const players = [
@@ -8308,6 +8473,7 @@ const renderPlayersPage = (): string => {
   <meta name='viewport' content='width=device-width, initial-scale=1' />
   <title>Players & Incentives — Ad Tech Ecosystem</title>
   <meta name='description' content='Who are the players in digital advertising, what do they want, and how do they make money? A plain-English guide to incentives, goals, and economics.' />
+  ${themeScript}
   <style>${playersStyles}${sidebarStyles}</style>
 </head>
 <body>
