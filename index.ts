@@ -7882,6 +7882,7 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '  </div>',
     renderAdFlowOverlay(exampleId),
     renderHomeOverlays(),
+    diagramLightboxHtml,
     '</body>',
     '</html>',
   ].join('\n');
