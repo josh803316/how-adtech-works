@@ -6,7 +6,14 @@ const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data
 
 type TopicId = 'buy-side' | 'sell-side' | 'data' | 'third-parties' | 'ad-serving-rtb' | 'measurement-currency';
 
-type ExampleId = 'instagram' | 'youtube' | 'web-display' | 'search' | 'video-player';
+type ExampleId =
+  | 'instagram'
+  | 'youtube'
+  | 'web-display'
+  | 'search'
+  | 'video-player'
+  | 'audio-streaming'
+  | 'digital-billboard';
 
 type FurtherReadingItem = {label: string; url: string};
 
@@ -79,7 +86,20 @@ type GlossaryId =
   | 'prebid'
   | 'gam'
   | 'walled-garden'
-  | 'dmp';
+  | 'dmp'
+  | 'ad-ops'
+  | 'csm'
+  | 'holding-company'
+  | 'programmatic-audio'
+  | 'dooh'
+  | 'ooh'
+  | 'geo-fencing'
+  | 'foot-traffic'
+  | 'gps-data'
+  | 'lwa'
+  | 'mrd'
+  | 'print-ads'
+  | 'cow';
 
 type GlossaryEntry = {
   id: GlossaryId;
@@ -96,7 +116,15 @@ const topics: Record<TopicId, Topic> = {
     label: 'Buy Side (Demand)',
     shortDescription:
       'How advertisers, agencies, and DSPs decide which impressions to buy — and the technology that executes billions of bid decisions per day.',
-    companies: ['The Trade Desk', 'Google DV360', 'Amazon DSP', 'Microsoft Xandr', 'Yahoo DSP', 'MediaMath'],
+    companies: [
+      'The Trade Desk',
+      'Google DV360',
+      'Amazon DSP',
+      'Microsoft Xandr',
+      'Ribeye Media',
+      'Yahoo DSP',
+      'MediaMath',
+    ],
     overview: [
       '<strong>The buy side</strong> is the demand side of digital advertising: everyone involved in deciding <em>which</em> ads to show and <em>how much to pay</em>. It spans the <strong>advertiser</strong> (the brand paying for ads), the <strong>agency</strong> (which plans and buys on their behalf), and the <strong>Demand-Side Platform (DSP)</strong> — the software that actually submits bids in real-time auctions. When you see an ad anywhere on the internet, the buy side has already decided, in under 100 milliseconds, that you were worth showing it to and at what price.',
       '<strong>Advertisers</strong> are the brands and companies paying for ads: Nike, a local restaurant, a SaaS startup. They define campaign goals (brand awareness, app installs, e-commerce purchases), budgets, flight dates, and targeting requirements. Most advertisers don’t operate DSPs directly — they work through agencies or managed service teams.',
@@ -156,7 +184,16 @@ const topics: Record<TopicId, Topic> = {
     label: 'Sell Side (Supply)',
     shortDescription:
       'How publishers and SSPs package inventory, run header bidding, and maximize revenue from every ad slot.',
-    companies: ['Magnite', 'PubMatic', 'OpenX', 'Index Exchange', 'TripleLift', 'Sharethrough', 'Google Ad Manager'],
+    companies: [
+      'Magnite',
+      'PubMatic',
+      'OpenX',
+      'Index Exchange',
+      'TripleLift',
+      'Ribeye Media',
+      'Sharethrough',
+      'Google Ad Manager',
+    ],
     overview: [
       '<strong>The sell side</strong> is the supply side of programmatic advertising: <strong>publishers</strong> who own the places where ads appear (websites, apps, streaming services, games) and the technology that helps them sell those slots to the highest bidder. Publishers are paid in <strong>CPM</strong> (cost per thousand impressions), so their goal is to maximize both <strong>fill rate</strong> (what percentage of slots get a paid ad) and the price per impression — a balance of volume and <strong>yield</strong>.',
       'A <strong>publisher</strong> can be a massive media company (The New York Times, Spotify, Disney Streaming) or a small blog running Google AdSense. Their ad inventory is their product — slots in their layout where ads can appear. The quality of inventory (brand safety, viewability, audience) determines what CPM it can command.',
@@ -222,6 +259,7 @@ const topics: Record<TopicId, Topic> = {
       '<strong>Second-party data</strong> is first-party data from another company, shared directly (e.g., an airline sharing frequent-flyer profiles with a hotel chain they partner with). <strong>Third-party data</strong> is audience data aggregated and sold by data brokers (Oracle’s BlueKai, Experian, Acxiom, Lotame) — demographic segments, purchase-intent signals, behavioral categories. Third-party cookie-based data is collapsing due to browser restrictions and privacy laws.',
       '<strong>Privacy regulations</strong> have fundamentally reshaped data in ad tech. GDPR (EU, 2018) requires explicit consent before collecting or processing personal data — affecting any site with European visitors. CCPA (California, 2020) gives California residents the right to opt out of data sales. Apple’s ATT (App Tracking Transparency, 2021) requires iOS apps to ask permission before tracking users across apps — this effectively eliminated IDFA (Apple’s ad ID) as a targeting signal for most apps, devastating mobile advertising accuracy.',
       '<strong>Identifiers</strong> are how users are recognized across sessions and sites. Historically: third-party cookies (browser-set, now blocked by Safari/Firefox, being phased out by Chrome), IDFA (Apple’s Identifier for Advertisers), GAID (Google’s Advertising ID for Android). Post-cookie alternatives: <strong>UID2</strong> (The Trade Desk — hashed/encrypted email), <strong>RampID</strong> (LiveRamp — identity graph linking many ID types), <strong>Google Privacy Sandbox</strong> (browser-level Topics API for interest-based targeting without individual identifiers), first-party login IDs (publisher logins matched to advertiser CRMs).',
+      '<strong>Location & GPS Data:</strong> Precise geographic data is a powerful targeting and measurement signal. By collecting (with user consent) latitude and longitude from mobile devices, ad tech companies can perform <strong>geo-fencing</strong> (targeting users in a specific area) and <strong>foot-traffic measurement</strong> (calculating how many people visit a physical store after seeing an ad). Companies like <strong>InMarket</strong> and <strong>Cuebiq</strong> specialize in this data, which is critical for bridging the gap between digital ads and real-world outcomes.',
       '<strong>LiveRamp</strong> is the dominant identity infrastructure provider. Their <strong>RampID</strong> connects an advertiser’s CRM records (hashed emails, phone numbers) to publisher user IDs and DSP cookies — without exposing raw PII. Think of it as a translator: your email address becomes a RampID, and that RampID links to publisher IDs and DSP cookies so an advertiser can reach you across sites without the publisher or DSP knowing who you are. LiveRamp’s <strong>Authenticated Traffic Solution (ATS)</strong> lets publishers pass RampIDs in bid requests, giving DSPs user-level signals even without third-party cookies.',
     ],
     technical: [
@@ -345,6 +383,7 @@ const topics: Record<TopicId, Topic> = {
     overview: [
       '<strong>Real-time bidding (RTB)</strong> is the heartbeat of programmatic advertising. Every time you load a web page, open an app, or start a streaming video, ad slots in that content trigger auctions — each lasting less than 100 milliseconds. A page load might trigger dozens of parallel auctions, each independently choosing the best ad for that specific slot, for that specific user, at that specific moment.',
       '<strong>What is a creative?</strong> The creative is the actual ad content delivered to the user. Types: (1) <em>Display banner</em> — static image (PNG/JPEG) or animated HTML5 (a ZIP of HTML/CSS/JS following IAB’s AMPHTML or standard HTML5 spec); (2) <em>Video</em> — an MP4 file served via the VAST XML protocol; (3) <em>Native ad</em> — a headline, image, description, and URL assembled by the publisher’s own UI template to blend with surrounding content; (4) <em>Rich media</em> — expandable banners, interactive formats, or VPAID-wrapped video with JavaScript interactivity. HTML5 banners replaced Flash entirely around 2017.',
+      '<strong>Consolidated Omnichannel Workflow (C.O.W.):</strong> A new trend in ad serving is the unification of the stack to reduce complexity, especially for local media. Platforms like <strong>Ribeye Media</strong> provide a <strong>C.O.W.</strong> that allows buyers to plan and execute across CTV, Audio, and Display in a single interface. This eliminates the "fragmentation tax" where buyers have to manage separate enterprise tools for every different media format.',
       '<strong>Ad servers</strong> are the systems responsible for storing, trafficking, and serving creatives to users. On the <em>buy side</em>, Google’s <strong>Campaign Manager 360 (CM360)</strong> — formerly DoubleClick Campaign Manager (DCM) — is the dominant tool used by agencies and advertisers. It stores creatives, applies targeting at serve-time, fires impression pixels, handles click-through redirects, and produces unified cross-platform reporting. On the <em>sell side</em>, <strong>Google Ad Manager (GAM)</strong> is the dominant publisher ad server, managing both direct-sold and programmatic inventory. <strong>Flashtalking</strong> (now part of Mediaocean) and <strong>Sizmek</strong> (acquired by Amazon) are CM360 alternatives.',
       '<strong>Dynamic Creative Optimization (DCO)</strong> generates personalized ad creative at serve time instead of pre-building every variant. A DCO system has a creative template with variable slots (headline, background, product image, CTA button). At serve time, a DCO server selects the best combination based on user data (weather, location, browsing history, CRM segment), assembles the creative, and returns it — all within the RTB timeline. This enables one campaign to effectively run thousands of relevant creative variants without manually trafficking each one.',
       '<strong>The OpenRTB protocol</strong> (maintained by IAB Tech Lab) is the standard JSON-over-HTTP API for programmatic auctions. When an SSP has an impression to sell, it formats a bid request per the OpenRTB spec and sends it to all connected DSPs. DSPs respond with bid responses. The SSP runs the auction and notifies the winner. OpenRTB defines the exact field names, data types, and enumerations used in these messages — it’s what makes different companies’ systems interoperable.',
@@ -398,7 +437,16 @@ const topics: Record<TopicId, Topic> = {
     label: 'Measurement, Currency & Clean Rooms',
     shortDescription:
       'TV and digital measurement, upfronts, attribution models, clean rooms, pixels, and how we prove advertising actually worked. TV/CTV measurement relies on currency, co-viewing, and ACR; digital relies more on incrementality studies, MMM, and MTA — with Data Science and Data Engineering playing key roles.',
-    companies: ['Nielsen', 'VideoAmp', 'iSpot.tv', 'Comscore', 'LiveRamp', 'Snowflake', 'Google Ads Data Hub'],
+    companies: [
+      'Nielsen',
+      'VideoAmp',
+      'iSpot.tv',
+      'Comscore',
+      'Ribeye Media',
+      'LiveRamp',
+      'Snowflake',
+      'Google Ads Data Hub',
+    ],
     overview: [
       '<strong>Measurement</strong> answers the most fundamental question in advertising: did it work? Without measurement, advertisers are spending blindly. The measurement ecosystem involves verifying that ads were seen (viewability), by the right people (demographic verification), and that they drove outcomes (attribution). Different media (TV, digital, CTV) have evolved different measurement systems that the industry is now trying to reconcile into cross-media measurement.',
       '<strong>Currency</strong> (<a href=’/glossary?term=currency’>what is currency?</a>) in media means the agreed-upon standard that buyers and sellers use to transact and guarantee delivery. In linear TV, <strong>Nielsen</strong> has been the dominant currency for 70+ years. A network guarantees ‘we will deliver 10 million adults 25-54’ using Nielsen’s panel-based ratings. If delivery falls short, the network issues make-goods — extra ad inventory to compensate. The currency standard is what makes guarantees possible.',
@@ -567,14 +615,68 @@ const examples: Record<ExampleId, Example> = {
       "<strong>Google's data advantage in Search:</strong> Google knows what you've searched before, what you've clicked, your location history (Maps), and your Gmail content (aggregated for ad purposes). This lets their ad auction be more accurate than keyword matching alone. The system considers: have you already converted on this advertiser's site (suppress retargeting)? Are you researching (early funnel) or ready to buy (late funnel)? What's your device's geo relative to store locations? This contextual richness, combined with billions of daily queries, makes Google Search the highest-intent ad surface in existence.",
     ],
     keyTakeaways: [
-      'Search ads are intent-driven: the query is the targeting signal. Ad Rank = CPC bid × Quality Score × auction-time factors; you pay the minimum to beat the next competitor.',
-      'Responsive Search Ads and Smart Bidding (Target CPA, ROAS) rely on conversion tracking; Quality Score affects position and actual CPC.',
+      'CTV uses SSAI (server-side ad insertion) for most premium inventory — ad stitched into the stream, no client-side ad blocking. OpenRTB with video extensions; longer timeouts and device IDs (no cookies).',
+      'Identity and frequency capping are hard across CTV devices; ACR and household IP matching power measurement and attribution.',
     ],
     inOneSentence:
-      'Search ads are sold on the query: keyword matching, Quality Score, and Ad Rank determine position; the highest-intent surface in digital advertising.',
+      'CTV/streaming video ads are served via SSAI or CSAI, bought programmatically with device and household IDs, and measured with ACR and IP-based attribution.',
     furtherReading: [
-      {label: 'Google Ads Help', url: 'https://support.google.com/google-ads'},
-      {label: 'Quality Score', url: 'https://support.google.com/google-ads/answer/6167118'},
+      {label: 'IAB VAST for CTV', url: 'https://www.iab.com/guidelines/vast/'},
+      {label: 'SCTE-35', url: 'https://www.scte.org/standards'},
+    ],
+  },
+  'audio-streaming': {
+    id: 'audio-streaming',
+    label: 'Programmatic Audio Ad',
+    surface: 'Music streaming (Spotify), Podcasts, and Digital Radio (SiriusXM)',
+    story: [
+      "You're listening to a playlist on Spotify's free tier or a podcast on SiriusXM, and a 30-second audio ad plays between songs. Just like CTV, this ad wasn't just 'broadcast' to everyone — it was selected for you in a real-time auction based on your listener profile, mood, and demographics.",
+      'Audio advertising is uniquely personal. It "follows" the user across devices — from mobile phones to smart speakers (Alexa/Google Home) to connected cars. Because listeners are often "eyes-busy" (driving, exercising, cooking), audio ads rely on high-quality production and clear calls to action.',
+      'SiriusXM and Pandora (SXM Media) operate one of the largest digital audio marketplaces. They use their own first-party data (what you listen to, your subscription data) to help advertisers target specific "moods" or "moments" — like "workout," "focus," or "party."',
+      "Podcast advertising is a growing sub-sector. While many podcast ads are still 'host-read' (baked into the audio file), programmatic 'dynamically inserted' ads are becoming the norm. This allows a podcast recorded three years ago to serve a relevant, current ad to a new listener today.",
+    ],
+    technicalFlow: [
+      "<strong>Audio Ad Request:</strong> The streaming app (e.g., Spotify) reaches a natural break or a pre-defined ad slot. It sends a request to an Audio SSP (like AdsWizz or Targetspot). The request includes listener ID, device type, content category (e.g., 'True Crime Podcast'), and often 'mood' or 'genre' metadata.",
+      "<strong>DAAAST and VAST:</strong> The industry uses VAST (Video Ad Serving Template) or the audio-specific DAAAST standard. These XML files deliver the audio file URL (usually a high-quality MP3 or AAC) and tracking beacons for 'start,' 'midpoint,' and 'complete.'",
+      "<strong>Targeting and Moods:</strong> Audio DSPs allow advertisers to target based on 'Genre' (Jazz, Rock, Hip Hop) and 'Context' (Gaming, Cooking, Driving). Because audio doesn't have 'viewability,' measurement focuses on <em>Listen-Through Rate (LTR)</em> and <em>Listen-While-Active (LWA)</em>.",
+      "<strong>Companion Ads:</strong> Many audio ads also deliver a 'companion banner' that appears on the phone or car screen while the audio plays. This provides a clickable surface for the user to 'Shop Now' or 'Learn More' without interrupting their listening experience.",
+    ],
+    keyTakeaways: [
+      'Programmatic audio uses VAST/DAAAST to deliver ads to streaming apps, smart speakers, and cars.',
+      'Targeting is based on first-party listener data, genre, and "mood" context. LTR (Listen-Through Rate) is the primary success metric.',
+    ],
+    inOneSentence:
+      'Audio ads are delivered programmatically to streaming services and podcasts using VAST XML, targeted by listener behavior and context.',
+    furtherReading: [
+      {label: 'IAB Digital Audio Guide', url: 'https://www.iab.com/insights/digital-audio-buyers-guide/'},
+      {label: 'SXM Media', url: 'https://www.sxmmedia.com/'},
+    ],
+  },
+  'digital-billboard': {
+    id: 'digital-billboard',
+    label: 'Programmatic DOOH (Billboard)',
+    surface: 'Digital Billboards, Transit Screens, and Elevators',
+    story: [
+      "You're driving down a highway or standing in an elevator, and the digital screen changes to show an ad for a local car dealership or a new movie. This is Digital Out-of-Home (DOOH). While traditional billboards were static paper, modern DOOH is connected to the internet and bought programmatically.",
+      'Programmatic DOOH (pDOOH) allows advertisers to buy screens based on "triggers" like weather, time of day, or proximity to a store. If it starts raining, a DSP can automatically start bidding on screens for umbrella or rain boot ads.',
+      'The bridge to digital is <strong>Location Data</strong>. By analyzing anonymized GPS signals from mobile phones (foot traffic), ad tech companies can estimate how many people — and what <em>types</em> of people — are passing a specific billboard at any given hour.',
+      'This creates a "one-to-many" medium. Unlike a phone where one ad = one person, a billboard impression might represent 50 people who drove past it. Measurement is therefore based on "multipliers" provided by companies like Geopath.',
+    ],
+    technicalFlow: [
+      "<strong>The DOOH Ad Request:</strong> The screen's media player (e.g., JCDecaux, Clear Channel) sends a request to a DOOH SSP (like Vistar Media or Place Exchange). The request includes the Screen ID, its latitude/longitude, and the current 'loop' status.",
+      "<strong>Impression Multipliers:</strong> Because one screen play reaches many people, the SSP uses a 'multiplier.' If data shows 45 people typically see that screen at 5:00 PM on a Tuesday, the DSP is charged for 45 impressions for a single ad play.",
+      "<strong>Geo-Fencing and Retargeting:</strong> Advertisers often use 'Mobile Extension' or 'Geo-Retargeting.' If your phone's GPS data shows you were in the vicinity of a billboard, the advertiser can later retarget you with a follow-up ad on your mobile phone to 'close the loop.'",
+      "<strong>Store Visit Attribution:</strong> This is the 'holy grail' of OOH. By matching mobile GPS data (users who were near the billboard) with store visit data (users who later entered the retail location), advertisers can prove that the billboard actually drove physical foot traffic.",
+    ],
+    keyTakeaways: [
+      'DOOH is a "one-to-many" medium bought via specialized SSPs. It uses foot traffic data to estimate impressions.',
+      'Real-world triggers (weather, location) drive automated buying. GPS data bridges the gap between seeing a billboard and visiting a store.',
+    ],
+    inOneSentence:
+      'Digital Out-of-Home ads are digital screens in public spaces bought programmatically using location data and real-world triggers.',
+    furtherReading: [
+      {label: 'Vistar Media - What is pDOOH?', url: 'https://www.vistarmedia.com/blog/what-is-programmatic-dooh'},
+      {label: 'Geopath Measurement', url: 'https://geopath.org/'},
     ],
   },
   'video-player': {
@@ -955,10 +1057,10 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'An intermediary that plans, buys, and manages ad campaigns on behalf of advertisers.',
     definition: [
-      'Agencies (e.g. GroupM, Publicis, IPG Mediabrands) handle media planning, programmatic buying, creative trafficking, and reporting. Holding-company agencies often run trading desks that centralize DSP access across many clients.',
-      'They negotiate rates, set up campaigns in DSPs, and ensure brand safety and performance targets are met.',
+      'Agencies (e.g. GroupM, Publicis, IPG Mediabrands) handle media planning, programmatic buying, creative trafficking, and reporting. Large agencies are often part of a <strong>Holding Company</strong> (the "Big Six"), which centralizes buying power and technology across multiple agency brands.',
+      'They negotiate rates, set up campaigns in DSPs, and ensure brand safety and performance targets are met. Inside an agency, roles like <strong>Ad Ops</strong> handle technical execution while account teams handle strategy.',
     ],
-    related: ['advertiser', 'dsp', 'campaign'],
+    related: ['advertiser', 'dsp', 'campaign', 'holding-company', 'ad-ops'],
   },
   campaign: {
     id: 'campaign',
@@ -1104,6 +1206,148 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     ],
     related: ['segment', 'third-party-data', 'clean-room'],
   },
+  'ad-ops': {
+    id: 'ad-ops',
+    term: 'Ad Operations (Ad Ops)',
+    category: 'Marketplace',
+    shortDefinition:
+      'The team responsible for the technical execution, trafficking, and troubleshooting of ad campaigns.',
+    definition: [
+      'Ad Ops is the "engine room" of advertising. On the buy side (agency/advertiser), they traffic creatives into ad servers, set up tracking pixels, configure targeting in DSPs, and ensure campaigns launch on time. On the sell side (publisher), they manage inventory, set up header bidding, and optimize yield.',
+      'Key tasks: creative QA, pixel implementation, discrepancy troubleshooting, and reporting. They are the bridge between the media plan and the technical reality of the internet.',
+    ],
+    related: ['agency', 'publisher', 'pixel', 'creative'],
+  },
+  csm: {
+    id: 'csm',
+    term: 'Customer Success Manager (CSM)',
+    category: 'Marketplace',
+    shortDefinition: 'The relationship owner between an ad tech vendor (DSP/SSP) and their clients.',
+    definition: [
+      "CSMs at ad tech companies (like The Trade Desk or Google) ensure that agencies and brands are using the platform effectively. They provide strategic recommendations, training, and help troubleshoot performance issues. Their goal is to grow the client's spend on the platform by proving value and driving results.",
+      'While Ad Ops handles the "how," CSMs often handle the "what" and "why" — aligning platform features with the advertiser\'s business goals.',
+    ],
+    related: ['dsp', 'ssp', 'agency'],
+  },
+  'holding-company': {
+    id: 'holding-company',
+    term: 'Agency Holding Company',
+    category: 'Marketplace',
+    shortDefinition: 'A massive global parent company that owns dozens of individual ad and media agencies.',
+    definition: [
+      'The "Big Six" holding companies (WPP, Publicis, Omnicom, IPG, Dentsu, Havas) own thousands of agencies worldwide. They centralize media buying power through "Trading Desks" that negotiate massive volume deals with publishers and platforms.',
+      'An advertiser might work with a creative agency, a media agency, and a PR agency — all of which are owned by the same holding company.',
+    ],
+    related: ['agency', 'advertiser'],
+  },
+  'programmatic-audio': {
+    id: 'programmatic-audio',
+    term: 'Programmatic Audio',
+    category: 'Marketplace',
+    shortDefinition: 'Automated buying and selling of audio ad inventory (podcasts, streaming music, digital radio).',
+    definition: [
+      'Audio ads served in digital environments like Spotify, Pandora, iHeartRadio, and SiriusXM. Unlike traditional radio, these can be targeted based on listener demographics, interests, and device data.',
+      'Technical standards like DAAAST (Digital Audio Ad Serving Template) or VAST with audio extensions are used to deliver these ads.',
+    ],
+    related: ['vast', 'dsp', 'ssp'],
+  },
+  dooh: {
+    id: 'dooh',
+    term: 'Digital Out-of-Home (DOOH)',
+    category: 'Marketplace',
+    shortDefinition: 'Digital billboards and screens in public spaces that can be bought programmatically.',
+    definition: [
+      'DOOH refers to digital screens in public places: highway billboards, bus shelters, elevators (Captivate), and gyms. Programmatic DOOH (pDOOH) allows these screens to be bought via DSPs just like web ads.',
+      'Measurement is based on "impressions" calculated via foot traffic data and mobile location signals, rather than 1:1 user tracking.',
+    ],
+    related: ['ooh', 'foot-traffic', 'gps-data'],
+  },
+  ooh: {
+    id: 'ooh',
+    term: 'Out-of-Home (OOH)',
+    category: 'Marketplace',
+    shortDefinition: 'Traditional physical advertising in the real world (billboards, posters, transit ads).',
+    definition: [
+      'The original "mass media" format. OOH includes everything from the massive billboards in Times Square to the posters on the side of a bus. It is increasingly being "digitized" into DOOH.',
+      'OOH is often used for broad reach and brand awareness, but modern data allows it to be linked to digital outcomes via location data.',
+    ],
+    related: ['dooh', 'foot-traffic'],
+  },
+  'geo-fencing': {
+    id: 'geo-fencing',
+    term: 'Geo-Fencing',
+    category: 'Data',
+    shortDefinition: 'Creating a virtual perimeter around a physical location to target ads to users inside it.',
+    definition: [
+      'Using GPS, Wi-Fi, or cellular data to identify when a device enters a specific geographic area (e.g., within 500 meters of a retail store).',
+      'Advertisers use geo-fencing to serve relevant ads (e.g., a coupon when you walk near a store) or to measure "store visits" after a user has seen an ad.',
+    ],
+    related: ['gps-data', 'foot-traffic'],
+  },
+  'foot-traffic': {
+    id: 'foot-traffic',
+    term: 'Foot Traffic Data',
+    category: 'Data',
+    shortDefinition: 'Anonymized location data showing how many people visit specific physical locations.',
+    definition: [
+      'Aggregated location signals from mobile apps (with user consent) used to measure how many people visit stores, malls, or billboards.',
+      'This data is critical for OOH measurement and "Store Visit" attribution (linking a digital ad view to a physical visit).',
+    ],
+    related: ['gps-data', 'geo-fencing'],
+  },
+  'gps-data': {
+    id: 'gps-data',
+    term: 'GPS / Location Data',
+    category: 'Data',
+    shortDefinition: 'Precise coordinates from a mobile device used for targeting and attribution.',
+    definition: [
+      "The most accurate form of location data, provided by the device's GPS chip. Used in ad tech for hyper-local targeting and verifying store visits.",
+      'Privacy changes (like Apple\'s "Allow Once") have made this data harder to collect at high frequency.',
+    ],
+    related: ['geo-fencing', 'foot-traffic'],
+  },
+  lwa: {
+    id: 'lwa',
+    term: 'Listen-While-Active (LWA)',
+    category: 'Measurement',
+    shortDefinition: 'A metric for audio advertising indicating the user is actively listening to the content.',
+    definition: [
+      'In audio, unlike display, "viewability" doesn\'t exist. LWA or completion rates are used to verify that the ad was actually heard by a user while the app was in the foreground or actively streaming.',
+    ],
+    related: ['programmatic-audio', 'viewability'],
+  },
+  mrd: {
+    id: 'mrd',
+    term: 'Media Rating Council (MRC)',
+    category: 'Measurement',
+    shortDefinition: 'The industry body that accredits measurement vendors and sets standards.',
+    definition: [
+      'The MRC audits and accredits companies like Nielsen, IAS, and DoubleVerify to ensure their measurement methodologies are accurate and consistent with industry standards.',
+    ],
+    related: ['currency', 'viewability'],
+  },
+  'print-ads': {
+    id: 'print-ads',
+    term: 'Print Advertising',
+    category: 'Marketplace',
+    shortDefinition: 'Traditional physical ads in newspapers, magazines, and journals.',
+    definition: [
+      "The oldest form of mass-market advertising. While primarily offline, print ads are now linked to digital via 'Bridge' technologies like QR codes, personalized URLs (PURLs), and promotional codes that track the source of digital traffic.",
+      'Print measurement is based on "Circulation" and "Readership" (estimated based on how many people share each physical copy).',
+    ],
+    related: ['ooh', 'attribution'],
+  },
+  cow: {
+    id: 'cow',
+    term: 'C.O.W. (Consolidated Omnichannel Workflow)',
+    category: 'Marketplace',
+    shortDefinition: "Ribeye Media's unified platform approach to local media advertising.",
+    definition: [
+      'The C.O.W. is an omnichannel platform designed by <strong>Ribeye Media</strong> specifically for the local media marketplace. It aims to eliminate the "fragmentation tax" by providing a single interface for planning, execution, and reporting across CTV, Audio, Display, and Walled Gardens.',
+      'Unlike legacy enterprise tools, the C.O.W. focuses on supply-path transparency and unified forecasting, allowing local broadcasters and media sales organizations to scale without technical friction.',
+    ],
+    related: ['dsp', 'ctv', 'programmatic-audio', 'dooh'],
+  },
 };
 
 // --- Glossary auto-linking ---
@@ -1164,6 +1408,21 @@ const GLOSS_TERM_DEFS: Array<{pattern: RegExp; id: GlossaryId}> = [
   {pattern: /\bretargeting\b/gi, id: 'retargeting'},
   {pattern: /\bcreatives?\b/gi, id: 'creative'},
   {pattern: /\bGoogle Ad Manager\b/gi, id: 'gam'},
+  {pattern: /\bad[ -]ops\b/gi, id: 'ad-ops'},
+  {pattern: /\bCustomer Success Manager\b/gi, id: 'csm'},
+  {pattern: /\bCSMs?\b/g, id: 'csm'},
+  {pattern: /\bholding compan(?:y|ies)\b/gi, id: 'holding-company'},
+  {pattern: /\bprogrammatic[ -]audio\b/gi, id: 'programmatic-audio'},
+  {pattern: /\bDOOH\b/g, id: 'dooh'},
+  {pattern: /\bOOH\b/g, id: 'ooh'},
+  {pattern: /\bgeo[ -]fencing\b/gi, id: 'geo-fencing'},
+  {pattern: /\bfoot[ -]traffic\b/gi, id: 'foot-traffic'},
+  {pattern: /\bGPS\b/g, id: 'gps-data'},
+  {pattern: /\blocation data\b/gi, id: 'gps-data'},
+  {pattern: /\bprint ads?\b/gi, id: 'print-ads'},
+  {pattern: /\bprint advertising\b/gi, id: 'print-ads'},
+  {pattern: /\bC\.O\.W\.\b/g, id: 'cow'},
+  {pattern: /\bRibeye Media\b/gi, id: 'cow'},
 ];
 
 const GLOSS_SENTINEL = '\uE000';
@@ -1458,691 +1717,6 @@ function updateThemeBtn(){
 updateThemeBtn();
 </script>`,
   ].join('\n');
-};
-
-const baseStyles = `
-  :root {
-    --bg: #050816;
-    --bg-alt: #0b1020;
-    --card: #0f172a;
-    --accent: #0ea5e9;
-    --accent-soft: rgba(56, 189, 248, 0.12);
-    --accent-strong: rgba(56, 189, 248, 0.5);
-    --text: #e5e7eb;
-    --muted: #9ca3af;
-    --border-subtle: rgba(148, 163, 184, 0.4);
-    --radius-lg: 20px;
-    --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
-    --font-sans: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: "Source Serif 4", Georgia, serif;
-    --line-height-body: 1.65;
-    --line-height-tight: 1.35;
-    --content-max: 75ch;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  .skip-link {
-    position: absolute;
-    left: -9999px;
-    z-index: 999;
-    padding: 12px 20px;
-    background: var(--accent);
-    color: #0f172a;
-    font-family: var(--font-sans);
-    font-weight: 600;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    text-decoration: none;
-  }
-  .skip-link:focus {
-    left: 50%;
-    top: 12px;
-    transform: translateX(-50%);
-    outline: 3px solid #e0f2fe;
-    outline-offset: 3px;
-  }
-
-  body {
-    min-height: 100vh;
-    font-family: var(--font-sans);
-    font-size: 1rem;
-    line-height: var(--line-height-body);
-    background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
-    color: var(--text);
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
-    padding: 28px 16px 32px;
-  }
-
-  .shell {
-    width: 100%;
-    max-width: 1120px;
-    background: radial-gradient(circle at top left, #0b1120, #020617);
-    border-radius: 24px;
-    border: 1px solid var(--border-subtle);
-    box-shadow: var(--shadow-soft);
-    padding: 24px 24px 28px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .shell::before {
-    content: "";
-    position: absolute;
-    inset: -120px;
-    background:
-      radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.18), transparent 55%),
-      radial-gradient(circle at 100% 20%, rgba(236, 72, 153, 0.17), transparent 55%),
-      radial-gradient(circle at 0 100%, rgba(56, 189, 248, 0.16), transparent 50%);
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .brand-dot {
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    background: radial-gradient(circle at 30% 0, #e5e7eb, #38bdf8 38%, #0ea5e9 72%, #0369a1 100%);
-    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9),
-      0 0 32px rgba(56, 189, 248, 0.65);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .brand-dot::after {
-    content: "";
-    position: absolute;
-    inset: 26%;
-    border-radius: inherit;
-    background: radial-gradient(circle at 30% 0, rgba(248, 250, 252, 0.9), transparent 60%);
-    opacity: 0.8;
-  }
-
-  .app-title {
-    font-size: 1.35rem;
-    letter-spacing: -0.03em;
-  }
-
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border-radius: 999px;
-    padding: 4px 10px;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    background: linear-gradient(
-      90deg,
-      rgba(15, 23, 42, 0.95),
-      rgba(15, 23, 42, 0.4)
-    );
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    color: var(--muted);
-  }
-
-  .chip-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: #22c55e;
-    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
-  }
-
-  .subtitle {
-    margin-top: 6px;
-    font-size: 0.9375rem;
-    line-height: var(--line-height-body);
-    color: var(--muted);
-    max-width: var(--content-max);
-  }
-
-  nav {
-    display: flex;
-    gap: 8px;
-  }
-
-  .nav-link {
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: 0.78rem;
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    color: var(--muted);
-    text-decoration: none;
-    background: rgba(15, 23, 42, 0.9);
-  }
-  .nav-link:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .nav-link-primary {
-    border-color: var(--accent-strong);
-    color: #e0f2fe;
-    background: radial-gradient(
-      circle at top left,
-      rgba(56, 189, 248, 0.24),
-      rgba(8, 47, 73, 0.96)
-    );
-  }
-
-  main {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
-    gap: 14px;
-  }
-
-  @media (max-width: 880px) {
-    body {
-      padding: 16px 10px 18px;
-    }
-
-    .shell {
-      padding: 16px 14px 18px;
-    }
-
-    header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    main {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
-    }
-  }
-
-  .panel {
-    position: relative;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-subtle);
-    background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9));
-    padding: 14px 14px 16px;
-    overflow: hidden;
-  }
-
-  .panel::before {
-    content: "";
-    position: absolute;
-    inset: -70px;
-    background: radial-gradient(
-      circle at top right,
-      rgba(56, 189, 248, 0.16),
-      transparent 55%
-    );
-    opacity: 0.6;
-    pointer-events: none;
-  }
-
-  .panel-header {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .panel-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-
-  .panel-subtitle {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .pill-row {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-
-  .pill {
-    border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    font-size: 0.72rem;
-    padding: 3px 8px;
-    color: var(--muted);
-    background: rgba(15, 23, 42, 0.9);
-    white-space: nowrap;
-  }
-
-  .pill strong {
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .ecosystem-grid {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  @media (max-width: 720px) {
-    .ecosystem-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  .ecosystem-column {
-    border-radius: 14px;
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
-    padding: 10px 9px 10px;
-  }
-
-  .ecosystem-column-title {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .ecosystem-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.6);
-    padding: 2px 7px;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .ecosystem-list {
-    display: grid;
-    gap: 6px;
-  }
-
-  .topic-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    border-radius: 11px;
-    padding: 7px 8px;
-    font-size: 0.8rem;
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    color: var(--text);
-    text-decoration: none;
-    background: linear-gradient(
-      135deg,
-      rgba(15, 23, 42, 0.98),
-      rgba(15, 23, 42, 0.9)
-    );
-  }
-
-  .topic-link span.label {
-    flex: 1;
-  }
-
-  .topic-link span.caption {
-    font-size: 0.7rem;
-    color: var(--muted);
-  }
-
-  .topic-link:hover {
-    border-color: var(--accent-strong);
-    background: radial-gradient(
-      circle at top left,
-      rgba(56, 189, 248, 0.12),
-      rgba(15, 23, 42, 0.96)
-    );
-  }
-  .topic-link:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .topic-link-icon {
-    font-size: 0.9rem;
-    opacity: 0.7;
-  }
-
-  .where-ads {
-    margin-top: 12px;
-  }
-
-  .where-ads-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .ad-surfaces {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .ad-card {
-    min-width: 150px;
-    max-width: 180px;
-    border-radius: 14px;
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
-    padding: 8px 9px 9px;
-    font-size: 0.78rem;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .ad-card:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .ad-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-
-  .ad-card-label {
-    font-weight: 500;
-  }
-
-  .ad-card-tag {
-    font-size: 0.68rem;
-    color: var(--muted);
-  }
-
-  .ad-card-body {
-    font-size: 0.73rem;
-    color: var(--muted);
-  }
-
-  .ad-card-footer {
-    margin-top: 5px;
-    font-size: 0.72rem;
-    color: #bae6fd;
-  }
-
-  .example-shell {
-    border-radius: 18px;
-    border: 1px solid rgba(148, 163, 184, 0.55);
-    background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.96));
-    padding: 10px 10px 10px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .example-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.74rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .example-content {
-    border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.6);
-    background: #000;
-    min-height: 210px;
-    padding: 10px 11px;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 8px;
-  }
-
-  .example-avatar-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    color: #f9fafb;
-  }
-
-  .example-avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 999px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-  }
-
-  .example-label {
-    font-weight: 500;
-  }
-
-  .example-tag {
-    font-size: 0.7rem;
-    color: #e5e7eb;
-    opacity: 0.7;
-  }
-
-  .example-image {
-    border-radius: 10px;
-    background: radial-gradient(circle at center, #4ade80 0, #15803d 40%, #020617 100%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .example-image::after {
-    content: "";
-    position: absolute;
-    inset: 16%;
-    border-radius: inherit;
-    background: radial-gradient(circle at top, rgba(248, 250, 252, 0.65), transparent 60%);
-    opacity: 0.7;
-  }
-
-  .example-cta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .example-cta-text {
-    font-size: 0.76rem;
-    color: #e5e7eb;
-  }
-
-  .example-cta-button {
-    font-size: 0.75rem;
-    border-radius: 999px;
-    padding: 5px 10px;
-    border: none;
-    color: #0f172a;
-    background: #facc15;
-    font-weight: 600;
-  }
-
-  .example-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.72rem;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-
-  .example-meta-link {
-    color: #bae6fd;
-    text-decoration: none;
-  }
-
-  .page-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
-    gap: 14px;
-    margin-top: 10px;
-  }
-
-  .page-section {
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-subtle);
-    background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
-    padding: 14px 14px 16px;
-  }
-
-  .page-heading {
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
-  }
-
-  .page-kicker {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-
-  .page-text {
-    font-size: 0.86rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .page-list {
-    font-size: 0.85rem;
-    color: var(--muted);
-    padding-left: 1.1rem;
-    display: grid;
-    gap: 4px;
-  }
-
-  .page-list li strong {
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  details {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed rgba(148, 163, 184, 0.6);
-  }
-
-  summary {
-    font-size: 0.85rem;
-    color: #e0f2fe;
-    cursor: pointer;
-  }
-
-  summary::-webkit-details-marker {
-    display: none;
-  }
-
-  summary::before {
-    content: "▶";
-    display: inline-block;
-    margin-right: 6px;
-    font-size: 0.7rem;
-    transform-origin: center;
-  }
-
-  details[open] summary::before {
-    transform: rotate(90deg);
-  }
-
-  footer {
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-
-  @media (max-width: 720px) {
-    .page-layout {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-`;
-
-const renderLayout = (opts: {title: string; description?: string; body: string}): string => {
-  const {title, description, body} = opts;
-
-  return [
-    '<!doctype html>',
-    "<html lang='en'>",
-    '<head>',
-    '  ' + FAVICON_LINK,
-    "  <meta charset='utf-8' />",
-    "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
-    "  <meta name='theme-color' content='#050816' />",
-    `  <title>${title}</title>`,
-    description ? `  <meta name='description' content='${description}' />` : '',
-    "  <link rel='preconnect' href='https://fonts.googleapis.com' />",
-    "  <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />",
-    "  <link href='https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap' rel='stylesheet' />",
-    '  <style>',
-    baseStyles,
-    '  </style>',
-    '</head>',
-    '<body>',
-    "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
-    "  <div class='shell'>",
-    '    <header>',
-    "      <div class='brand'>",
-    "        <div class='brand-dot' aria-hidden='true'></div>",
-    '        <div>',
-    "          <div class='chip'>",
-    "            <span class='chip-dot'></span>",
-    '            Ad Tech Learning Environment',
-    '          </div>',
-    "          <h1 class='app-title'>How Ad Tech & Data Engineering Work</h1>",
-    "          <p class='subtitle'>From high-level ecosystem maps to under-the-hood data pipelines, learn how ads reach Instagram, YouTube, the open web, and more.</p>",
-    '        </div>',
-    '      </div>',
-    '      <nav>',
-    "        <a class='nav-link nav-link-primary' href='/'>Overview</a>",
-    "        <a class='nav-link' href='/topic/ad-serving-rtb'>RTB Flow</a>",
-    "        <a class='nav-link' href='/topic/data'>Data & Pipelines</a>",
-    "        <a class='nav-link' href='/players'>Players & $$$</a>",
-    '      </nav>',
-    '    </header>',
-    body,
-    '    <footer>',
-    '      <span>Built for learning and interview prep — Bun, Elysia, vanilla HTML/CSS/JS.</span>',
-    '      <span>Designed as a shared mental model for product, marketing, and engineering.</span>',
-    '    </footer>',
-    '  </div>',
-    '</body>',
-    '</html>',
-  ]
-    .filter(Boolean)
-    .join('\n');
 };
 
 const renderTopicPage = (topicId: TopicId): string => {
@@ -5643,6 +5217,40 @@ const renderExampleDiagram = (id: ExampleId): string => {
     ].join('\n');
   }
 
+  if (id === 'audio-streaming') {
+    return [
+      "<div class='diagram'>",
+      "  <div class='diagram-label'>Audio streaming flow</div>",
+      "  <div class='diagram-rail stack'>",
+      "    <div class='diagram-node'><strong>Audio player</strong>Requests ad during stream</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node'><strong>Exchange</strong>Auctions on mood & listener ID</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node primary'><strong>VAST Audio</strong>Delivers high-quality MP3/AAC</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node'><strong>Beacons</strong>Listen-through rate tracking</div>",
+      '  </div>',
+      '</div>',
+    ].join('\n');
+  }
+
+  if (id === 'digital-billboard') {
+    return [
+      "<div class='diagram'>",
+      "  <div class='diagram-label'>pDOOH billboard flow</div>",
+      "  <div class='diagram-rail stack'>",
+      "    <div class='diagram-node'><strong>Signage player</strong>Signals ad slot via GPS</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node'><strong>DOOH DSP</strong>Triggers on weather & foot traffic</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node primary'><strong>Multiplier</strong>Estimates one-to-many reach</div>",
+      "    <div class='diagram-arrow'>↓</div>",
+      "    <div class='diagram-node'><strong>Location match</strong>Bridges ad play to store visit</div>",
+      '  </div>',
+      '</div>',
+    ].join('\n');
+  }
+
   return '';
 };
 
@@ -5657,6 +5265,8 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     `            <a class='example-tab${id === 'web-display' ? ' active' : ''}' href='/?example=web-display'>Web</a>`,
     `            <a class='example-tab${id === 'search' ? ' active' : ''}' href='/?example=search'>Search</a>`,
     `            <a class='example-tab${id === 'video-player' ? ' active' : ''}' href='/?example=video-player'>Video</a>`,
+    `            <a class='example-tab${id === 'audio-streaming' ? ' active' : ''}' href='/?example=audio-streaming'>Audio</a>`,
+    `            <a class='example-tab${id === 'digital-billboard' ? ' active' : ''}' href='/?example=digital-billboard'>OOH</a>`,
     '          </div>',
   ].join('\n');
 
@@ -5768,6 +5378,41 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '          </div>',
   ].join('\n');
 
+  const audioFrame = [
+    "          <div class='stream-frame'>",
+    "            <div class='stream-header'>",
+    "              <span style='font-size:0.8rem;font-weight:600;'>AudioStream</span>",
+    "              <span style='font-size:0.7rem;color:#9ca3af;'>Live ▾</span>",
+    '            </div>',
+    "            <div class='stream-player' style='background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative;' aria-hidden='true'>",
+    "              <div style='width:120px; height:120px; background:#334155; border-radius:8px; margin-bottom:16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:2rem;'>♫</div>",
+    "              <div class='stream-ad-badge'>Ad · Sponsored</div>",
+    '            </div>',
+    "            <div class='stream-controls'>",
+    "              <div class='stream-timeline'><div class='stream-timeline-fill' style='width:40%;'></div></div>",
+    "              <div style='display:flex;justify-content:space-between;font-size:0.75rem;color:#e2e8f0;margin-top:8px;'>",
+    '                <strong>Outdoor Gear Co.</strong>',
+    '                <span style="color:#9ca3af;">0:12 / 0:30</span>',
+    '              </div>',
+    '              <div style="font-size:0.7rem;color:#9ca3af;margin-top:2px;">"Gear up for your next hike"</div>',
+    '            </div>',
+    '          </div>',
+  ].join('\n');
+
+  const billboardFrame = [
+    "          <div class='billboard-frame' style='background:#0f172a; height:320px; display:flex; flex-direction:column; padding:20px; align-items:center;'>",
+    "            <div style='width:100%; height:180px; background:#1e293b; border:8px solid #334155; border-radius:4px; position:relative; overflow:hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);'>",
+    "              <div style='width:100%; height:100%; background: linear-gradient(to bottom, #0ea5e9, #0284c7); display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; padding:10px; text-align:center;'>",
+    "                <div style='font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; opacity:0.8;'>Now Nearby</div>",
+    "                <div style='font-size:1.1rem; font-weight:800; line-height:1.1;'>OUTDOOR GEAR CO.</div>",
+    "                <div style='font-size:0.7rem; margin-top:8px;'>Visit us 2 miles ahead at Exit 45</div>",
+    '              </div>',
+    '            </div>',
+    "            <div style='width:20px; height:60px; background:#334155;'></div>",
+    "            <div style='width:100px; height:10px; background:#334155; border-radius:4px;'></div>",
+    '          </div>',
+  ].join('\n');
+
   const frame =
     id === 'instagram'
       ? instagramFrame
@@ -5777,10 +5422,15 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
           ? webFrame
           : id === 'search'
             ? searchFrame
-            : streamFrame;
+            : id === 'audio-streaming'
+              ? audioFrame
+              : id === 'digital-billboard'
+                ? billboardFrame
+                : streamFrame;
 
   return [
     "        <article class='phone phone-instagram' aria-label='Ad example preview'>",
+    `          <h3 style="position:absolute;left:-9999px;">${label}</h3>`,
     tabs,
     frame,
     "          <div class='instagram-footer'>",
@@ -6407,6 +6057,110 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
       },
     ],
   },
+  'audio-streaming': {
+    subtitle: 'From ad break to listen-through rate',
+    nodes: [
+      {id: 'app', label: 'Streaming App', sub: 'Spotify/SXM App', x: 55, y: 80, cat: 'pub'},
+      {id: 'req', label: 'Ad Request', sub: 'Audio VAST Request', x: 195, y: 80, cat: 'exchange'},
+      {id: 'auc', label: 'Audio Auction', sub: 'Mood/Genre Bid', x: 345, y: 80, cat: 'exchange'},
+      {id: 'vast', label: 'VAST Audio', sub: 'MP3/AAC Stream', x: 495, y: 80, cat: 'buy'},
+      {id: 'play', label: 'Audio Plays', sub: 'Background Audio', x: 650, y: 80, cat: 'user'},
+      {id: 'track', label: 'Tracking Beacons', sub: 'Quartile Pings', x: 495, y: 255, cat: 'measure'},
+      {id: 'ltr', label: 'LTR Metric', sub: 'Listen-Through Rate', x: 345, y: 255, cat: 'measure'},
+    ],
+    edges: [
+      {id: 'e0', from: 'app', to: 'req', label: 'natural break'},
+      {id: 'e1', from: 'req', to: 'auc', label: 'context + ID'},
+      {id: 'e2', from: 'auc', to: 'vast', label: 'winning ad'},
+      {id: 'e3', from: 'vast', to: 'play', label: 'audio buffer'},
+      {id: 'e4', from: 'play', to: 'track', label: 'events', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'track', to: 'ltr', label: 'aggregated', d: 'M445 255 L395 255'},
+    ],
+    steps: [
+      {
+        title: 'Ad Break Detected',
+        desc: 'The streaming app reaches a pre-defined break point (between songs or a podcast mid-roll marker) and initiates a request for an audio ad.',
+        nodes: ['app', 'req'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Bidding on Mood/Genre',
+        desc: "The audio exchange (like AdsWizz) runs an auction. DSPs bid based on the genre (Jazz, Podcast), user profile, and current context ('driving', 'workout').",
+        nodes: ['req', 'auc'],
+        edges: ['e1'],
+      },
+      {
+        title: 'VAST Audio Delivered',
+        desc: "The winning ad's VAST XML is returned to the player, containing the URL for the audio asset (MP3/AAC) and the tracking pixels.",
+        nodes: ['auc', 'vast'],
+        edges: ['e2'],
+      },
+      {
+        title: 'Audio Playback',
+        desc: 'The player buffers and plays the audio ad. Since audio is often background, the playback is seamless with the surrounding content.',
+        nodes: ['vast', 'play'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Tracking & LTR',
+        desc: 'The player fires pings at the start, midpoint, and completion. These are aggregated to calculate the Listen-Through Rate (LTR) for the campaign.',
+        nodes: ['play', 'track', 'ltr'],
+        edges: ['e4', 'e5'],
+      },
+    ],
+  },
+  'digital-billboard': {
+    subtitle: 'From foot traffic trigger to store visit attribution',
+    nodes: [
+      {id: 'screen', label: 'Digital Screen', sub: 'Billboard Hardware', x: 55, y: 80, cat: 'pub'},
+      {id: 'ssp', label: 'DOOH SSP', sub: 'Vistar/PlaceExchange', x: 195, y: 80, cat: 'exchange'},
+      {id: 'dsp', label: 'DOOH DSP', sub: 'Triggers: Weather/Geo', x: 345, y: 80, cat: 'buy'},
+      {id: 'mult', label: 'Multiplier', sub: 'Foot Traffic Data', x: 495, y: 80, cat: 'measure'},
+      {id: 'view', label: 'Public Display', sub: 'One-to-Many View', x: 650, y: 80, cat: 'user'},
+      {id: 'gps', label: 'Mobile GPS', sub: 'Hashed IDs in Proximity', x: 495, y: 255, cat: 'data'},
+      {id: 'store', label: 'Store Visit', sub: 'Attribution Lift', x: 345, y: 255, cat: 'measure'},
+    ],
+    edges: [
+      {id: 'e0', from: 'screen', to: 'ssp', label: 'ad loop req'},
+      {id: 'e1', from: 'ssp', to: 'dsp', label: 'location'},
+      {id: 'e2', from: 'dsp', to: 'mult', label: 'triggers met'},
+      {id: 'e3', from: 'mult', to: 'view', label: 'ad play'},
+      {id: 'e4', from: 'view', to: 'gps', label: 'exposure', d: 'M650 105 C650 180 495 180 495 230'},
+      {id: 'e5', from: 'gps', to: 'store', label: 'foot traffic', d: 'M445 255 L395 255'},
+    ],
+    steps: [
+      {
+        title: 'Screen Request',
+        desc: "The digital billboard's player reaches an available slot in its loop and sends a request to a DOOH-specialized SSP.",
+        nodes: ['screen', 'ssp'],
+        edges: ['e0'],
+      },
+      {
+        title: 'Trigger-Based Bidding',
+        desc: "The DSP bids if current triggers (weather, time of day, proximity) are met. Bidding is based on the location's historical audience profile.",
+        nodes: ['ssp', 'dsp'],
+        edges: ['e1'],
+      },
+      {
+        title: 'Impression Multiplier',
+        desc: "Because one play reaches many people, Geopath or similar data providers provide a 'multiplier' to estimate the number of impressions.",
+        nodes: ['dsp', 'mult'],
+        edges: ['e2'],
+      },
+      {
+        title: 'One-to-Many Playback',
+        desc: 'The ad is shown on the billboard. It is a public, shared experience rather than a private 1:1 digital impression.',
+        nodes: ['mult', 'view'],
+        edges: ['e3'],
+      },
+      {
+        title: 'Closing the Loop',
+        desc: "Anonymized mobile GPS data identifies phones that were near the screen during the ad play. If those same IDs later enter the advertiser's store, a 'Store Visit' is recorded.",
+        nodes: ['view', 'gps', 'store'],
+        edges: ['e4', 'e5'],
+      },
+    ],
+  },
 };
 
 const renderAdFlowOverlay = (id: ExampleId): string => {
@@ -6693,6 +6447,64 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       "              <div class='search-result-title'>Ultralight tents for weekend trips</div>",
       "              <div class='search-result-url'>outdoorgear.example</div>",
       '              <div>Free shipping on orders over $50. Explore 1–4 person options.</div>',
+      '            </div>',
+      '          </div>',
+    ].join('\n');
+  }
+
+  if (id === 'audio-streaming') {
+    return [
+      "          <div class='stream-frame'>",
+      "            <div class='stream-header'>",
+      "              <span style='font-size:0.8rem;font-weight:600;'>AudioStream</span>",
+      "              <span style='font-size:0.7rem;color:#9ca3af;'>Live ▾</span>",
+      '            </div>',
+      "            <div class='stream-player' style='background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative;' aria-hidden='true'>",
+      "              <div style='width:120px; height:120px; background:#334155; border-radius:8px; margin-bottom:16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:2rem;'>♫</div>",
+      "              <div class='stream-ad-badge'>Ad · Sponsored</div>",
+      '            </div>',
+      "            <div class='stream-controls'>",
+      "              <div class='stream-timeline'><div class='stream-timeline-fill' style='width:40%;'></div></div>",
+      "              <div style='display:flex;justify-content:space-between;font-size:0.75rem;color:#e2e8f0;margin-top:8px;'>",
+      '                <strong>Outdoor Gear Co.</strong>',
+      '                <span style="color:#9ca3af;">0:12 / 0:30</span>',
+      '              </div>',
+      '              <div style="font-size:0.7rem;color:#9ca3af;margin-top:2px;">"Gear up for your next hike"</div>',
+      '            </div>',
+      "            <div style='padding:12px; border-top:1px solid #334155; display:flex; align-items:center; gap:12px;'>",
+      "              <div style='width:40px;height:40px;background:#0ea5e9;border-radius:4px;'></div>",
+      "              <div style='flex:1;'>",
+      "                <div style='font-size:0.7rem;font-weight:600;color:#e2e8f0;'>Companion Ad</div>",
+      "                <div style='font-size:0.65rem;color:#9ca3af;'>Tap to shop the collection</div>",
+      '              </div>',
+      "              <button class='instagram-cta-button' style='padding:4px 8px;font-size:0.65rem;'>Shop</button>",
+      '            </div>',
+      '          </div>',
+    ].join('\n');
+  }
+
+  if (id === 'digital-billboard') {
+    return [
+      "          <div class='billboard-frame' style='background:#0f172a; height:100%; display:flex; flex-direction:column; padding:20px; align-items:center;'>",
+      "            <div style='width:100%; height:180px; background:#1e293b; border:8px solid #334155; border-radius:4px; position:relative; overflow:hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);'>",
+      "              <div style='width:100%; height:100%; background: linear-gradient(to bottom, #0ea5e9, #0284c7); display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; padding:10px; text-align:center;'>",
+      "                <div style='font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; opacity:0.8;'>Now Nearby</div>",
+      "                <div style='font-size:1.1rem; font-weight:800; line-height:1.1;'>OUTDOOR GEAR CO.</div>",
+      "                <div style='font-size:0.7rem; margin-top:8px;'>Visit us 2 miles ahead at Exit 45</div>",
+      '              </div>',
+      "              <div style='position:absolute; bottom:5px; right:5px; font-size:0.4rem; color:rgba(255,255,255,0.5);'>Powered by pDOOH</div>",
+      '            </div>',
+      "            <div style='width:20px; height:100px; background:#334155;'></div>",
+      "            <div style='width:100px; height:10px; background:#334155; border-radius:4px;'></div>",
+      "            <div style='margin-top:20px; background:#1e293b; border-radius:12px; padding:12px; width:100%; border:1px solid #334155;'>",
+      "              <div style='font-size:0.7rem; color:#9ca3af; margin-bottom:8px; display:flex; justify-content:space-between;'>",
+      '                <span>Real-time Triggers</span>',
+      '                <span style="color:#10b981;">● Active</span>',
+      '              </div>',
+      "              <div style='display:flex; gap:8px;'>",
+      "                <div style='background:#0f172a; padding:4px 8px; border-radius:4px; font-size:0.65rem; color:#e2e8f0;'>Temp: 72°F</div>",
+      "                <div style='background:#0f172a; padding:4px 8px; border-radius:4px; font-size:0.65rem; color:#e2e8f0;'>Traffic: Heavy</div>",
+      '              </div>',
       '            </div>',
       '          </div>',
     ].join('\n');
@@ -7529,6 +7341,26 @@ const renderExampleReferences = (id: ExampleId): string => {
     ].join('\n');
   }
 
+  if (id === 'audio-streaming') {
+    return [
+      "<div class='references'>",
+      '  For audio-specific standards, check out',
+      "  <a href='https://www.iab.com/guidelines/vast/' target='_blank' rel='noreferrer'>IAB VAST for audio</a>",
+      "  and SXM Media's guide to programmatic audio.",
+      '</div>',
+    ].join('\n');
+  }
+
+  if (id === 'digital-billboard') {
+    return [
+      "<div class='references'>",
+      '  To learn more about pDOOH, visit',
+      "  <a href='https://www.vistarmedia.com/blog/what-is-programmatic-dooh' target='_blank' rel='noreferrer'>Vistar Media's explainer</a>",
+      '  and Geopath for OOH measurement standards.',
+      '</div>',
+    ].join('\n');
+  }
+
   return '';
 };
 
@@ -8350,6 +8182,56 @@ const renderPlayersPage = (): string => {
       economics: `<strong>The deal:</strong> You receive free or subsidized content (Google Search, Instagram, news articles, Spotify's free tier) in exchange for seeing ads. The average American user generates approximately $50–80/year in digital ad revenue for the platforms they use.<br/><br/>You are not charged. But you do "pay" in attention, behavioral data, and some portion of your privacy. Privacy regulations like GDPR and CCPA give users opt-out rights — but very few exercise them.`,
       fear: 'Feeling surveilled, targeted ads crossing the line from helpful to creepy, your data being sold without meaningful consent, and increasingly — algorithmic content curation that affects what information you see.',
       links: [],
+    },
+    {
+      icon: '⚙️',
+      iconBg: '#e2e8f0',
+      name: 'Ad Operations (Ad Ops)',
+      examples: 'The technical team at an agency or publisher',
+      tagline: 'The engine room of the ad tech stack',
+      badge: {text: 'Essential labor', cls: 'badge-earns'},
+      plainEnglish:
+        'Ad Ops is where the "magic" (and the headaches) happen. They are the technical specialists who actually set up the campaigns, traffic the creatives, place the pixels, and troubleshoot when something breaks. If an ad doesn\'t show or a conversion doesn\'t track, Ad Ops is the first call.',
+      goals: `<ul>
+        <li>Launch campaigns on time and without errors</li>
+        <li>Minimize "discrepancies" between different ad servers</li>
+        <li>Ensure all tracking pixels are firing correctly</li>
+        <li>Optimize the "waterfall" or "header bidding" for publishers</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>SLA compliance</strong> (launching on time)</li>
+        <li><strong>Error rate</strong> in creative trafficking</li>
+        <li><strong>Discrepancy %</strong> (e.g. advertiser vs publisher numbers)</li>
+        <li><strong>Fill rate</strong> (on the sell side)</li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> Typically salaried employees at agencies, publishers, or ad tech companies. Their value is in technical precision — a single typo in a tracking URL can waste millions of dollars in ad spend. Many companies are now outsourcing Ad Ops to global service hubs to reduce costs.`,
+      fear: 'A "dead pixel" on a massive campaign launch, creatives being rejected by exchanges, or the increasing complexity of "privacy-safe" measurement making their jobs 10x harder.',
+      links: [{label: 'Glossary: Ad Ops →', href: '/glossary?term=ad-ops'}],
+    },
+    {
+      icon: '📈',
+      iconBg: '#dcfce7',
+      name: 'Customer Success (CSM)',
+      examples: 'Account Managers at TTD, Google, or Magnite',
+      tagline: 'The strategic partner and growth driver',
+      badge: {text: 'Relationship & Growth', cls: 'badge-earns'},
+      plainEnglish:
+        "CSMs at ad tech companies are the bridge between the technology and the client's business goals. They don't just provide support; they proactively look for ways to help the client spend more money more effectively. They are part consultant, part salesperson, and part product expert.",
+      goals: `<ul>
+        <li>Drive platform adoption and feature usage</li>
+        <li>Ensure high client retention (low churn)</li>
+        <li>Identify opportunities for "upselling" new products or formats</li>
+        <li>Help clients interpret complex reporting and attribution data</li>
+      </ul>`,
+      measures: `<ul>
+        <li><strong>Net Revenue Retention (NRR)</strong></li>
+        <li><strong>Platform Spend (GMV) Growth</strong></li>
+        <li><strong>Client Health Score</strong></li>
+        <li><strong>NPS (Net Promoter Score)</strong></li>
+      </ul>`,
+      economics: `<strong>Earns:</strong> Salary + Performance Bonuses tied to client spend or retention. A successful CSM at a major DSP might manage $50M+ in annual media spend across their book of business.`,
+      fear: 'Clients "churning" to a competitor, budget cuts at the advertiser level, or the platform failing to deliver results during a critical campaign.',
+      links: [{label: 'Glossary: CSM →', href: '/glossary?term=csm'}],
     },
   ];
 
