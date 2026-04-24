@@ -4,7 +4,16 @@ import {FAVICON_BASE64} from './favicon-data';
 // Favicon: PNG embedded as data URL so it always shows (no extra request, works in Safari).
 const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,${FAVICON_BASE64}" /><link rel="shortcut icon" href="data:image/png;base64,${FAVICON_BASE64}" />`;
 
-type TopicId = 'buy-side' | 'sell-side' | 'data' | 'third-parties' | 'ad-serving-rtb' | 'measurement-currency';
+type TopicId =
+  | 'buy-side'
+  | 'sell-side'
+  | 'data'
+  | 'third-parties'
+  | 'ad-serving-rtb'
+  | 'measurement-currency'
+  | 'local-vs-global'
+  | 'roles'
+  | 'nomenclature';
 
 type ExampleId =
   | 'instagram'
@@ -99,6 +108,28 @@ type GlossaryId =
   | 'lwa'
   | 'mrd'
   | 'print-ads'
+  | 'rate-card'
+  | 'local-media'
+  | 'global-media'
+  | 'spo'
+  | 'retail-media'
+  | 'sellers-json'
+  | 'curation'
+  | 'mfa'
+  | 'sustainability'
+  | 'white-label'
+  | 'io'
+  | 'line-item'
+  | 'signal-loss'
+  | 'attention-metrics'
+  | 'gen-ai-creative'
+  | 'cmp'
+  | 'shoppable-ads'
+  | 'iroas'
+  | 'markup'
+  | 'margin'
+  | 'billing-event'
+  | 'discrepancy'
   | 'cow';
 
 type GlossaryEntry = {
@@ -503,6 +534,114 @@ const topics: Record<TopicId, Topic> = {
       },
     ],
   },
+  'local-vs-global': {
+    id: 'local-vs-global',
+    label: 'Local vs. Global Media',
+    shortDescription:
+      'The critical differences between mass-scale global platforms and the fragmented but relevant world of local media.',
+    overview: [
+      'In the ad tech world, there is a fundamental divide between <strong>Global Media</strong> (Walled Gardens like Meta, Google, Amazon, and Netflix) and <strong>Local Media</strong> (local TV stations, newspapers, regional radio, and city-specific publishers).',
+      '<strong>Global Media</strong> offers massive, unified scale. A single campaign in Meta Ads Manager can reach 3 billion people. The tools are standardized, the data is unified, and the workflow is relatively simple for a buyer. However, these platforms often lack "local relevance" and deep community connection. They also take a large cut of ad spend away from the communities they serve.',
+      '<strong>Local Media</strong> is where the "real world" happens. Local news, local sports, and community events drive high trust and relevance. For advertisers like car dealerships, real estate agents, or local retailers, local media is essential. However, local media is highly fragmented. To run a national "local" campaign, a buyer might have to deal with hundreds of different publishers, each with their own <strong>Rate Card</strong>, ad server, and reporting format. This complexity creates a "fragmentation tax" that often pushes budgets toward global giants.',
+      '<strong>Ribeye Media</strong> was founded to bridge this gap. By providing a <strong>Consolidated Omnichannel Workflow (C.O.W.)</strong>, Ribeye lets buyers plan and execute across local CTV, Audio, and Display in a single interface, making local media as easy to buy as global media.',
+    ],
+    technical: [
+      '<strong>The Fragmentation Tax:</strong> Buying local media traditionally requires managing separate logins for every local broadcaster or publisher. Each might have a different ad specification, a different <strong>Rate Card</strong> structure (e.g. flat fees vs dynamic CPMs), and different reporting cadence. The technical cost of managing 500 local relationships often outweighs the media cost itself.',
+      '<strong>Unified Identity in Local:</strong> Global platforms use their own logged-in user data. Local media must rely on shared identity standards like <strong>UID2</strong> or <strong>RampID</strong> to prove that the person seeing a local TV ad is the same person who later visited the local store. <strong>Geo-fencing</strong> is a key technical tactic in local media — using GPS data to only show ads to users within a few miles of a specific business.',
+      '<strong>Consolidated Omnichannel Workflow (C.O.W.):</strong> This technical approach (pioneered by Ribeye Media) involves building a "meta-DSP" or unified buying layer. It uses APIs to connect to multiple underlying SSPs and local publisher ad servers, normalizing the data into a single schema. This allows a buyer to set a single budget and have it automatically distributed across the best-performing local channels (CTV, Audio, Display) without manual trafficking for each.',
+    ],
+    keyTakeaways: [
+      'Global media offers scale and ease but lacks local relevance; local media offers trust and relevance but is highly fragmented.',
+      'Rate cards are the "menu" of local media, often still transacted via fixed prices even as programmatic scales.',
+      'The C.O.W. (Consolidated Omnichannel Workflow) by Ribeye Media aims to eliminate the fragmentation tax by unifying local media buying.',
+    ],
+    inOneSentence:
+      'Local vs. Global Media is the choice between mass-scale standardized platforms and highly relevant but fragmented local publishers — with the C.O.W. aiming to bridge the gap.',
+    keyTerms: ['local-media', 'global-media', 'rate-card', 'cow', 'geo-fencing'],
+    quickCheck: [
+      {
+        q: 'Why is local media fragmented compared to global platforms?',
+        a: 'Local media consists of thousands of independent broadcasters and publishers, each with their own rate cards and ad servers, whereas global platforms like Meta or Google provide a single unified interface for massive scale.',
+      },
+      {
+        q: 'What is the "fragmentation tax"?',
+        a: 'The additional time, effort, and technical cost required to buy and manage advertising across many small local publishers instead of one large global platform.',
+      },
+    ],
+  },
+  roles: {
+    id: 'roles',
+    label: 'Operations & Roles',
+    shortDescription:
+      'The human side of ad tech: from AdOps "traffickers" to strategic CSMs and the teams that keep the machines running.',
+    overview: [
+      'While ad tech is driven by algorithms and real-time auctions, it is still built and operated by people. The "human side" of the industry is divided into several key roles that bridge the gap between a brand\'s goals and the technical execution.',
+      '<strong>Ad Operations (Ad Ops)</strong> is the "engine room." They are the technical experts who actually traffic the ads, set up the pixels, and ensure that everything renders correctly. Without Ad Ops, the most brilliant media plan is just a spreadsheet.',
+      '<strong>Customer Success Managers (CSMs)</strong> are the relationship leads. They work at ad tech platforms (DSPs, SSPs) to help agencies and brands get the most value out of the software. They identify new features the client should use and troubleshoot performance issues.',
+      "<strong>Media Planners & Buyers</strong> at agencies decide <em>where</em> the money should go. They analyze <strong>Rate Cards</strong>, evaluate audience data, and use tools like the <strong>C.O.W.</strong> to allocate budgets across different channels to meet the advertiser's goals.",
+    ],
+    technical: [
+      '<strong>The Workflow of an Ad Ops Specialist:</strong> (1) Receive assets (creatives, click URLs); (2) QA the assets for technical compliance (file size, bit rate, SSL support); (3) Traffic the creative into the ad server (GAM, CM360, or a local ad server); (4) Generate and test tracking pixels; (5) Configure targeting in the DSP; (6) Monitor "Discrepancy Reports" — if the DSP says it served 1M impressions but the publisher says it only saw 900k, Ad Ops must find out where the 100k went (latency, ad blocking, or technical failure).',
+      '<strong>CSM Strategic Optimization:</strong> A CSM uses platform analytics to find "performance leakage." If a campaign is under-delivering, they might suggest raising <strong>Floor Prices</strong>, adjusting <strong>Frequency Caps</strong>, or testing new audience <strong>Segments</strong>. They are the human bridge between the platform\'s ML models and the client\'s business reality.',
+      '<strong>Data Engineering & Science:</strong> Behind the scenes, these teams build the pipelines that Ad Ops and CSMs rely on. They design the <strong>Identity Graphs</strong>, maintain the <strong>Data Lake</strong>, and train the bidding models that decide which impressions are worth buying.',
+    ],
+    keyTakeaways: [
+      'Ad Ops handles the "how" (technical execution and trafficking); CSMs handle the "what" and "why" (strategy and platform value).',
+      'The fragmentation of local media makes these roles even more critical, as there is more "manual" work involved in coordinating many small publishers.',
+      'Technical literacy is increasingly required for all roles, with SQL and data visualization becoming standard skills.',
+    ],
+    inOneSentence:
+      'Operations & Roles are the people — AdOps, CSMs, and Planners — who turn media strategies into technical reality and optimize the performance of the machines.',
+    keyTerms: ['ad-ops', 'csm', 'agency', 'publisher', 'rate-card'],
+    quickCheck: [
+      {
+        q: 'What is the main difference between Ad Ops and CSM roles?',
+        a: 'Ad Ops focuses on the technical execution (trafficking, pixels, troubleshooting), while CSMs focus on strategic growth and ensuring the client gets value from the platform.',
+      },
+      {
+        q: 'Why is Ad Ops often called the "engine room" of advertising?',
+        a: 'Because they handle the critical technical tasks that allow campaigns to actually launch and track; without their work, media plans cannot be executed.',
+      },
+    ],
+  },
+  nomenclature: {
+    id: 'nomenclature',
+    label: 'Terminology & Hierarchy',
+    shortDescription: 'The Rosetta Stone of ad tech: how different platforms use different names for the same things.',
+    overview: [
+      'One of the most confusing aspects of ad tech is that every major platform (Google, Meta, The Trade Desk, Amazon) uses slightly different <strong>Terminology</strong> for identical concepts. A "Campaign" in one system might be an "Insertion Order" in another.',
+      'Understanding these naming conventions is critical for <strong>Ad Ops</strong> and <strong>CSMs</strong> who work across multiple platforms. At its core, every system follows a hierarchy from broad business goals down to specific technical assets.',
+    ],
+    technical: [
+      '<strong>The Universal Hierarchy:</strong> (1) <strong>Account/Advertiser</strong> (The brand); (2) <strong>Budget Bucket</strong> (The total money allocated); (3) <strong>Targeting Unit</strong> (Who and where); (4) <strong>Creative</strong> (What the user sees).',
+      '<strong>Comparison Table:</strong>',
+      '<ul>',
+      '<li><strong>Google (DV360):</strong> Partner → Advertiser → Campaign → Insertion Order (IO) → Line Item → Creative</li>',
+      '<li><strong>Meta (Facebook):</strong> Account → Campaign (Goal) → Ad Set (Targeting/Budget) → Ad (Creative)</li>',
+      '<li><strong>The Trade Desk (TTD):</strong> Partner → Advertiser → Campaign → Ad Group (Targeting/Budget) → Creative</li>',
+      '<li><strong>Amazon (DSP):</strong> Entity → Advertiser → Campaign → Line Item → Creative</li>',
+      '</ul>',
+      '<strong>Measurement Nomenclature:</strong> A "pixel" is a "tag" in Google-speak and a "beacon" in some older systems. "Viewability" is the industry standard, but some platforms are now pushing <strong>Attention Metrics</strong> as a more premium measurement.',
+    ],
+    keyTakeaways: [
+      'Different platforms use different names (Line Item vs Ad Set vs Ad Group) for the granular targeting layer.',
+      'Insertion Orders (IOs) usually represent the legal and budgetary contract, while Line Items represent the tactical execution.',
+      'A "pixel" is functionally identical to a "tag" or "beacon" — it\'s just a tracking request.',
+    ],
+    inOneSentence:
+      'Terminology & Hierarchy explains how the ad tech industry uses different labels for the same fundamental structures across Google, Meta, and the open web.',
+    keyTerms: ['io', 'line-item', 'campaign', 'pixel', 'creative', 'markup'],
+    quickCheck: [
+      {
+        q: 'What is the Meta equivalent of a DV360 Line Item?',
+        a: 'The "Ad Set" — both are the layer where you define targeting, budget, and schedule.',
+      },
+      {
+        q: 'What is the difference between a Campaign and an IO in many DSPs?',
+        a: 'An IO (Insertion Order) typically holds the budget and flight dates, while a Campaign is a broader organizational folder that can contain multiple IOs.',
+      },
+    ],
+  },
 };
 
 const examples: Record<ExampleId, Example> = {
@@ -835,12 +974,13 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
   },
   pixel: {
     id: 'pixel',
-    term: 'Ad Pixel',
+    term: 'Ad Pixel (Beacons & Tags)',
     category: 'Measurement',
     shortDefinition: 'A small piece of code that fires when an ad is shown, clicked, or a user converts.',
     definition: [
       'Pixels are typically a 1×1 image request or script that sends an event (impression, click, conversion) to an ad server, advertiser, or measurement partner. Payloads include event type, timestamp, and identifiers (cookie, device ID, hashed email).',
-      'Used for attribution, conversion tracking, and retargeting. Server-side forwarding (SSF) or server-to-server pings avoid ad-blocking and can improve match rates.',
+      '<strong>Terminology variations:</strong> While "pixel" is common, Google refers to them as <strong>Tags</strong>, some platforms call them <strong>Beacons</strong>, and Meta uses the term <strong>Meta Pixel</strong> (formerly Facebook Pixel). In server-side contexts, they are often called <strong>Pings</strong> or <strong>Postbacks</strong>.',
+      'Used for attribution, conversion tracking, and retargeting. Server-side forwarding (SSF) or server-to-server pings (Conversions API) avoid ad-blocking and can improve match rates by bypassing browser-side restrictions.',
     ],
     related: ['attribution', 'vast'],
   },
@@ -850,7 +990,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Measurement',
     shortDefinition: 'XML standards that describe video ad creative and tracking for players.',
     definition: [
-      'VAST (Video Ad Serving Template) delivers ad creative URLs, impression and tracking event URLs (start, quartiles, complete, skip, click), and optional companion ads. VMAP wraps multiple VAST responses for ad pods.',
+      'VAST (Video Ad Serving Template) is the industry standard XML schema for delivering ad creative URLs and tracking event URLs (start, quartiles, complete, skip, click) to a video player. VMAP (Video Multiple Ad Playlist) wraps multiple VAST responses to define ad pods (e.g. 3 ads in a row).',
+      '<strong>Nomenclature:</strong> Some teams simply call these "Video Tags" or "XML Feeds." In the CTV world, you may hear about <strong>Macros</strong> — placeholders within the VAST URL (like [IP_ADDRESS]) that the player fills in before making the request to provide more context to the ad server.',
       'The video player requests an ad, receives VAST/VMAP, loads the creative, and fires tracking URLs at the right moments; those beacons feed billing and measurement.',
     ],
     related: ['pixel'],
@@ -874,9 +1015,9 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'The actual ad content delivered to users — images, HTML5 animations, video, or native formats.',
     definition: [
-      "A creative is the ad unit itself — what the user sees and interacts with. Creative types: (1) Display: static images (PNG/JPG) or HTML5 animated banners (a ZIP of HTML/CSS/JS assets); (2) Video: MP4 files served via VAST XML, ranging from 6-second bumpers to 30-second spots; (3) Native: headlines, images, and descriptions assembled by the publisher's UI template to blend with surrounding content; (4) Rich media: expandable banners, interstitials, or video overlays with JavaScript interactivity.",
-      'Creatives are trafficked (configured) in ad servers like Google Campaign Manager 360 (CM360) or Meta Ads Manager. Trafficking involves: uploading assets, setting click-through URLs, assigning impression tracking pixels, defining targeting rules, and configuring creative rotation. Creatives go through policy review before serving — exchanges and publishers have automated and manual systems to reject malicious, deceptive, or policy-violating ads.',
-      'Dynamic Creative Optimization (DCO) systems generate personalized creatives at serve time by assembling components (background, headline, product image, CTA) based on user data, reducing the need to manually traffic hundreds of variants.',
+      "A creative is the ad unit itself — what the user sees and interacts with. Creative types: (1) Display: static images (PNG/JPG) or HTML5 animated banners (a ZIP of HTML/CSS/JS assets); (2) Video: MP4 files served via VAST XML, ranging from 6-second bumpers to 30-second spots; (3) Native: headlines, images, and descriptions assembled by the publisher's UI template; (4) Rich media: expandable banners, interstitials, or video overlays.",
+      '<strong>Platform names:</strong> In Google Campaign Manager, a creative is a distinct object. In Meta, it\'s the "Ad" layer of the hierarchy. In many DSPs, you upload "Assets" which are then grouped into "Creatives."',
+      'Creatives are trafficked (configured) in ad servers. Trafficking involves: uploading assets, setting click-through URLs, assigning impression tracking pixels, defining targeting rules, and configuring creative rotation. Creatives go through policy review (automated and manual) to reject malicious or policy-violating ads.',
     ],
     related: ['vast', 'dco', 'pixel'],
   },
@@ -1210,11 +1351,10 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ad-ops',
     term: 'Ad Operations (Ad Ops)',
     category: 'Marketplace',
-    shortDefinition:
-      'The team responsible for the technical execution, trafficking, and troubleshooting of ad campaigns.',
+    shortDefinition: 'The technical team that executes, traffics, and optimizes ad campaigns and publisher inventory.',
     definition: [
       'Ad Ops is the "engine room" of advertising. On the buy side (agency/advertiser), they traffic creatives into ad servers, set up tracking pixels, configure targeting in DSPs, and ensure campaigns launch on time. On the sell side (publisher), they manage inventory, set up header bidding, and optimize yield.',
-      'Key tasks: creative QA, pixel implementation, discrepancy troubleshooting, and reporting. They are the bridge between the media plan and the technical reality of the internet.',
+      'Key tasks: creative QA, pixel implementation, discrepancy troubleshooting, and reporting. They are the bridge between the media plan and the technical reality of the internet. Increasingly, Ad Ops roles are becoming more technical, often requiring knowledge of SQL, JavaScript, and data visualization.',
     ],
     related: ['agency', 'publisher', 'pixel', 'creative'],
   },
@@ -1222,12 +1362,249 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'csm',
     term: 'Customer Success Manager (CSM)',
     category: 'Marketplace',
-    shortDefinition: 'The relationship owner between an ad tech vendor (DSP/SSP) and their clients.',
+    shortDefinition: 'The strategic relationship lead between an ad tech platform and its clients.',
     definition: [
-      "CSMs at ad tech companies (like The Trade Desk or Google) ensure that agencies and brands are using the platform effectively. They provide strategic recommendations, training, and help troubleshoot performance issues. Their goal is to grow the client's spend on the platform by proving value and driving results.",
-      'While Ad Ops handles the "how," CSMs often handle the "what" and "why" — aligning platform features with the advertiser\'s business goals.',
+      "CSMs at ad tech companies (like The Trade Desk, Google, or Ribeye Media) ensure that agencies and brands are using the platform effectively. They provide strategic recommendations, training, and help troubleshoot performance issues. Their goal is to grow the client's spend on the platform by proving value and driving results.",
+      'While Ad Ops handles the "how," CSMs often handle the "what" and "why" — aligning platform features with the advertiser\'s business goals and identifying new opportunities for growth.',
     ],
     related: ['dsp', 'ssp', 'agency'],
+  },
+  'rate-card': {
+    id: 'rate-card',
+    term: 'Rate Card',
+    category: 'Marketplace',
+    shortDefinition: 'A document provided by a publisher detailing their ad rates and placement options.',
+    definition: [
+      'A rate card is the official "menu" of a publisher. It lists the standard costs (usually in CPM) for different ad units, sponsorship packages, and targeting options. While programmatic advertising has moved towards dynamic pricing, rate cards are still the foundation for direct-sold and guaranteed deals.',
+      'In the local media world, rate cards are essential for transparency between local broadcasters and local businesses. They often include "frequency discounts" where the rate decreases as the advertiser commits to more impressions or spots.',
+    ],
+    related: ['publisher', 'cpm', 'inventory'],
+  },
+  'local-media': {
+    id: 'local-media',
+    term: 'Local Media',
+    category: 'Marketplace',
+    shortDefinition: 'Advertising targeted at a specific geographic area, often via local broadcasters or publishers.',
+    definition: [
+      'Local media focuses on a specific DMA (Designated Market Area) or city. This includes local TV stations, local newspapers, regional radio, and geo-fenced digital ads. Local advertising is critical for "brick and mortar" businesses that need to drive physical foot traffic.',
+      'Ribeye Media specializes in local media, helping local broadcasters compete with global giants by providing a unified workflow (the C.O.W.) to manage their cross-channel inventory.',
+    ],
+    related: ['global-media', 'geo-fencing', 'cow'],
+  },
+  'global-media': {
+    id: 'global-media',
+    term: 'Global Media',
+    category: 'Marketplace',
+    shortDefinition: 'Mass-scale advertising across multiple countries and regions, usually via major platforms.',
+    definition: [
+      'Global media refers to advertising on massive platforms that span the entire world — like Meta, YouTube, or Netflix. These platforms offer "scale" that local media cannot match, but they often lack the deep community connection and local relevance of a neighborhood publisher.',
+      'Global advertisers (like Coca-Cola or Nike) often mix global media for brand awareness with local media for specific regional promotions.',
+    ],
+    related: ['local-media', 'walled-garden'],
+  },
+  spo: {
+    id: 'spo',
+    term: 'Supply Path Optimization (SPO)',
+    category: 'Marketplace',
+    shortDefinition: 'The strategy of finding the most efficient and direct path to buy a publisher’s inventory.',
+    definition: [
+      'SPO is the process by which DSPs and buyers evaluate the many ways they can buy the same impression and choose the most efficient one. Because the same publisher inventory is often available through multiple SSPs and exchanges, SPO helps reduce fee leakage and improves transparency.',
+      'Effective SPO can increase the "working media" (the actual money that goes to the publisher) by cutting out unnecessary intermediaries who add fees without adding value.',
+    ],
+    related: ['dsp', 'ssp', 'exchange'],
+  },
+  'retail-media': {
+    id: 'retail-media',
+    term: 'Retail Media Network (RMN)',
+    category: 'Marketplace',
+    shortDefinition: 'An advertising platform owned by a retailer, using their first-party shopper data.',
+    definition: [
+      'Retail Media is the "third wave" of digital advertising (after Search and Social). Retailers like Amazon, Walmart, and Kroger let brands buy ads on their websites or using their shopper data to target users elsewhere.',
+      'The power of Retail Media is "closed-loop attribution": because the retailer knows what you saw AND what you bought, they can prove exactly how many jars of peanut butter an ad sold.',
+    ],
+    related: ['first-party-data', 'attribution', 'walled-garden'],
+  },
+  'sellers-json': {
+    id: 'sellers-json',
+    term: 'Sellers.json',
+    category: 'Marketplace',
+    shortDefinition: 'An IAB standard file hosted by SSPs that lists their authorized publishers.',
+    definition: [
+      'Sellers.json is the supply-side complement to ads.txt. While ads.txt is hosted by publishers, sellers.json is hosted by SSPs and exchanges. It provides a list of all direct publishers and intermediate resellers that the SSP is authorized to represent.',
+      'DSPs use sellers.json to verify the identities of the sellers in a bid request. This helps prevent domain spoofing and ensures that the advertiser knows exactly who they are buying from in the programmatic supply chain.',
+    ],
+    related: ['open-rtb', 'spo', 'publisher'],
+  },
+  curation: {
+    id: 'curation',
+    term: 'Curation',
+    category: 'Marketplace',
+    shortDefinition: 'The process of bundling premium inventory into custom "curated" marketplaces.',
+    definition: [
+      'Curation allows intermediaries (like agencies or data providers) to create custom inventory pools within an SSP. They select high-quality publishers and layer on specific data (like attention metrics or sustainability scores) to create a curated "deal" that a DSP can then target.',
+      'Curation is a way to reduce the complexity of the open web by providing a "pre-filtered" marketplace of high-performing inventory.',
+    ],
+    related: ['pmp', 'spo', 'inventory'],
+  },
+  mfa: {
+    id: 'mfa',
+    term: 'Made For Advertising (MFA)',
+    category: 'Marketplace',
+    shortDefinition: 'Low-quality websites designed solely to maximize ad revenue, often with poor user experience.',
+    definition: [
+      'MFA sites are built to harvest programmatic ad spend. They typically have low-quality content, extremely high ad density, and use aggressive tactics to keep users clicking. They often perform well on "vanity metrics" like CTR but drive very little actual business value.',
+      'The industry is currently pushing to exclude MFA sites from media plans to improve "working media" efficiency and reduce the carbon footprint of digital advertising.',
+    ],
+    related: ['brand-safety', 'yield', 'sustainability'],
+  },
+  sustainability: {
+    id: 'sustainability',
+    term: 'Sustainability (Green Media)',
+    category: 'Marketplace',
+    shortDefinition: 'Measuring and reducing the carbon footprint of digital advertising campaigns.',
+    definition: [
+      'Digital advertising has a significant environmental impact due to the massive server power required for RTB auctions. Sustainability initiatives in ad tech (like Scope3) aim to measure the carbon emissions of each ad impression.',
+      'Advertisers are increasingly choosing "green media" paths by excluding high-emission publishers (like MFA sites) and shortening the supply chain (SPO) to reduce the number of server calls per auction.',
+    ],
+    related: ['spo', 'mfa', 'rtb'],
+  },
+  'white-label': {
+    id: 'white-label',
+    term: 'White Labeling',
+    category: 'Marketplace',
+    shortDefinition: 'Using another company’s technology but branding it as your own.',
+    definition: [
+      'In ad tech, many agencies or smaller DSPs don\'t build their own bidding engines. Instead, they "white-label" a platform like Xandr or MediaMath. They put their own logo on the dashboard and sell it to their clients as their proprietary "Trading Desk."',
+      'Ribeye Media provides a white-label version of the C.O.W. to local broadcasters, allowing them to offer a "Local Ads" portal to small businesses that is actually powered by Ribeye\'s backend technology.',
+    ],
+    related: ['cow', 'agency'],
+  },
+  io: {
+    id: 'io',
+    term: 'Insertion Order (IO)',
+    category: 'Marketplace',
+    shortDefinition: 'A formal contract between a buyer and a seller for an advertising campaign.',
+    definition: [
+      'The IO is the legal "parent" of a campaign. it specifies the flight dates (start/end), the total budget, the agreed-upon CPM/rate, and the inventory being purchased. In the traditional world, an IO was a signed PDF; in the programmatic world, an IO is a digital object in a DSP (like DV360) that acts as a budget bucket.',
+      '<strong>Synonyms:</strong> Some companies call this a <strong>Media Order</strong> or a <strong>Master Service Agreement (MSA) Addendum</strong>. Inside many DSPs, the "Campaign" level acts similarly to an IO.',
+    ],
+    related: ['campaign', 'line-item'],
+  },
+  'line-item': {
+    id: 'line-item',
+    term: 'Line Item',
+    category: 'Marketplace',
+    shortDefinition: 'The granular tactical unit of a campaign where targeting and bidding are defined.',
+    definition: [
+      'Line items live under an IO or Campaign. This is where the actual "work" happens: you set the specific audience targeting (e.g. "Females 25-34 in Chicago"), the bid price, the frequency caps, and assign the creatives.',
+      '<strong>Nomenclature confusion:</strong> In Google DV360, they are "Line Items." In Meta Ads Manager, they are <strong>Ad Sets</strong>. In The Trade Desk, they are <strong>Ad Groups</strong>. In Xandr, they can be <strong>Augmented Line Items (ALIs)</strong>. Despite the different names, they all serve the same purpose: defining the "who, where, and how much."',
+    ],
+    related: ['io', 'campaign'],
+  },
+  'signal-loss': {
+    id: 'signal-loss',
+    term: 'Signal Loss',
+    category: 'Data',
+    shortDefinition: 'The reduction in trackable data due to privacy regulations and browser restrictions.',
+    definition: [
+      'Signal loss refers to the "blinding" of ad tech systems caused by the deprecation of third-party cookies (Chrome), Apple\'s App Tracking Transparency (ATT), and regulations like GDPR/CCPA. This makes it harder to target users and measure whether an ad led to a sale.',
+      'To combat signal loss, the industry is moving toward first-party data, Privacy Sandbox APIs, and modeled conversions (using AI to "guess" conversions where data is missing).',
+    ],
+    related: ['third-party-data', 'iroas'],
+  },
+  'attention-metrics': {
+    id: 'attention-metrics',
+    term: 'Attention Metrics',
+    category: 'Measurement',
+    shortDefinition: 'New metrics that measure how intensely a user actually looks at an ad.',
+    definition: [
+      'While "Viewability" only measures if an ad was on screen, Attention Metrics (pioneered by companies like Adelaide or Lumen) use eye-tracking data and AI models to predict whether a user actually processed the ad. Metrics include "Attention Seconds" or "Eye-on-Ad" scores.',
+      'Higher attention scores are increasingly correlated with better brand lift and sales outcomes than simple click-through rates.',
+    ],
+    related: ['viewability'],
+  },
+  'gen-ai-creative': {
+    id: 'gen-ai-creative',
+    term: 'Generative AI Creative',
+    category: 'Marketplace',
+    shortDefinition: 'Using AI to automatically generate and test ad variations.',
+    definition: [
+      'Generative AI allows advertisers to create thousands of variations of an ad (different backgrounds, headlines, or voiceovers) in seconds. These are often used in Dynamic Creative Optimization (DCO) to show the most relevant version to each user.',
+      'Platforms like Meta and Google now have "Advantage+" or "Performance Max" tools that automatically generate these assets to maximize performance.',
+    ],
+    related: ['creative', 'dco'],
+  },
+  cmp: {
+    id: 'cmp',
+    term: 'Consent Management Platform (CMP)',
+    category: 'Data',
+    shortDefinition: 'Software that manages user permissions for data collection and tracking.',
+    definition: [
+      'A CMP is the "Accept/Reject Cookies" popup you see on websites. It captures the user\'s choice and translates it into a "Consent String" (e.g. TCF 2.2) that is passed through the programmatic chain so that every vendor knows if they are legally allowed to track that user.',
+      'Major CMPs include OneTrust, Quantcast, and Didomi. Without a CMP, publishers in Europe and California risk massive fines under GDPR and CCPA.',
+    ],
+    related: ['signal-loss'],
+  },
+  'shoppable-ads': {
+    id: 'shoppable-ads',
+    term: 'Shoppable Ads',
+    category: 'Marketplace',
+    shortDefinition: 'Ad formats that allow users to purchase a product directly within the ad unit.',
+    definition: [
+      'Shoppable ads remove the friction of clicking to a separate website. On Instagram, you can "Add to Cart" directly. On CTV (Connected TV), you can scan a QR code on the screen to buy the product on your phone. This is a core part of the Retail Media explosion.',
+    ],
+    related: ['retail-media', 'ctv'],
+  },
+  iroas: {
+    id: 'iroas',
+    term: 'Incremental ROAS (iROAS)',
+    category: 'Measurement',
+    shortDefinition: 'A metric that measures only the ADDITIONAL sales driven by an ad.',
+    definition: [
+      'Standard ROAS measures all sales from people who saw an ad. Incremental ROAS (iROAS) uses holdout tests to exclude people who would have bought the product anyway. iROAS is the "truth" of advertising value, proving that the ad actually caused the sale.',
+    ],
+    related: ['attribution'],
+  },
+  markup: {
+    id: 'markup',
+    term: 'Markup / Platform Fee',
+    category: 'Marketplace',
+    shortDefinition: 'The additional cost layered on top of the media cost by ad tech platforms.',
+    definition: [
+      'Markup is how many ad tech companies make their money. If a DSP buys an impression for $1.00 (the "Net" cost) and charges the advertiser $1.20 (the "Gross" cost), the $0.20 is the markup. This is also referred to as a <strong>Platform Fee</strong> or <strong>Take Rate</strong>.',
+    ],
+    related: ['cpm', 'margin'],
+  },
+  margin: {
+    id: 'margin',
+    term: 'Margin (Ad Tech)',
+    category: 'Marketplace',
+    shortDefinition: 'The difference between the price a company pays for inventory and the price they sell it for.',
+    definition: [
+      'Margin is the lifeblood of ad tech intermediaries. For an agency trading desk, margin is the profit they keep after paying the DSP and the publisher. High margins are often found in "blind" buys where the advertiser doesn\'t see the breakdown of costs.',
+      'Industry trends are pushing toward "Disclosed" models where margins are capped and transparent, rather than "Non-Disclosed" models where margins can exceed 30%.',
+    ],
+    related: ['markup', 'spo'],
+  },
+  'billing-event': {
+    id: 'billing-event',
+    term: 'Billing Event',
+    category: 'Measurement',
+    shortDefinition: 'The specific action that triggers a payment (e.g. an impression, a click, or 10s of video).',
+    definition: [
+      'Not every impression is billed. A "Billable Impression" might require the ad to be 100% viewable, or for the video to play for at least 2 seconds. The billing event defines the contract between the buyer and the seller.',
+    ],
+    related: ['viewability', 'cpm'],
+  },
+  discrepancy: {
+    id: 'discrepancy',
+    term: 'Discrepancy',
+    category: 'Measurement',
+    shortDefinition: 'The difference in numbers between two different tracking systems.',
+    definition: [
+      'It is common for a DSP to say it served 1,000,000 ads while the Publisher says it only received 950,000. This 5% difference is a "discrepancy." Causes include latency (the user left before the ad loaded), ad blockers, or technical measurement differences. Industry standard allows for a 5-10% discrepancy.',
+    ],
+    related: ['ad-ops', 'pixel'],
   },
   'holding-company': {
     id: 'holding-company',
@@ -1235,8 +1612,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'A massive global parent company that owns dozens of individual ad and media agencies.',
     definition: [
-      'The "Big Six" holding companies (WPP, Publicis, Omnicom, IPG, Dentsu, Havas) own thousands of agencies worldwide. They centralize media buying power through "Trading Desks" that negotiate massive volume deals with publishers and platforms.',
-      'An advertiser might work with a creative agency, a media agency, and a PR agency — all of which are owned by the same holding company.',
+      'The "Big Six" holding companies (WPP, Publicis, Omnicom, Interpublic, Dentsu, and Havas) own the vast majority of the world\'s largest media agencies. For example, WPP owns Mindshare, Wavemaker, and EssenceMediacom. These sub-agencies often specialize in different regions or client types, but they share the parent company\'s "Trading Desk" and technology stack.',
+      'Holding companies use their scale to negotiate better rates with publishers (like Google, Meta, and NBCUniversal). In the programmatic era, they have consolidated their buying power into internal teams like <strong>Publicis Media</strong> or <strong>GroupM</strong> to maximize efficiency and data leverage.',
     ],
     related: ['agency', 'advertiser'],
   },
@@ -1422,6 +1799,36 @@ const GLOSS_TERM_DEFS: Array<{pattern: RegExp; id: GlossaryId}> = [
   {pattern: /\bprint ads?\b/gi, id: 'print-ads'},
   {pattern: /\bprint advertising\b/gi, id: 'print-ads'},
   {pattern: /\bC\.O\.W\.\b/g, id: 'cow'},
+  {pattern: /\bRate Card(s)?\b/gi, id: 'rate-card'},
+  {pattern: /\bLocal Media\b/gi, id: 'local-media'},
+  {pattern: /\bGlobal Media\b/gi, id: 'global-media'},
+  {pattern: /\bSupply Path Optimization\b/gi, id: 'spo'},
+  {pattern: /\bSPO\b/g, id: 'spo'},
+  {pattern: /\bRetail Media (Network)?(s)?\b/gi, id: 'retail-media'},
+  {pattern: /\bRMN(s)?\b/g, id: 'retail-media'},
+  {pattern: /\bSellers\.json\b/gi, id: 'sellers-json'},
+  {pattern: /\bCuration\b/gi, id: 'curation'},
+  {pattern: /\bMade For Advertising\b/gi, id: 'mfa'},
+  {pattern: /\bMFA\b/g, id: 'mfa'},
+  {pattern: /\bSustainability\b/gi, id: 'sustainability'},
+  {pattern: /\bGreen Media\b/gi, id: 'sustainability'},
+  {pattern: /\bWhite Label\b/gi, id: 'white-label'},
+  {pattern: /\bInsertion Order\b/gi, id: 'io'},
+  {pattern: /\bIO(s)?\b/g, id: 'io'},
+  {pattern: /\bLine Item(s)?\b/gi, id: 'line-item'},
+  {pattern: /\bSignal Loss\b/gi, id: 'signal-loss'},
+  {pattern: /\bAttention Metric(s)?\b/gi, id: 'attention-metrics'},
+  {pattern: /\bAttention Second(s)?\b/gi, id: 'attention-metrics'},
+  {pattern: /\bGen(erative)? AI\b/gi, id: 'gen-ai-creative'},
+  {pattern: /\bCMP\b/g, id: 'cmp'},
+  {pattern: /\bConsent Management Platform\b/gi, id: 'cmp'},
+  {pattern: /\bShoppable Ad(s)?\b/gi, id: 'shoppable-ads'},
+  {pattern: /\biROAS\b/g, id: 'iroas'},
+  {pattern: /\bIncremental ROAS\b/gi, id: 'iroas'},
+  {pattern: /\bMarkup\b/gi, id: 'markup'},
+  {pattern: /\bPlatform Fee(s)?\b/gi, id: 'markup'},
+  {pattern: /\bBilling Event(s)?\b/gi, id: 'billing-event'},
+  {pattern: /\bDiscrepancy\b/gi, id: 'discrepancy'},
   {pattern: /\bRibeye Media\b/gi, id: 'cow'},
 ];
 
