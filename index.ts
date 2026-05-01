@@ -2102,6 +2102,7 @@ const renderSidebar = (currentPath: string): string => {
     link('/example/video-player', '📹', 'Video Player'),
     "  <div class='ide-section'>Reference</div>",
     link('/players', '💰', 'Players &amp; Incentives'),
+    link('/companies', '🏢', 'Ecosystem Companies'),
     link('/glossary', '📖', 'Glossary'),
     "  <div class='ide-sidebar-footer'>",
     "    <button class='ide-theme-toggle' id='theme-toggle' onclick='toggleTheme()'></button>",
@@ -7805,6 +7806,14 @@ const renderHomeOverlays = (): string => {
       url: '/players',
       tags: 'advertiser agency dsp ssp publisher money incentives goals economics follow the money',
     },
+    {
+      type: 'guide',
+      icon: '🏢',
+      title: 'Ecosystem Companies',
+      desc: 'DSPs, SSPs, exchanges, ad servers, identity, measurement, CTV, audio, DOOH and adjacent vendors — all in one filterable table with site links.',
+      url: '/companies',
+      tags: 'dsp ssp exchange ad server identity measurement ctv audio dooh vendors companies videoamp ribeye trade desk magnite pubmatic liveramp doubleverify ias nielsen comscore',
+    },
   ]);
 
   const topicLinks = Object.values(topics)
@@ -7838,6 +7847,7 @@ const renderHomeOverlays = (): string => {
       ${exampleLinks}
       <div class="nav-section-label">Reference</div>
       <a class="nav-item" href="/players">Players &amp; Incentives — who wants what &amp; where the money goes</a>
+      <a class="nav-item" href="/companies">Ecosystem Companies — DSPs, SSPs, exchanges &amp; adjacent vendors at a glance</a>
       <a class="nav-item" href="/glossary">Glossary (all terms)</a>
       <div class="nav-section-label">Interview prep</div>
       <a class="nav-item" href="/#interview-prep">How to use this site</a>
@@ -8058,6 +8068,16 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '                <div>',
     "                  <div class='players-callout-title'>Players &amp; Incentives</div>",
     "                  <div class='players-callout-sub'>Who wants what — and where does the money actually go?</div>",
+    '                </div>',
+    '              </div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
+    "            <a class='players-callout' href='/companies'>",
+    "              <div class='players-callout-left'>",
+    "                <div class='players-callout-icon'>🏢</div>",
+    '                <div>',
+    "                  <div class='players-callout-title'>Ecosystem Companies</div>",
+    "                  <div class='players-callout-sub'>DSPs, SSPs, exchanges, identity, measurement, CTV, audio, DOOH — at a glance, with site links.</div>",
     '                </div>',
     '              </div>',
     "              <div class='players-callout-arrow'>→</div>",
@@ -8840,6 +8860,991 @@ const renderPlayersPage = (): string => {
 </html>`;
 };
 
+type CompanyCategory =
+  | 'DSP'
+  | 'SSP'
+  | 'Exchange'
+  | 'Ad Server'
+  | 'CTV / Streaming'
+  | 'Audio / Podcast'
+  | 'DOOH'
+  | 'Identity / Data'
+  | 'CDP / DMP'
+  | 'Measurement / Verification'
+  | 'Walled Garden'
+  | 'Adjacent / Tools';
+
+type Company = {
+  name: string;
+  category: CompanyCategory;
+  specialty: string;
+  url: string;
+  note?: string;
+};
+
+const companies: Company[] = [
+  // ── DSPs ──
+  {
+    name: 'The Trade Desk',
+    category: 'DSP',
+    specialty: 'Largest independent DSP. Owns UID2 identity standard. Display, video, CTV, DOOH, audio.',
+    url: 'https://www.thetradedesk.com/',
+  },
+  {
+    name: 'Google DV360',
+    category: 'DSP',
+    specialty: "Google's enterprise DSP. Deep YouTube / GDN / AdX integration; first-party Google data.",
+    url: 'https://marketingplatform.google.com/about/display-video-360/',
+  },
+  {
+    name: 'Amazon DSP',
+    category: 'DSP',
+    specialty: 'DSP backed by Amazon retail / shopping data. Reaches Amazon-owned and 3rd-party inventory.',
+    url: 'https://advertising.amazon.com/solutions/products/amazon-dsp',
+  },
+  {
+    name: 'Yahoo DSP',
+    category: 'DSP',
+    specialty: 'Omnichannel DSP from Yahoo (formerly Verizon Media / BrightRoll / Oath).',
+    url: 'https://www.yahooinc.com/advertising/dsp',
+  },
+  {
+    name: 'Microsoft Invest (Xandr)',
+    category: 'DSP',
+    specialty: 'Enterprise DSP acquired by Microsoft from AT&T; strong CTV / programmatic guaranteed.',
+    url: 'https://about.ads.microsoft.com/en/solutions/microsoft-advertising-platform',
+  },
+  {
+    name: 'StackAdapt',
+    category: 'DSP',
+    specialty: 'Self-serve multi-channel DSP popular with mid-market agencies and performance buyers.',
+    url: 'https://www.stackadapt.com/',
+  },
+  {
+    name: 'Basis Technologies',
+    category: 'DSP',
+    specialty: 'Formerly Centro. Workflow + DSP geared toward agencies and local / regional media buying.',
+    url: 'https://basis.com/',
+  },
+  {
+    name: 'Adform',
+    category: 'DSP',
+    specialty: 'European-rooted independent ad tech stack: DSP, DMP, ad server.',
+    url: 'https://site.adform.com/',
+  },
+  {
+    name: 'Viant',
+    category: 'DSP',
+    specialty: 'People-based DSP built around its Household ID identity graph.',
+    url: 'https://www.viantinc.com/',
+  },
+  {
+    name: 'Quantcast',
+    category: 'DSP',
+    specialty: 'AI-driven DSP focused on real-time audience modeling and contextual targeting.',
+    url: 'https://www.quantcast.com/',
+  },
+  {
+    name: 'Simpli.fi',
+    category: 'DSP',
+    specialty: 'Localized programmatic specialist; geo-fencing and addressable geo-fencing for local advertisers.',
+    url: 'https://www.simpli.fi/',
+  },
+  {
+    name: 'AdTheorent (Cadent)',
+    category: 'DSP',
+    specialty: 'ML-driven DSP focused on predictive performance; merged with Cadent.',
+    url: 'https://www.adtheorent.com/',
+  },
+
+  // ── SSPs ──
+  {
+    name: 'Magnite',
+    category: 'SSP',
+    specialty: 'Largest independent SSP. Formed from Rubicon Project + Telaria + SpotX. Strong CTV.',
+    url: 'https://www.magnite.com/',
+  },
+  {
+    name: 'PubMatic',
+    category: 'SSP',
+    specialty: 'Independent SSP with omnichannel reach and OpenWrap header bidding wrapper.',
+    url: 'https://pubmatic.com/',
+  },
+  {
+    name: 'OpenX',
+    category: 'SSP',
+    specialty: 'SSP / exchange focused on premium publishers and clean-room driven addressability.',
+    url: 'https://www.openx.com/',
+  },
+  {
+    name: 'Index Exchange',
+    category: 'SSP',
+    specialty: 'Independent SSP / exchange known for low-latency header bidding and supply path transparency.',
+    url: 'https://www.indexexchange.com/',
+  },
+  {
+    name: 'TripleLift',
+    category: 'SSP',
+    specialty: 'SSP specializing in native, in-image, and CTV (especially programmatic creative formats).',
+    url: 'https://triplelift.com/',
+  },
+  {
+    name: 'Sharethrough',
+    category: 'SSP',
+    specialty: 'SSP focused on native / in-feed and "Enhanced" creative auto-formatting.',
+    url: 'https://www.sharethrough.com/',
+  },
+  {
+    name: 'Equativ',
+    category: 'SSP',
+    specialty: 'Formerly Smart AdServer. Independent SSP + ad server, strong in EMEA. Acquired Sharethrough.',
+    url: 'https://equativ.com/',
+  },
+  {name: 'Smaato', category: 'SSP', specialty: 'Mobile-first SSP and exchange.', url: 'https://www.smaato.com/'},
+  {
+    name: 'Verve Group',
+    category: 'SSP',
+    specialty: 'Mobile-focused SSP / DSP combo (PubNative, Smaato sister brand).',
+    url: 'https://www.verve.com/',
+  },
+  {
+    name: 'Kargo',
+    category: 'SSP',
+    specialty: 'Premium mobile / video SSP with proprietary ad formats; acquired VideoByte and Forsman & Bodenfors.',
+    url: 'https://kargo.com/',
+  },
+
+  // ── Exchanges ──
+  {
+    name: 'Google AdX (Ad Manager)',
+    category: 'Exchange',
+    specialty: "World's largest ad exchange, bundled inside Google Ad Manager. At the center of DOJ antitrust case.",
+    url: 'https://admanager.google.com/',
+  },
+  {
+    name: 'Xandr Monetize',
+    category: 'Exchange',
+    specialty: 'Microsoft-owned exchange (AppNexus heritage). Sell-side counterpart to Microsoft Invest.',
+    url: 'https://www.xandr.com/',
+  },
+  {
+    name: 'Amazon Publisher Services (APS)',
+    category: 'Exchange',
+    specialty: "Amazon's server-side header bidding (TAM) and unified auction (UAM).",
+    url: 'https://aps.amazon.com/',
+  },
+
+  // ── Ad Servers ──
+  {
+    name: 'Google Ad Manager (GAM)',
+    category: 'Ad Server',
+    specialty: 'Dominant publisher ad server (formerly DFP). Serves direct + programmatic via unified auction.',
+    url: 'https://admanager.google.com/',
+  },
+  {
+    name: 'Campaign Manager 360',
+    category: 'Ad Server',
+    specialty: "Google's buy-side ad server (formerly DCM / DoubleClick Campaign Manager).",
+    url: 'https://marketingplatform.google.com/about/campaign-manager/',
+  },
+  {
+    name: 'FreeWheel',
+    category: 'Ad Server',
+    specialty: 'Comcast-owned premium video / CTV ad server and SSP. Used by major broadcasters.',
+    url: 'https://www.freewheel.com/',
+  },
+  {
+    name: 'Innovid',
+    category: 'Ad Server',
+    specialty: 'Independent CTV-first ad server and creative platform; merged with FlashTalking under Mediaocean.',
+    url: 'https://www.innovid.com/',
+  },
+  {
+    name: 'Flashtalking by Mediaocean',
+    category: 'Ad Server',
+    specialty: 'Independent buy-side ad server focused on dynamic creative, attribution and verification.',
+    url: 'https://www.flashtalking.com/',
+  },
+  {
+    name: 'Disney DRAX',
+    category: 'Ad Server',
+    specialty: 'Disney Real-Time Ad Exchange — the ad server / exchange behind Disney+, Hulu, ESPN ad sales.',
+    url: 'https://disneyadvertising.com/disney-real-time-ad-exchange-drax/',
+  },
+
+  // ── CTV / Streaming ──
+  {
+    name: 'Roku Advertising (OneView)',
+    category: 'CTV / Streaming',
+    specialty: "Roku's DSP and identity for CTV; uses ACR data from Roku-powered TVs.",
+    url: 'https://advertising.roku.com/',
+  },
+  {
+    name: 'Samsung Ads',
+    category: 'CTV / Streaming',
+    specialty: 'Samsung-owned CTV ad business with first-party Samsung TV ACR data.',
+    url: 'https://www.samsungads.com/',
+  },
+  {
+    name: 'LG Ad Solutions',
+    category: 'CTV / Streaming',
+    specialty: 'LG TV ad sales (formerly Alphonso). Uses ACR data from LG smart TVs.',
+    url: 'https://lgads.tv/',
+  },
+  {
+    name: 'Vizio (Inscape)',
+    category: 'CTV / Streaming',
+    specialty: "Vizio's ad business + Inscape ACR data; agreed acquisition by Walmart.",
+    url: 'https://www.vizio.com/ads',
+  },
+  {
+    name: 'NBCU One Platform',
+    category: 'CTV / Streaming',
+    specialty: "NBCUniversal's unified buying platform for Peacock + linear + digital.",
+    url: 'https://together.nbcuni.com/oneplatform/',
+  },
+  {
+    name: 'Paramount EyeQ',
+    category: 'CTV / Streaming',
+    specialty: "Paramount's digital + CTV advertising marketplace (Pluto TV, Paramount+).",
+    url: 'https://www.paramount.com/',
+  },
+
+  // ── Audio / Podcast ──
+  {
+    name: 'SiriusXM Media',
+    category: 'Audio / Podcast',
+    specialty: 'Combined Pandora / SiriusXM / SoundCloud / AdsWizz ad platform; largest US digital audio.',
+    url: 'https://www.siriusxmmedia.com/',
+  },
+  {
+    name: 'Spotify Advertising',
+    category: 'Audio / Podcast',
+    specialty: 'Spotify Audience Network + Ad Studio for music, podcasts, and Megaphone publishers.',
+    url: 'https://ads.spotify.com/',
+  },
+  {
+    name: 'iHeartMedia',
+    category: 'Audio / Podcast',
+    specialty: 'Largest US radio + podcast network; ad sales across iHeartRadio and podcast portfolio.',
+    url: 'https://www.iheartmedia.com/',
+  },
+  {
+    name: 'Triton Digital',
+    category: 'Audio / Podcast',
+    specialty: 'Streaming audio ad server, SSP, and measurement (a2x, Tap, Webcast Metrics).',
+    url: 'https://www.tritondigital.com/',
+  },
+  {
+    name: 'AdsWizz',
+    category: 'Audio / Podcast',
+    specialty: 'Audio ad server / SSP / DSP under SiriusXM. Powers programmatic audio + dynamic ad insertion.',
+    url: 'https://www.adswizz.com/',
+  },
+
+  // ── DOOH ──
+  {
+    name: 'Vistar Media',
+    category: 'DOOH',
+    specialty: 'Leading programmatic DOOH platform — DSP, SSP, and ad server for digital out-of-home.',
+    url: 'https://www.vistarmedia.com/',
+  },
+  {
+    name: 'Place Exchange',
+    category: 'DOOH',
+    specialty: 'DOOH SSP / exchange that maps physical screens into OpenRTB buying.',
+    url: 'https://www.placeexchange.com/',
+  },
+  {
+    name: 'Hivestack (Perion)',
+    category: 'DOOH',
+    specialty: 'Programmatic DOOH platform now part of Perion. Strong international footprint.',
+    url: 'https://www.hivestack.com/',
+  },
+  {
+    name: 'Broadsign',
+    category: 'DOOH',
+    specialty: 'CMS / ad server for DOOH networks; integrated SSP for programmatic DOOH.',
+    url: 'https://broadsign.com/',
+  },
+
+  // ── Identity / Data ──
+  {
+    name: 'LiveRamp',
+    category: 'Identity / Data',
+    specialty: 'Dominant identity infrastructure. RampID identity graph, ATS, and data collaboration / clean room.',
+    url: 'https://liveramp.com/',
+  },
+  {
+    name: 'UID2 (The Trade Desk)',
+    category: 'Identity / Data',
+    specialty: 'Open-source post-cookie identity standard based on hashed + encrypted email.',
+    url: 'https://unifiedid.com/',
+  },
+  {
+    name: 'ID5',
+    category: 'Identity / Data',
+    specialty: 'Independent universal ID provider for the open web; widely integrated with SSPs.',
+    url: 'https://id5.io/',
+  },
+  {
+    name: 'Lotame Panorama ID',
+    category: 'Identity / Data',
+    specialty: 'Cookieless ID + DMP. Lotame data marketplace for 3rd-party audience segments.',
+    url: 'https://www.lotame.com/',
+  },
+  {
+    name: 'Experian Marketing Services',
+    category: 'Identity / Data',
+    specialty: 'Identity graph + audience data products; consumer + auto + finance segments.',
+    url: 'https://www.experian.com/business/marketing',
+  },
+  {
+    name: 'Acxiom (IPG / Kinesso)',
+    category: 'Identity / Data',
+    specialty: "Long-running identity / data company inside IPG. Powers Kinesso's identity stack.",
+    url: 'https://www.acxiom.com/',
+  },
+  {
+    name: 'Epsilon (Publicis)',
+    category: 'Identity / Data',
+    specialty: 'CRM + identity + data inside Publicis. Core Audience ID and CORE AI platform.',
+    url: 'https://www.epsilon.com/',
+  },
+  {
+    name: 'TransUnion TruAudience',
+    category: 'Identity / Data',
+    specialty: 'Identity + audience platform combining TransUnion and Neustar data.',
+    url: 'https://www.transunion.com/business/marketing',
+  },
+
+  // ── CDP / DMP / Data Cloud ──
+  {
+    name: 'Twilio Segment',
+    category: 'CDP / DMP',
+    specialty: 'Customer Data Platform — collects first-party events and pipes them to ad / analytics tools.',
+    url: 'https://segment.com/',
+  },
+  {
+    name: 'Tealium',
+    category: 'CDP / DMP',
+    specialty: 'CDP + tag management; widely deployed across enterprise marketing stacks.',
+    url: 'https://tealium.com/',
+  },
+  {
+    name: 'mParticle',
+    category: 'CDP / DMP',
+    specialty: 'CDP focused on mobile-first + cross-channel identity stitching.',
+    url: 'https://www.mparticle.com/',
+  },
+  {
+    name: 'Snowflake Data Clean Room',
+    category: 'CDP / DMP',
+    specialty: 'Data cloud that hosts most ad-tech warehouses; native data clean room for advertiser ↔ publisher data.',
+    url: 'https://www.snowflake.com/',
+  },
+  {
+    name: 'Databricks',
+    category: 'CDP / DMP',
+    specialty: 'Lakehouse platform widely used by ad-tech engineering teams for ML + bid logging at scale.',
+    url: 'https://www.databricks.com/',
+  },
+  {
+    name: 'Salesforce Data Cloud',
+    category: 'CDP / DMP',
+    specialty: "Salesforce's CDP / data cloud (successor to Audience Studio / Krux DMP).",
+    url: 'https://www.salesforce.com/data/',
+  },
+
+  // ── Measurement / Verification ──
+  {
+    name: 'DoubleVerify',
+    category: 'Measurement / Verification',
+    specialty: 'Brand safety, viewability, fraud (IVT), and attention measurement; pre-bid + post-bid.',
+    url: 'https://doubleverify.com/',
+  },
+  {
+    name: 'Integral Ad Science (IAS)',
+    category: 'Measurement / Verification',
+    specialty: 'Brand safety, viewability, IVT, contextual targeting; competes head-to-head with DV.',
+    url: 'https://integralads.com/',
+  },
+  {
+    name: 'HUMAN Security',
+    category: 'Measurement / Verification',
+    specialty: 'Bot / IVT detection (formerly White Ops). Key infra behind ad-fraud takedowns.',
+    url: 'https://www.humansecurity.com/',
+  },
+  {
+    name: 'Nielsen',
+    category: 'Measurement / Verification',
+    specialty: 'Legacy TV + cross-media currency. NielsenONE is the cross-platform measurement product.',
+    url: 'https://www.nielsen.com/',
+  },
+  {
+    name: 'Comscore',
+    category: 'Measurement / Verification',
+    specialty: 'Cross-platform measurement, currency, and digital audience measurement — Nielsen alternative.',
+    url: 'https://www.comscore.com/',
+  },
+  {
+    name: 'VideoAmp',
+    category: 'Measurement / Verification',
+    specialty: 'Cross-screen measurement + currency challenger using ACR + STB data. Used in upfronts as alt-currency.',
+    url: 'https://www.videoamp.com/',
+  },
+  {
+    name: 'iSpot.tv',
+    category: 'Measurement / Verification',
+    specialty: 'TV ad measurement and outcomes; ACR + smart-TV data. Approved as a Nielsen-alternative currency.',
+    url: 'https://www.ispot.tv/',
+  },
+  {
+    name: 'Samba TV',
+    category: 'Measurement / Verification',
+    specialty: 'ACR-based cross-screen audience + measurement company; embedded in many smart TVs.',
+    url: 'https://www.samba.tv/',
+  },
+  {
+    name: 'TVision',
+    category: 'Measurement / Verification',
+    specialty: 'Person-level attention + co-viewing measurement for TV (panel + computer vision).',
+    url: 'https://tvisioninsights.com/',
+  },
+  {
+    name: 'Adelaide',
+    category: 'Measurement / Verification',
+    specialty: 'Attention metrics (AU score) used as a media-quality currency across digital + CTV.',
+    url: 'https://www.adelaidemetrics.com/',
+  },
+  {
+    name: 'Adalytics',
+    category: 'Measurement / Verification',
+    specialty:
+      'Independent ad-quality + brand-safety research and forensics; high-profile MFA / made-for-advertising exposés.',
+    url: 'https://adalytics.io/',
+  },
+
+  // ── Walled Gardens ──
+  {
+    name: 'Google Ads',
+    category: 'Walled Garden',
+    specialty: 'Search + YouTube + Display + GDN. Largest single ad business on the open web.',
+    url: 'https://ads.google.com/',
+  },
+  {
+    name: 'Meta Ads',
+    category: 'Walled Garden',
+    specialty: 'Facebook + Instagram + WhatsApp + Audience Network. Bid-and-buy through Meta Ads Manager.',
+    url: 'https://www.facebook.com/business/ads',
+  },
+  {
+    name: 'Amazon Advertising',
+    category: 'Walled Garden',
+    specialty: 'Sponsored Products / Sponsored Brands / DSP. Built on Amazon retail + IMDb + Twitch + Prime Video.',
+    url: 'https://advertising.amazon.com/',
+  },
+  {
+    name: 'TikTok for Business',
+    category: 'Walled Garden',
+    specialty: "TikTok's self-serve + managed ad platform. Pangle is its in-app SSP.",
+    url: 'https://www.tiktok.com/business/',
+  },
+  {
+    name: 'Pinterest Ads',
+    category: 'Walled Garden',
+    specialty: 'Visual / shopping-driven ads. Strong on planning / consideration stage.',
+    url: 'https://business.pinterest.com/',
+  },
+  {
+    name: 'Snap Ads',
+    category: 'Walled Garden',
+    specialty: 'Snapchat + AR ads. Snap Audience Network for off-Snap inventory.',
+    url: 'https://forbusiness.snapchat.com/',
+  },
+  {
+    name: 'LinkedIn Marketing Solutions',
+    category: 'Walled Garden',
+    specialty: 'B2B ads against professional / job / company graph data.',
+    url: 'https://business.linkedin.com/marketing-solutions',
+  },
+  {
+    name: 'Reddit Ads',
+    category: 'Walled Garden',
+    specialty: "Self-serve + managed ads against Reddit's community / interest graph.",
+    url: 'https://ads.reddit.com/',
+  },
+
+  // ── Adjacent / Tools ──
+  {
+    name: 'Ribeye Media',
+    category: 'Adjacent / Tools',
+    specialty:
+      'Consolidated Omnichannel Workflow (C.O.W.) for local / regional buyers — plan + execute CTV, audio, and display in one interface.',
+    url: 'https://ribeye.media/',
+  },
+  {
+    name: 'Prebid.org',
+    category: 'Adjacent / Tools',
+    specialty: 'Open-source header-bidding wrapper (Prebid.js + Prebid Server). Industry standard on the open web.',
+    url: 'https://prebid.org/',
+  },
+  {
+    name: 'IAB Tech Lab',
+    category: 'Adjacent / Tools',
+    specialty: 'Standards body for OpenRTB, VAST, ads.txt, sellers.json, GPP and most programmatic plumbing.',
+    url: 'https://iabtechlab.com/',
+  },
+  {
+    name: 'Mediaocean',
+    category: 'Adjacent / Tools',
+    specialty: 'Workflow + ad-server backbone for major holding-company agencies (Prisma, Flashtalking, Innovid).',
+    url: 'https://www.mediaocean.com/',
+  },
+  {
+    name: 'Scope3',
+    category: 'Adjacent / Tools',
+    specialty: 'Sustainability + supply-chain decarbonization data; emerging media-quality scoring layer.',
+    url: 'https://scope3.com/',
+  },
+  {
+    name: 'Jounce Media',
+    category: 'Adjacent / Tools',
+    specialty: 'Independent supply-path research; defines what counts as MFA / made-for-advertising inventory.',
+    url: 'https://www.jouncemedia.com/',
+  },
+  {
+    name: 'Sincera (The Trade Desk)',
+    category: 'Adjacent / Tools',
+    specialty: 'Supply-chain transparency / metadata company acquired by The Trade Desk in 2025.',
+    url: 'https://www.sincera.io/',
+  },
+  {
+    name: 'Permutive',
+    category: 'Adjacent / Tools',
+    specialty: 'Edge / on-device first-party data + cohort platform for premium publishers.',
+    url: 'https://permutive.com/',
+  },
+  {
+    name: 'Habu (LiveRamp)',
+    category: 'Adjacent / Tools',
+    specialty: 'Data clean-room orchestration acquired by LiveRamp.',
+    url: 'https://liveramp.com/our-platform/data-collaboration-clean-room/',
+  },
+  {
+    name: 'InfoSum',
+    category: 'Adjacent / Tools',
+    specialty: 'Independent data clean-room / collaboration platform.',
+    url: 'https://www.infosum.com/',
+  },
+];
+
+const renderCompaniesPage = (): string => {
+  const companiesStyles = `
+  :root {
+    --bg: #f4f4f5;
+    --bg-alt: #e5e7eb;
+    --card: #ffffff;
+    --card-soft: #f9fafb;
+    --border-subtle: #e5e7eb;
+    --border-strong: #d4d4d8;
+    --accent: #0ea5e9;
+    --accent-soft: #e0f2fe;
+    --accent-strong: #0284c7;
+    --text-main: #111827;
+    --text-soft: #6b7280;
+    --text-muted: #9ca3af;
+    --line-height-body: 1.55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, #e4e4e7 1px, transparent 0), radial-gradient(circle, #e4e4e7 1px, transparent 0);
+    background-size: 18px 18px;
+    background-position: 0 0, 9px 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    color: var(--text-main);
+    line-height: var(--line-height-body);
+  }
+  .skip-link {
+    position: absolute; left: -9999px; z-index: 999;
+    padding: 12px 20px; background: var(--accent); color: #0f172a;
+    font-weight: 600; font-size: 0.95rem; border-radius: 8px; text-decoration: none;
+  }
+  .skip-link:focus { left: 50%; top: 12px; transform: translateX(-50%); outline: 3px solid #e0f2fe; outline-offset: 3px; }
+  .page-shell { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 0; }
+  .page-top-nav {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .page-back { font-size: 0.82rem; color: var(--text-soft); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 20px; background: var(--card); }
+  .page-back:hover { color: var(--text-main); border-color: var(--accent); }
+  .breadcrumb-sep { color: var(--text-muted); font-size: 0.8rem; }
+  .breadcrumb-current { font-size: 0.82rem; color: var(--text-soft); }
+  .page-hero { margin-bottom: 28px; }
+  .page-hero-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-strong); background: var(--accent-soft); padding: 4px 10px; border-radius: 20px; margin-bottom: 12px;
+  }
+  .page-hero h1 { font-size: 2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); margin-bottom: 12px; }
+  .page-hero p { font-size: 1rem; color: var(--text-soft); max-width: 75ch; line-height: 1.6; }
+  .page-hero p + p { margin-top: 8px; }
+
+  /* Controls */
+  .controls-row {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 14px;
+  }
+  .controls-search {
+    flex: 1 1 260px; min-width: 220px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 8px 12px;
+  }
+  .controls-search input {
+    flex: 1; border: 0; outline: 0; background: transparent; font: inherit;
+    color: var(--text-main); font-size: 0.92rem;
+  }
+  .controls-meta { font-size: 0.78rem; color: var(--text-muted); }
+  .filter-chips {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;
+  }
+  .filter-chip {
+    font-size: 0.74rem; font-weight: 600;
+    padding: 5px 10px; border-radius: 20px;
+    background: var(--card); color: var(--text-soft);
+    border: 1px solid var(--border-strong);
+    cursor: pointer; user-select: none;
+    transition: all 0.12s ease;
+  }
+  .filter-chip:hover { color: var(--text-main); border-color: var(--accent); }
+  .filter-chip.active {
+    background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent);
+  }
+  .filter-chip-count { opacity: 0.65; margin-left: 4px; font-weight: 500; }
+
+  /* Table */
+  .companies-table-wrap {
+    background: var(--card); border: 1px solid var(--border-subtle); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 32px;
+  }
+  table.companies-table {
+    width: 100%; border-collapse: collapse; font-size: 0.88rem;
+  }
+  .companies-table thead th {
+    text-align: left; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted);
+    background: var(--card-soft);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+  .companies-table tbody tr { border-bottom: 1px solid var(--border-subtle); transition: background 0.1s; }
+  .companies-table tbody tr:last-child { border-bottom: 0; }
+  .companies-table tbody tr:hover { background: var(--card-soft); }
+  .companies-table td { padding: 12px 14px; vertical-align: top; }
+  .companies-table td.company-name { font-weight: 700; color: var(--text-main); white-space: nowrap; }
+  .companies-table td.company-specialty { color: var(--text-soft); line-height: 1.5; }
+  .companies-table td.company-link { white-space: nowrap; text-align: right; }
+  .companies-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--accent-strong); text-decoration: none;
+    padding: 5px 10px; border: 1px solid #bae6fd; border-radius: 20px; background: var(--accent-soft);
+    transition: background 0.12s;
+  }
+  .companies-link:hover { background: #bae6fd; }
+
+  /* Category badge */
+  .cat-badge {
+    display: inline-block;
+    font-size: 0.7rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .cat-DSP { background:#ede9fe; color:#5b21b6; }
+  .cat-SSP { background:#fce7f3; color:#9d174d; }
+  .cat-Exchange { background:#d1fae5; color:#065f46; }
+  .cat-AdServer { background:#dbeafe; color:#1e3a8a; }
+  .cat-CTV { background:#fee2e2; color:#991b1b; }
+  .cat-Audio { background:#fef3c7; color:#92400e; }
+  .cat-DOOH { background:#cffafe; color:#155e75; }
+  .cat-Identity { background:#fef9c3; color:#713f12; }
+  .cat-CDP { background:#e0e7ff; color:#3730a3; }
+  .cat-Measurement { background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; }
+  .cat-Walled { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; }
+  .cat-Adjacent { background:#fff7ed; color:#9a3412; }
+
+  /* Empty + responsive */
+  .empty-row td { text-align: center; color: var(--text-muted); padding: 24px 14px; font-size: 0.9rem; }
+  @media (max-width: 720px) {
+    .companies-table thead { display: none; }
+    .companies-table, .companies-table tbody, .companies-table tr, .companies-table td { display: block; width: 100%; }
+    .companies-table tr { padding: 14px; }
+    .companies-table td { padding: 4px 0; }
+    .companies-table td.company-name { font-size: 1rem; }
+    .companies-table td.company-link { text-align: left; padding-top: 8px; }
+  }
+
+  /* Notes / takeaway */
+  .page-takeaway {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #bfdbfe; border-radius: 16px; padding: 22px;
+    margin-bottom: 28px;
+  }
+  .page-takeaway-title { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin-bottom: 10px; }
+  .page-takeaway-body { font-size: 0.88rem; color: #1e3a5f; line-height: 1.6; }
+  .page-takeaway-body p { margin-bottom: 6px; }
+  .page-takeaway-body p:last-child { margin-bottom: 0; }
+
+  /* Dark mode */
+  [data-theme="dark"] {
+    --bg: #0f1117; --bg-alt: #1a1b26;
+    --card: #1e2030; --card-soft: #181926;
+    --border-subtle: rgba(148,163,184,0.15);
+    --border-strong: rgba(148,163,184,0.28);
+    --accent: #38bdf8; --accent-soft: rgba(56,189,248,0.12);
+    --accent-strong: #7dd3fc;
+    --text-main: #e2e8f0; --text-soft: #94a3b8; --text-muted: #64748b;
+  }
+  [data-theme="dark"] body {
+    background-image:
+      radial-gradient(circle, #1e2030 1px, transparent 0),
+      radial-gradient(circle, #1e2030 1px, transparent 0);
+  }
+  [data-theme="dark"] .companies-table-wrap { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .companies-table thead th { background: var(--card-soft); border-color: var(--border-subtle); color: var(--text-muted); }
+  [data-theme="dark"] .companies-table tbody tr { border-color: var(--border-subtle); }
+  [data-theme="dark"] .companies-table tbody tr:hover { background: var(--card-soft); }
+  [data-theme="dark"] .controls-search { background: var(--card); border-color: var(--border-strong); }
+  [data-theme="dark"] .filter-chip { background: var(--card); border-color: var(--border-strong); }
+  [data-theme="dark"] .filter-chip.active { background: var(--accent-soft); color: var(--accent-strong); border-color: var(--accent); }
+  [data-theme="dark"] .companies-link { background: var(--accent-soft); border-color: rgba(56,189,248,0.4); color: var(--accent-strong); }
+  [data-theme="dark"] .page-takeaway { background: var(--card); border-color: var(--border-subtle); }
+  [data-theme="dark"] .page-takeaway-title { color: var(--accent-strong); }
+  [data-theme="dark"] .page-takeaway-body { color: var(--text-main); }
+  [data-theme="dark"] .cat-Walled { background: rgba(148,163,184,0.12); color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
+  [data-theme="dark"] .cat-Measurement { background: rgba(34,197,94,0.12); color: #86efac; border-color: rgba(34,197,94,0.3); }
+  [data-theme="dark"] .page-back { color: var(--accent-strong); }
+  [data-theme="dark"] a { color: var(--accent-strong); }
+  `;
+
+  const categoryOrder: CompanyCategory[] = [
+    'DSP',
+    'SSP',
+    'Exchange',
+    'Ad Server',
+    'CTV / Streaming',
+    'Audio / Podcast',
+    'DOOH',
+    'Identity / Data',
+    'CDP / DMP',
+    'Measurement / Verification',
+    'Walled Garden',
+    'Adjacent / Tools',
+  ];
+
+  const catClass = (c: CompanyCategory): string => {
+    switch (c) {
+      case 'DSP':
+        return 'cat-DSP';
+      case 'SSP':
+        return 'cat-SSP';
+      case 'Exchange':
+        return 'cat-Exchange';
+      case 'Ad Server':
+        return 'cat-AdServer';
+      case 'CTV / Streaming':
+        return 'cat-CTV';
+      case 'Audio / Podcast':
+        return 'cat-Audio';
+      case 'DOOH':
+        return 'cat-DOOH';
+      case 'Identity / Data':
+        return 'cat-Identity';
+      case 'CDP / DMP':
+        return 'cat-CDP';
+      case 'Measurement / Verification':
+        return 'cat-Measurement';
+      case 'Walled Garden':
+        return 'cat-Walled';
+      case 'Adjacent / Tools':
+        return 'cat-Adjacent';
+    }
+  };
+
+  const counts: Record<string, number> = {};
+  for (const c of companies) {
+    counts[c.category] = (counts[c.category] ?? 0) + 1;
+  }
+
+  const chipsHtml = ['All', ...categoryOrder]
+    .map((cat) => {
+      const isAll = cat === 'All';
+      const n = isAll ? companies.length : (counts[cat] ?? 0);
+      const active = isAll ? ' active' : '';
+      const data = isAll ? 'all' : cat;
+      return `<button type='button' class='filter-chip${active}' data-cat="${data}">${cat}<span class='filter-chip-count'>${n}</span></button>`;
+    })
+    .join('\n');
+
+  // Sort rows: by category order, then by company name within
+  const sorted = [...companies].sort((a, b) => {
+    const ai = categoryOrder.indexOf(a.category);
+    const bi = categoryOrder.indexOf(b.category);
+    if (ai !== bi) {
+      return ai - bi;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  const rowsHtml = sorted
+    .map((c) => {
+      const host = (() => {
+        try {
+          return new URL(c.url).host.replace(/^www\./, '');
+        } catch {
+          return c.url;
+        }
+      })();
+      const haystack = `${c.name} ${c.specialty} ${c.category} ${host}`.toLowerCase();
+      return `<tr class='company-row' data-cat="${c.category}" data-search="${haystack.replace(/"/g, '&quot;')}">
+        <td><span class='cat-badge ${catClass(c.category)}'>${c.category}</span></td>
+        <td class='company-name'>${c.name}</td>
+        <td class='company-specialty'>${c.specialty}</td>
+        <td class='company-link'><a class='companies-link' href='${c.url}' target='_blank' rel='noopener noreferrer'>${host} ↗</a></td>
+      </tr>`;
+    })
+    .join('\n');
+
+  return `<!doctype html>
+<html lang='en'>
+<head>
+  ${FAVICON_LINK}
+  <meta charset='utf-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <title>Ecosystem Companies — DSPs, SSPs &amp; the Wider Ad Tech Stack</title>
+  <meta name='description' content='A filterable table of the major DSPs, SSPs, ad exchanges, ad servers, identity, measurement, CTV, audio, DOOH and adjacent ad-tech companies — with site links and one-line specialties.' />
+  ${themeScript}
+  <style>${companiesStyles}${sidebarStyles}</style>
+</head>
+<body>
+  <a href='#main-content' class='skip-link'>Skip to main content</a>
+  ${renderSidebar('/companies')}
+  <div class='page-shell' id='main-content'>
+
+    <nav class='page-top-nav'>
+      <a class='page-back' href='/'>← Overview</a>
+      <span class='breadcrumb-sep'>/</span>
+      <span class='breadcrumb-current'>Ecosystem Companies</span>
+    </nav>
+
+    <div class='page-hero'>
+      <div class='page-hero-label'>Ecosystem at a glance</div>
+      <h1>Who's Who in Ad Tech</h1>
+      <p>A scannable, filterable table of the major DSPs, SSPs, ad exchanges, ad servers, identity / data providers, measurement vendors, CTV / audio / DOOH platforms, walled gardens, and adjacent ad-tech companies — each with a one-line specialty and a link to their site.</p>
+      <p>Filter by category, search by name or speciality. Some companies legitimately sit in more than one box (Magnite has a DSP, Amazon has both a DSP and a publisher network, Google owns the largest exchange + the dominant ad server) — this list places each under its primary role.</p>
+    </div>
+
+    <div class='controls-row'>
+      <label class='controls-search' aria-label='Search ecosystem'>
+        <span aria-hidden='true'>🔍</span>
+        <input id='companies-search' type='search' placeholder='Search company, speciality, or URL…' autocomplete='off' />
+      </label>
+      <span class='controls-meta' id='companies-meta'>${sorted.length} companies</span>
+    </div>
+
+    <div class='filter-chips' id='companies-chips' role='tablist' aria-label='Filter by category'>
+      ${chipsHtml}
+    </div>
+
+    <div class='companies-table-wrap'>
+      <table class='companies-table' aria-label='Ad tech ecosystem companies'>
+        <thead>
+          <tr>
+            <th style='width:170px;'>Category</th>
+            <th style='width:200px;'>Company</th>
+            <th>Speciality</th>
+            <th style='width:170px;'>Website</th>
+          </tr>
+        </thead>
+        <tbody id='companies-tbody'>
+          ${rowsHtml}
+          <tr class='empty-row' id='companies-empty' style='display:none;'>
+            <td colspan='4'>No companies match that filter.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class='page-takeaway'>
+      <div class='page-takeaway-title'>How to read this list</div>
+      <div class='page-takeaway-body'>
+        <p><strong>DSPs</strong> bid on impressions for advertisers. <strong>SSPs</strong> sell impressions on behalf of publishers. <strong>Exchanges</strong> run the auction in the middle. <strong>Ad servers</strong> traffic and serve the actual creative.</p>
+        <p><strong>CTV / Audio / DOOH</strong> rows are the channel-specific specialists you'd plug into a DSP or SSP. <strong>Identity / Data</strong>, <strong>CDP / DMP</strong>, and <strong>Measurement / Verification</strong> are the layers that make targeting, addressability, and accountability work.</p>
+        <p><strong>Walled gardens</strong> own their entire stack — buy directly through their UI rather than through an open DSP. <strong>Adjacent / Tools</strong> covers everything that doesn't fit the buy/sell axis but quietly props up the ecosystem (Prebid, IAB Tech Lab, supply-chain transparency, clean rooms, omnichannel workflow tools like Ribeye Media).</p>
+      </div>
+    </div>
+
+    <div style='font-size:0.8rem;color:var(--text-muted);text-align:center;padding-bottom:8px;'>
+      Go deeper: <a href='/players' style='color:var(--accent-strong);'>Players &amp; Incentives</a> ·
+      <a href='/topic/buy-side' style='color:var(--accent-strong);'>Buy Side</a> ·
+      <a href='/topic/sell-side' style='color:var(--accent-strong);'>Sell Side</a> ·
+      <a href='/topic/third-parties' style='color:var(--accent-strong);'>3rd-Party Providers</a> ·
+      <a href='/glossary' style='color:var(--accent-strong);'>Glossary</a>
+    </div>
+
+  </div>
+
+  <script>
+  (function(){
+    var chipsEl = document.getElementById('companies-chips');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.company-row'));
+    var search = document.getElementById('companies-search');
+    var meta = document.getElementById('companies-meta');
+    var empty = document.getElementById('companies-empty');
+    var activeCat = 'all';
+
+    function apply(){
+      var q = (search.value || '').trim().toLowerCase();
+      var shown = 0;
+      rows.forEach(function(r){
+        var cat = r.getAttribute('data-cat');
+        var hay = r.getAttribute('data-search');
+        var catOk = activeCat === 'all' || cat === activeCat;
+        var qOk = !q || hay.indexOf(q) !== -1;
+        if (catOk && qOk) { r.style.display = ''; shown++; }
+        else { r.style.display = 'none'; }
+      });
+      empty.style.display = shown === 0 ? '' : 'none';
+      meta.textContent = shown + (shown === 1 ? ' company' : ' companies');
+    }
+
+    chipsEl.addEventListener('click', function(e){
+      var t = e.target;
+      while (t && t !== chipsEl && !t.classList.contains('filter-chip')) t = t.parentNode;
+      if (!t || t === chipsEl) return;
+      Array.prototype.forEach.call(chipsEl.querySelectorAll('.filter-chip'), function(c){ c.classList.remove('active'); });
+      t.classList.add('active');
+      activeCat = t.getAttribute('data-cat') || 'all';
+      apply();
+    });
+
+    search.addEventListener('input', apply);
+  })();
+  </script>
+</body>
+</html>`;
+};
+
 const app = new Elysia();
 
 app
@@ -8887,6 +9892,12 @@ app
   })
   .get('/players', () => {
     const html = renderPlayersPage();
+    return new Response(html, {
+      headers: {'content-type': 'text/html; charset=utf-8'},
+    });
+  })
+  .get('/companies', () => {
+    const html = renderCompaniesPage();
     return new Response(html, {
       headers: {'content-type': 'text/html; charset=utf-8'},
     });
