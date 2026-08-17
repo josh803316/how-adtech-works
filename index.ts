@@ -5266,7 +5266,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="440" y="234" font-size="7.5" fill="${mu}">· 150ms ad renders</text>` +
       // Legend
       `<text x="2" y="256" font-size="7.5" fill="${mu}">Legend: Blue = buy side · Purple = DSP / exchange · Green = publisher. DSP = Demand-Side Platform · nurl = win notification URL · pCTR = predicted click-through rate</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Bid request flows from exchange to DSP; DSP returns bid and creative; the winner is notified via nurl and serves the ad.',
       )
@@ -5314,7 +5314,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="142" y="216" font-size="7" fill="${mu}" font-style="italic">If no bid meets floor: passback to next demand source</text>` +
       // Legend
       `<text x="2" y="252" font-size="7.5" fill="${mu}">Legend: Green = publisher · Blue = header bidding · Purple = exchange/DSPs. GAM = Google Ad Manager · SSP = Supply-Side Platform · Floor = minimum CPM</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Publisher runs GAM and Prebid; SSPs return bids in parallel; highest bid wins and is passed to GAM for the unified auction.',
       )
@@ -5376,7 +5376,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       ln(498, 176, 326, 192, '', gr, 'ag') +
       ln(498, 176, 474, 192, '', gr, 'ag') +
       `<text x="2" y="254" font-size="7.5" fill="${mu}">Legend: Blue = collection · Purple = storage/process · Green = applications. ACR = Automatic Content Recognition · CAPI = Conversions API · dbt = data build tool · MTA = Multi-Touch Attribution · MMM = Media Mix Modeling</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Events flow from collection (SDKs, pixels, logs) into storage and processing, then into audience segments, attribution, and bidder enrichment.',
       )
@@ -5420,7 +5420,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       ln(469, 128, 469, 142, 'ratings', gr, 'ag') +
       ln(469, 184, 469, 198, 'match', gr, 'ag') +
       `<text x="2" y="252" font-size="7.5" fill="${mu}">Legend: Blue = identity · Purple = brand safety/fraud · Green = measurement. ATS = Authenticated Traffic Solution · RampID = LiveRamp ID · IVT = Invalid Traffic · ADH = Ads Data Hub</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Third-party providers span identity (LiveRamp, UID2), verification (IAS, DoubleVerify), and measurement (Nielsen, VideoAmp, clean rooms).',
       )
@@ -5480,7 +5480,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="385" y="198" text-anchor="middle" font-size="6.5" fill="${st}">VideoClicks</text>` +
       `<text x="385" y="208" text-anchor="middle" font-size="6.5" fill="${st}">Impression URL</text>` +
       `<text x="2" y="228" font-size="7.5" fill="${mu}">Legend: Blue = request flow · Purple = auction · Green = creative/render. nurl = win notification URL · seatbid = DSP bid response · GPT = Google Publisher Tag · Prebid.js = header bidding library</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Sequential steps from page load to ad render: ad request → bid request → DSP evaluation → auction → winner notified → creative served.',
       )
@@ -5528,7 +5528,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<path stroke="${pu}" stroke-width="1" fill="none" stroke-dasharray="3,2" d="M 270 124 L 72 146"/>` +
       `<path stroke="${pu}" stroke-width="1" fill="none" stroke-dasharray="3,2" d="M 270 124 L 481 146"/>` +
       `<text x="2" y="256" font-size="7.5" fill="${mu}">Legend: Blue = digital attribution · Green = TV/CTV currency · Purple = shared infrastructure. C3/C7 = live + DVR · MTA = Multi-Touch Attribution · MMM = Media Mix Model · ADH = Ads Data Hub</text>` +
-      `</svg>` +
+      '</svg>' +
       flowCaption(
         'Measurement covers pixels, attribution models, and currency (Nielsen, VideoAmp); clean rooms and identity graphs support cross-party analysis.',
       )
@@ -5942,7 +5942,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       `<path stroke="${or}" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#ao)" d="M513 140 C 513 120 80 120 82 140"/>` +
       `<text x="300" y="118" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Smart Bidding feedback loop</text>` +
       `<text x="2" y="202" font-size="6.5" fill="${mu}">QS = Quality Score · LP = Landing Page · CPC = Cost Per Click · VCG = Vickrey-Clarke-Groves (generalized 2nd price) · tROAS/tCPA = target return / cost bidding strategies</text>` +
-      `</svg>`
+      '</svg>'
     );
   }
 
@@ -5977,7 +5977,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       `<path stroke="${or}" stroke-width="1.2" fill="none" stroke-dasharray="3,2" marker-end="url(#ao)" d="M456 108 C 456 80 100 80 100 108"/>` +
       `<text x="280" y="78" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Conversion signal feeds back into auction model</text>` +
       `<text x="2" y="176" font-size="6.5" fill="${mu}">CAPI = Conversions API · DPA = Dynamic Product Ads · DCO = Dynamic Creative Optimization · FBX = Facebook Exchange · Advantage+ = Meta's automated campaign system</text>` +
-      `</svg>`
+      '</svg>'
     );
   }
 
@@ -6017,7 +6017,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(306, 140, 312, 140, '', pu, 'ap') +
       ln(410, 140, 416, 140, '', gr, 'ag') +
       `<text x="2" y="186" font-size="6.5" fill="${mu}">IMA = Interactive Media Ads SDK · VAST = Video Ad Serving Template · PAL = Programmatic Access Library · VTR = View-Through Rate · CPV = Cost Per View · OM SDK = Open Measurement SDK</text>` +
-      `</svg>`
+      '</svg>'
     );
   }
 
@@ -6056,7 +6056,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(306, 162, 312, 162, '', pu, 'ap') +
       ln(410, 162, 416, 162, '', gr, 'ag') +
       `<text x="2" y="206" font-size="6.5" fill="${mu}">GAM = Google Ad Manager · IX = Index Exchange · key-val = key-value pair used to route bids in GAM · CM360 = Campaign Manager 360 · Prebid.js = open-source header bidding wrapper</text>` +
-      `</svg>`
+      '</svg>'
     );
   }
 
@@ -6096,7 +6096,7 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(306, 163, 312, 163, '', pu, 'ap') +
       ln(414, 163, 420, 163, '', gr, 'ag') +
       `<text x="2" y="206" font-size="6.5" fill="${mu}">SCTE-35 = digital program insertion standard · SSAI = Server-Side Ad Insertion · ADS = Ad Decision Server · ACR = Automatic Content Recognition · FA = Fingerprinting/Advertising ID</text>` +
-      `</svg>`
+      '</svg>'
     );
   }
 
@@ -7973,7 +7973,7 @@ const renderEcosystemDiagram = (): string => {
     `<rect x="412" y="8" width="100" height="24" rx="4" fill="${orF}" stroke="${or}" stroke-width="1"/>` +
     `<text x="462" y="24" text-anchor="middle" font-size="8" fill="${or}">3rd-Party</text>` +
     `<text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="7" fill="${mu}">Demand flows left → right; auctions run in the Exchange; Data &amp; Identity and verification/measurement support both sides.</text>` +
-    `</svg></div>`
+    '</svg></div>'
   );
 };
 
@@ -8393,7 +8393,7 @@ const renderPlayersPage = (): string => {
         <li><strong>Reach &amp; Frequency</strong> — who saw it and how often</li>
         <li><strong>Brand Lift</strong> — did awareness actually improve?</li>
       </ul>`,
-      economics: `<strong>Pays:</strong> Anywhere from $1–3 CPM for low-quality open-web display ads up to $20–50 CPM for premium video or connected TV. A national brand might spend $50M–$500M/year. A small business might spend $500/month on Google Ads.<br/><br/><strong>Agency fee:</strong> If they use an agency, ~10–15% of their media budget goes to the agency before a single ad is shown.`,
+      economics: '<strong>Pays:</strong> Anywhere from $1–3 CPM for low-quality open-web display ads up to $20–50 CPM for premium video or connected TV. A national brand might spend $50M–$500M/year. A small business might spend $500/month on Google Ads.<br/><br/><strong>Agency fee:</strong> If they use an agency, ~10–15% of their media budget goes to the agency before a single ad is shown.',
       fear: 'Paying for ads nobody saw, ads appearing next to brand-damaging content, having no idea if any of it worked, or being overcharged because the supply chain is opaque.',
       links: [{label: 'Buy Side →', href: '/topic/buy-side'}],
     },
@@ -8444,7 +8444,7 @@ const renderPlayersPage = (): string => {
         <li><strong>p99 bid latency</strong> (must be under 100ms)</li>
         <li><strong>Unique reach</strong></li>
       </ul>`,
-      economics: `<strong>Earns:</strong> The Trade Desk charges roughly 21% platform fee on all spend run through it — so for every $100 an advertiser allocates, $21 goes to TTD and $79 goes toward actual media.<br/><br/>Google DV360 fees vary by deal type but are in the same range. Some DSPs charge a flat CPM (e.g., $0.35–1.00 per 1,000 impressions) instead of a percentage.`,
+      economics: '<strong>Earns:</strong> The Trade Desk charges roughly 21% platform fee on all spend run through it — so for every $100 an advertiser allocates, $21 goes to TTD and $79 goes toward actual media.<br/><br/>Google DV360 fees vary by deal type but are in the same range. Some DSPs charge a flat CPM (e.g., $0.35–1.00 per 1,000 impressions) instead of a percentage.',
       fear: 'Being disintermediated — either by advertisers going direct to walled gardens (Google, Meta) or by publishers creating private deal structures that bypass the open exchange.',
       links: [
         {label: 'Buy Side →', href: '/topic/buy-side'},
@@ -8631,7 +8631,7 @@ const renderPlayersPage = (): string => {
         <li><strong>Discrepancy %</strong> (e.g. advertiser vs publisher numbers)</li>
         <li><strong>Fill rate</strong> (on the sell side)</li>
       </ul>`,
-      economics: `<strong>Earns:</strong> Typically salaried employees at agencies, publishers, or ad tech companies. Their value is in technical precision — a single typo in a tracking URL can waste millions of dollars in ad spend. Many companies are now outsourcing Ad Ops to global service hubs to reduce costs.`,
+      economics: '<strong>Earns:</strong> Typically salaried employees at agencies, publishers, or ad tech companies. Their value is in technical precision — a single typo in a tracking URL can waste millions of dollars in ad spend. Many companies are now outsourcing Ad Ops to global service hubs to reduce costs.',
       fear: 'A "dead pixel" on a massive campaign launch, creatives being rejected by exchanges, or the increasing complexity of "privacy-safe" measurement making their jobs 10x harder.',
       links: [{label: 'Glossary: Ad Ops →', href: '/glossary?term=ad-ops'}],
     },
@@ -8656,7 +8656,7 @@ const renderPlayersPage = (): string => {
         <li><strong>Client Health Score</strong></li>
         <li><strong>NPS (Net Promoter Score)</strong></li>
       </ul>`,
-      economics: `<strong>Earns:</strong> Salary + Performance Bonuses tied to client spend or retention. A successful CSM at a major DSP might manage $50M+ in annual media spend across their book of business.`,
+      economics: '<strong>Earns:</strong> Salary + Performance Bonuses tied to client spend or retention. A successful CSM at a major DSP might manage $50M+ in annual media spend across their book of business.',
       fear: 'Clients "churning" to a competitor, budget cuts at the advertiser level, or the platform failing to deliver results during a critical campaign.',
       links: [{label: 'Glossary: CSM →', href: '/glossary?term=csm'}],
     },

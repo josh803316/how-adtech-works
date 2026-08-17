@@ -1,0 +1,14 @@
+{
+  "extends": ["@josh803316/shared-config/biome.json"],
+  "linter": {
+    "rules": {
+      "complexity": { "useOptionalChain": "warn" },
+      "style": {
+        "useExplicitLengthCheck": "warn",
+        "useSingleVarDeclarator": "warn",
+        "useTemplate": "warn"
+      },
+      "suspicious": { "noConsole": "warn" }
+    }
+  }
+}
