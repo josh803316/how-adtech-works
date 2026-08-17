@@ -5,15 +5,15 @@
     "": {
       "name": "how-adtech-works",
       "dependencies": {
-        "elysia": "latest",
+        "@types/bun": "^1.3.14",
+        "elysia": "^1.4.29",
       },
       "devDependencies": {
-        "@josh803316/shared-config": "latest",
-        "@types/bun": "latest",
-        "sharp": "latest",
+        "@josh803316/shared-config": "3.0.2",
+        "sharp": "^0.35.3",
       },
       "peerDependencies": {
-        "typescript": "latest",
+        "typescript": "7.0.2",
       },
     },
   },
