@@ -18,7 +18,9 @@
   },
   "dependencies": {
     "@types/bun": "^1.3.14",
-    "elysia": "^1.4.29"
+    "elysia": "2.0.0-beta.12",
+    "exact-mirror": "^1.2.4",
+    "typebox": "^1.3.0"
   },
   "trustedDependencies": [
     "@josh803316/shared-config",
