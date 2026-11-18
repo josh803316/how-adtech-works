@@ -34,11 +34,11 @@ jobs:
         with:
           bun-version: latest
 
-      # semantic-release requires Node >=22.14.0 (Bun reports ~v20 for process.version)
+      # The current semantic-release version requires Node >=26.13.
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: 22
+          node-version: 26
 
       # Install release tooling — not in package.json to avoid Vercel needing GitHub Packages auth
       # GITHUB_TOKEN must be set here so Bun can expand ${GITHUB_TOKEN} in .npmrc
