@@ -1,8 +1,11 @@
-import {Elysia} from 'elysia';
-import {FAVICON_BASE64} from './favicon-data';
+import { Elysia } from 'elysia'
+import { campaignPlanningContent } from './campaign-planning'
+import { FAVICON_BASE64 } from './favicon-data'
+import { mediaMeasurementContent } from './media-measurement'
+import { unifiedMediaContent } from './unified-media'
 
 // Favicon: PNG embedded as data URL so it always shows (no extra request, works in Safari).
-const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,${FAVICON_BASE64}" /><link rel="shortcut icon" href="data:image/png;base64,${FAVICON_BASE64}" />`;
+const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,${FAVICON_BASE64}" /><link rel="shortcut icon" href="data:image/png;base64,${FAVICON_BASE64}" />`
 
 type TopicId =
   | 'buy-side'
@@ -13,7 +16,7 @@ type TopicId =
   | 'measurement-currency'
   | 'local-vs-global'
   | 'roles'
-  | 'nomenclature';
+  | 'nomenclature'
 
 type ExampleId =
   | 'instagram'
@@ -22,35 +25,38 @@ type ExampleId =
   | 'search'
   | 'video-player'
   | 'audio-streaming'
-  | 'digital-billboard';
+  | 'digital-billboard'
 
-type FurtherReadingItem = {label: string; url: string};
+interface FurtherReadingItem {
+  label: string
+  url: string
+}
 
-type Topic = {
-  id: TopicId;
-  label: string;
-  shortDescription: string;
-  overview: string[];
-  technical: string[];
-  companies?: string[];
-  deepDive?: string[];
-  keyTakeaways?: string[];
-  inOneSentence?: string;
-  furtherReading?: FurtherReadingItem[];
-  keyTerms?: GlossaryId[];
-  quickCheck?: {q: string; a: string}[];
-};
+interface Topic {
+  id: TopicId
+  label: string
+  shortDescription: string
+  overview: string[]
+  technical: string[]
+  companies?: string[]
+  deepDive?: string[]
+  keyTakeaways?: string[]
+  inOneSentence?: string
+  furtherReading?: FurtherReadingItem[]
+  keyTerms?: GlossaryId[]
+  quickCheck?: { q: string; a: string }[]
+}
 
-type Example = {
-  id: ExampleId;
-  label: string;
-  surface: string;
-  story: string[];
-  technicalFlow: string[];
-  keyTakeaways?: string[];
-  inOneSentence?: string;
-  furtherReading?: FurtherReadingItem[];
-};
+interface Example {
+  id: ExampleId
+  label: string
+  surface: string
+  story: string[]
+  technicalFlow: string[]
+  keyTakeaways?: string[]
+  inOneSentence?: string
+  furtherReading?: FurtherReadingItem[]
+}
 
 type GlossaryId =
   | 'yield'
@@ -101,6 +107,8 @@ type GlossaryId =
   | 'holding-company'
   | 'programmatic-audio'
   | 'dooh'
+  | 'unified-media-platform'
+  | 'trade-area'
   | 'ooh'
   | 'geo-fencing'
   | 'foot-traffic'
@@ -130,16 +138,16 @@ type GlossaryId =
   | 'margin'
   | 'billing-event'
   | 'discrepancy'
-  | 'cow';
+  | 'cow'
 
-type GlossaryEntry = {
-  id: GlossaryId;
-  term: string;
-  category: 'Marketplace' | 'Data' | 'Measurement';
-  shortDefinition: string;
-  definition: string[];
-  related?: GlossaryId[];
-};
+interface GlossaryEntry {
+  id: GlossaryId
+  term: string
+  category: 'Marketplace' | 'Data' | 'Measurement'
+  shortDefinition: string
+  definition: string[]
+  related?: GlossaryId[]
+}
 
 const topics: Record<TopicId, Topic> = {
   'buy-side': {
@@ -159,7 +167,7 @@ const topics: Record<TopicId, Topic> = {
     overview: [
       '<strong>The buy side</strong> is the demand side of digital advertising: everyone involved in deciding <em>which</em> ads to show and <em>how much to pay</em>. It spans the <strong>advertiser</strong> (the brand paying for ads), the <strong>agency</strong> (which plans and buys on their behalf), and the <strong>Demand-Side Platform (DSP)</strong> — the software that actually submits bids in real-time auctions. When you see an ad anywhere on the internet, the buy side has already decided, in under 100 milliseconds, that you were worth showing it to and at what price.',
       '<strong>Advertisers</strong> are the brands and companies paying for ads: Nike, a local restaurant, a SaaS startup. They define campaign goals (brand awareness, app installs, e-commerce purchases), budgets, flight dates, and targeting requirements. Most advertisers don’t operate DSPs directly — they work through agencies or managed service teams.',
-      '<strong>Agencies</strong> (WPP’s GroupM, Publicis, IPG Mediabrands, Havas) act as expert intermediaries. They handle media planning (which channels reach my audience?), buying (negotiating rates and setting up programmatic campaigns), creative trafficking, and performance reporting. Holding-company agencies often operate their own trading desks that centralize DSP access across many clients.',
+      '<strong>Agencies</strong> (Mindshare, agencies within Publicis Media, and independents) act as expert intermediaries. They handle media planning (which channels reach my audience?), buying (negotiating rates and setting up programmatic campaigns), creative trafficking, and performance reporting. Holding-company agencies often operate their own trading desks that centralize DSP access across many clients.',
       'A <strong>Demand-Side Platform (DSP)</strong> is the core technology that connects advertiser budgets and targeting rules to the actual ad auction. The DSP receives a bid request from an exchange (describing an available impression), evaluates it against active campaigns in milliseconds, and either passes or returns a bid with a price and creative. The biggest independent DSP is <strong>The Trade Desk</strong>. Other major players include <strong>Google DV360</strong>, <strong>Amazon DSP</strong>, <strong>Microsoft Xandr</strong>, and <strong>Yahoo DSP</strong>.',
       '<strong>The Trade Desk</strong> is the largest independent (non-walled-garden) DSP, used by agencies and brands worldwide. Their platform (called Solimar) supports display, video, audio, connected TV (CTV), digital out-of-home (DOOH), and native formats — all in one interface. They built <strong>Unified ID 2.0 (UID2)</strong>, an open-source identity standard based on hashed and encrypted emails, designed as a privacy-respecting alternative to third-party cookies. The Trade Desk is ‘independent’ because they don’t own media, unlike Google or Amazon.',
       '<strong>Google DV360</strong> (Display & Video 360) is Google’s enterprise buying platform. It has deep native integration with YouTube, Google Display Network, and Google’s own ad exchange (AdX), plus external inventory. Because Google also owns the user’s search history, email (Gmail), location (Maps), and browser (Chrome), DV360 benefits from audience data that no independent DSP can match. This ‘walled garden’ advantage creates both power and antitrust scrutiny.',
@@ -191,8 +199,8 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'The buy side is everyone who decides which ads to show and how much to pay — with the DSP as the system that turns campaign rules and data into real-time bids in under 100ms.',
     furtherReading: [
-      {label: 'IAB OpenRTB spec', url: 'https://www.iab.com/guidelines/openrtb/'},
-      {label: 'The Trade Desk UID2', url: 'https://unifiedid.com/'},
+      { label: 'IAB OpenRTB spec', url: 'https://www.iab.com/guidelines/openrtb/' },
+      { label: 'The Trade Desk UID2', url: 'https://unifiedid.com/' },
     ],
     keyTerms: ['dsp', 'advertiser', 'agency', 'campaign', 'cpm', 'open-rtb'],
     quickCheck: [
@@ -259,10 +267,19 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'The sell side is publishers and the tech (SSPs, GAM) that packages and sells ad inventory to demand, with header bidding and unified auctions maximizing yield per impression.',
     furtherReading: [
-      {label: 'Prebid.js documentation', url: 'https://docs.prebid.org/'},
-      {label: 'IAB ads.txt', url: 'https://iabtechlab.com/ads-txt/'},
+      { label: 'Prebid.js documentation', url: 'https://docs.prebid.org/' },
+      { label: 'IAB ads.txt', url: 'https://iabtechlab.com/ads-txt/' },
     ],
-    keyTerms: ['ssp', 'publisher', 'inventory', 'yield', 'header-bidding', 'gam', 'floor-price', 'fill-rate'],
+    keyTerms: [
+      'ssp',
+      'publisher',
+      'inventory',
+      'yield',
+      'header-bidding',
+      'gam',
+      'floor-price',
+      'fill-rate',
+    ],
     quickCheck: [
       {
         q: 'What is header bidding and why do publishers use it?',
@@ -283,7 +300,14 @@ const topics: Record<TopicId, Topic> = {
     label: 'Data & Identity',
     shortDescription:
       'How signals about users and context are collected, stored, resolved across devices, and activated for targeting and measurement.',
-    companies: ['LiveRamp', 'The Trade Desk (UID2)', 'Segment', 'Snowflake', 'Databricks', 'Google Privacy Sandbox'],
+    companies: [
+      'LiveRamp',
+      'The Trade Desk (UID2)',
+      'Segment',
+      'Snowflake',
+      'Databricks',
+      'Google Privacy Sandbox',
+    ],
     overview: [
       'Data is the fuel of ad tech. Every <strong>impression</strong> comes with signals: who is this user likely to be, what page or app are they on, what have they done before, what device are they using? These signals drive <strong>targeting</strong> (finding the right person), <strong>bidding</strong> (deciding how much to pay), and <strong>measurement</strong> (proving the ad worked). Without data pipelines and <strong>identity resolution</strong> working correctly, none of the economics of programmatic advertising function.',
       '<strong>First-party data</strong> is collected directly by a company from its own users — purchase history, app behavior, email engagement, loyalty records. It’s the most valuable and privacy-safe because the user has a direct relationship with the company. A retailer’s purchase history or a streaming service’s viewing data are prime examples. With third-party cookies dying, first-party data is now the industry’s primary targeting signal.',
@@ -298,7 +322,7 @@ const topics: Record<TopicId, Topic> = {
       '<strong>Audience segment architecture:</strong> User segments (e.g., ‘camping enthusiast’, ‘luxury car intender’, ‘lapsed purchaser’) are built from behavioral signals in the warehouse: visit frequency, category engagement, purchase recency/frequency/value (RFV), content consumption patterns. The segment membership is stored in a fast lookup store — Redis, DynamoDB, or Aerospike — keyed by user ID. At bid time, the DSP queries this store with a sub-millisecond latency requirement. You cannot run a SQL query at bid time; everything that touches the critical path must be pre-computed and stored in memory or SSD.',
       '<strong>Feature engineering for ML bidding models:</strong> DSP bid models consume pre-computed feature vectors for each impression. Typical features: hour-of-day, day-of-week, device type (mobile/desktop/tablet), OS, browser, content category (IAB taxonomy), advertiser × domain historical pCTR, user recency (days since last seen), segment membership (one-hot encoded or embedded), auction win-rate for this domain/SSP, viewability rate for this placement. The model outputs a bid price as a function of predicted value. Models are trained offline but inference runs in real-time, requiring tight latency budgets (<5ms for the model call itself).',
       '<strong>Identity resolution in practice:</strong> LiveRamp’s identity graph maintains a probabilistic and deterministic graph connecting: email hash (SHA-256) ↔ cookie IDs ↔ device IDs (IDFA, GAID) ↔ publisher login IDs ↔ household/postal data. When an advertiser uploads a CRM file (hashed emails), LiveRamp resolves each record against the graph to find matching cookies and device IDs across the web. This ‘audience onboarding’ process feeds segments into DSPs. The match rate — how many CRM records find a web identity — is a key metric, typically 40–60%.',
-      '<strong>Data clean rooms (technical):</strong> LiveRamp Data Collaboration, Snowflake Data Clean Room, AWS Clean Rooms, and Google Ads Data Hub all follow the same pattern: two parties deposit their data into a shared compute environment governed by strict query controls. Neither party can see the other’s raw records — only aggregate query outputs are allowed (enforced by differential privacy thresholds and row minimums). Typical queries: ‘How many users in my advertiser audience saw ads from publisher X in the last 30 days?’ or ‘What was the purchase lift for users exposed to campaign Y vs control?’',
+      '<strong>Data clean rooms (technical):</strong> A clean room applies controls to data collaboration. Implementations vary in supported joins, query permissions, and permitted outputs. The <a href="/training/media-measurement#clean-rooms">clean room module</a> walks through a publisher and advertiser match.',
       '<strong>dbt (data build tool)</strong> is the dominant transformation layer for ad tech data warehouses. Teams write SELECT-based SQL models that dbt executes in the right dependency order. dbt also runs data quality tests (nulls, uniqueness, referential integrity), generates documentation, and creates a lineage graph. In an ad tech context, a typical dbt project has: source models (impressions, clicks, conversions from the lake), staging models (clean, typed), mart models (campaign reporting, audience segments, attribution) and downstream models for ML feature generation.',
       '<strong>Real-time vs batch in ad tech:</strong> Not all data needs to be real-time. Frequency cap state must be real-time (query on every bid). Segment membership can be near-real-time (updated hourly). Campaign pacing state must be near-real-time (updated every few seconds). Reporting aggregates can be batch (hourly, daily). Attribution models are typically batch (run daily over the prior day’s data). This tiered approach — mixing real-time (Kafka+Flink), near-real-time (micro-batch Spark), and batch (daily dbt runs) — is the standard architecture.',
     ],
@@ -318,10 +342,17 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'Data & identity is how user and context signals are collected, stored, and resolved so they can drive targeting and bidding in real time — with pipelines, identity graphs, and clean rooms as the core infrastructure.',
     furtherReading: [
-      {label: 'Google Privacy Sandbox', url: 'https://privacysandbox.com/'},
-      {label: 'LiveRamp RampID', url: 'https://www.liveramp.com/products/rampid/'},
+      { label: 'Google Privacy Sandbox', url: 'https://privacysandbox.com/' },
+      { label: 'LiveRamp RampID', url: 'https://www.liveramp.com/products/rampid/' },
     ],
-    keyTerms: ['first-party-data', 'third-party-data', 'identity-graph', 'data-lake', 'segment', 'clean-room'],
+    keyTerms: [
+      'first-party-data',
+      'third-party-data',
+      'identity-graph',
+      'data-lake',
+      'segment',
+      'clean-room',
+    ],
     quickCheck: [
       {
         q: 'How does identity resolution work without third-party cookies?',
@@ -383,8 +414,8 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'Third-party providers are the specialist vendors — identity, verification, measurement, and data — that the rest of the ecosystem integrates with for safety, accuracy, and audience activation.',
     furtherReading: [
-      {label: 'MRC viewability', url: 'https://www.mediaratingcouncil.org/'},
-      {label: 'IAB ads.txt', url: 'https://iabtechlab.com/ads-txt/'},
+      { label: 'MRC viewability', url: 'https://www.mediaratingcouncil.org/' },
+      { label: 'IAB ads.txt', url: 'https://iabtechlab.com/ads-txt/' },
     ],
     keyTerms: ['viewability', 'brand-safety', 'clean-room', 'attribution', 'pixel', 'dmp'],
     quickCheck: [
@@ -444,8 +475,8 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'Ad serving and RTB are the machinery: OpenRTB auctions, ad servers, creatives (display and VAST video), and the sub-100ms path from request to rendered ad.',
     furtherReading: [
-      {label: 'IAB OpenRTB spec', url: 'https://www.iab.com/guidelines/openrtb/'},
-      {label: 'VAST 4.x specification', url: 'https://www.iab.com/guidelines/vast/'},
+      { label: 'IAB OpenRTB spec', url: 'https://www.iab.com/guidelines/openrtb/' },
+      { label: 'VAST 4.x specification', url: 'https://www.iab.com/guidelines/vast/' },
     ],
     keyTerms: ['rtb', 'open-rtb', 'creative', 'vast', 'ad-server', 'impression', 'cpm'],
     quickCheck: [
@@ -489,7 +520,7 @@ const topics: Record<TopicId, Topic> = {
     ],
     technical: [
       '<strong>TV currency mechanics:</strong> Nielsen’s C3 and C7 ratings measure viewership of live TV + 3 days of DVR (C3) or 7 days of DVR (C7) within the ‘commercial pod’ (not the full program, but the actual commercial minutes). They’re derived from Nielsen’s ~40,000-household panel, extrapolated via statistical weighting to represent the national population. Each rating point = 1% of the target demographic. A 3.0 rating in adults 25-54 means 3% of all US adults 25-54 watched. Upfront deals are priced in CPP (cost per rating point) against the contracted currency.',
-      '<strong>Set-top box and ACR data pipelines:</strong> VideoAmp and iSpot receive tuning data from cable/satellite operators: every channel change, every minute of viewing per household. ACR data (from smart TV manufacturers like Samsung, LG via Samba TV, or Vizio via Inscape) identifies content on screen by fingerprinting frames against a reference library. Both require household-to-demographic matching via postal/survey data. The pipeline: raw tuning events → household assignment → demographic linkage → content match → audience segment → reach/frequency calculation. Processing runs at scale (millions of households) using Spark and Databricks.',
+      '<strong>Set-top box and ACR data pipelines:</strong> Tuning events and recognized screen content represent different observations. Providers combine them with schedules and metadata, then address duplicate observations and sample coverage. See the <a href="/training/media-measurement#tv">TV data module</a> for VideoAmp and person-level estimates.',
       '<strong>Digital attribution pipeline:</strong> Conversion pixel (JavaScript tag or Conversions API call) fires when a user completes a desired action (purchase, form fill, app install). The pixel includes: timestamp, advertiser campaign/line-item ID, conversion value, and user identifiers (cookie, hashed email, device ID). Attribution logic joins this conversion event to prior impression and click events for the same user (via identity resolution), then applies the chosen attribution model. This runs as a batch job (daily or hourly) in the data warehouse. Output: credited impressions/clicks per campaign, attributed revenue, ROAS.',
       '<strong>Media Mix Modeling (MMM) vs. Multi-Touch Attribution (MTA):</strong> MMM uses aggregate sales and media spend data (no individual-level data) across weeks/months to estimate the contribution of each channel to overall sales using regression or Bayesian modeling. It’s privacy-safe but has low granularity (channel-level, not impression-level). MTA uses individual-level impression/click/conversion data to assign fractional credit to each touchpoint. MTA is more actionable but requires user-level data that’s increasingly restricted. Industry practice: use both — MMM for strategic budget allocation, MTA for in-campaign optimization.',
       '<strong>Viewability and attention measurement:</strong> IAB and MRC define viewability as: display ads — 50% of pixels in-view for 1 continuous second; video ads — 50% in-view for 2 continuous seconds. IAS and DoubleVerify measure this via JavaScript Intersection Observer in the browser. ‘Attention’ goes further: attention measurement vendors (Adelaide, Lumen, TVision) measure not just whether an ad could be seen but whether users actually engaged with it — eye-tracking, dwell time, interaction rates. Attention metrics are emerging as the next generation of quality signals.',
@@ -515,8 +546,8 @@ const topics: Record<TopicId, Topic> = {
     inOneSentence:
       'Measurement and currency cover how we prove ads worked (attribution, viewability, incrementality) and how we transact on guarantees (Nielsen, alternative currencies, clean rooms).',
     furtherReading: [
-      {label: 'Nielsen C3/C7', url: 'https://www.nielsen.com/'},
-      {label: 'Google Ads Data Hub', url: 'https://support.google.com/google-ads/answer/9009994'},
+      { label: 'Nielsen C3/C7', url: 'https://www.nielsen.com/' },
+      { label: 'Google Ads Data Hub', url: 'https://support.google.com/google-ads/answer/9009994' },
     ],
     keyTerms: ['attribution', 'currency', 'clean-room', 'viewability', 'upfronts', 'pixel'],
     quickCheck: [
@@ -548,7 +579,7 @@ const topics: Record<TopicId, Topic> = {
     technical: [
       '<strong>The Fragmentation Tax:</strong> Buying local media traditionally requires managing separate logins for every local broadcaster or publisher. Each might have a different ad specification, a different <strong>Rate Card</strong> structure (e.g. flat fees vs dynamic CPMs), and different reporting cadence. The technical cost of managing 500 local relationships often outweighs the media cost itself.',
       '<strong>Unified Identity in Local:</strong> Global platforms use their own logged-in user data. Local media must rely on shared identity standards like <strong>UID2</strong> or <strong>RampID</strong> to prove that the person seeing a local TV ad is the same person who later visited the local store. <strong>Geo-fencing</strong> is a key technical tactic in local media — using GPS data to only show ads to users within a few miles of a specific business.',
-      '<strong>Consolidated Omnichannel Workflow (C.O.W.):</strong> This technical approach (pioneered by Ribeye Media) involves building a "meta-DSP" or unified buying layer. It uses APIs to connect to multiple underlying SSPs and local publisher ad servers, normalizing the data into a single schema. This allows a buyer to set a single budget and have it automatically distributed across the best-performing local channels (CTV, Audio, Display) without manual trafficking for each.',
+      '<strong>Unified local workflow:</strong> Ribeye Media describes a platform that coordinates planning, activation, pacing, and reporting across owned inventory and partner channels. A workflow layer can centralize operations while buying partners execute their own line items. See the <a href="/training/unified-media">unified media buying guide</a> for how budget authority and measurement affect cross-channel allocation.',
     ],
     keyTakeaways: [
       'Global media offers scale and ease but lacks local relevance; local media offers trust and relevance but is highly fragmented.',
@@ -607,7 +638,8 @@ const topics: Record<TopicId, Topic> = {
   nomenclature: {
     id: 'nomenclature',
     label: 'Terminology & Hierarchy',
-    shortDescription: 'The Rosetta Stone of ad tech: how different platforms use different names for the same things.',
+    shortDescription:
+      'The Rosetta Stone of ad tech: how different platforms use different names for the same things.',
     overview: [
       'One of the most confusing aspects of ad tech is that every major platform (Google, Meta, The Trade Desk, Amazon) uses slightly different <strong>Terminology</strong> for identical concepts. A "Campaign" in one system might be an "Insertion Order" in another.',
       'Understanding these naming conventions is critical for <strong>Ad Ops</strong> and <strong>CSMs</strong> who work across multiple platforms. At its core, every system follows a hierarchy from broad business goals down to specific technical assets.',
@@ -625,7 +657,7 @@ const topics: Record<TopicId, Topic> = {
     ],
     keyTakeaways: [
       'Different platforms use different names (Line Item vs Ad Set vs Ad Group) for the granular targeting layer.',
-      'Insertion Orders (IOs) usually represent the legal and budgetary contract, while Line Items represent the tactical execution.',
+      'A commercial IO documents the buy. A platform IO can group execution settings and line items. The <a href="/training/campaign-planning#trafficking">campaign setup guide</a> follows both from approval to launch.',
       'A "pixel" is functionally identical to a "tag" or "beacon" — it\'s just a tracking request.',
     ],
     inOneSentence:
@@ -642,7 +674,7 @@ const topics: Record<TopicId, Topic> = {
       },
     ],
   },
-};
+}
 
 const examples: Record<ExampleId, Example> = {
   instagram: {
@@ -670,8 +702,11 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       "Instagram ads are sold and served entirely inside Meta's ecosystem, using Meta's first-party data and proprietary auction — no open exchange.",
     furtherReading: [
-      {label: 'Meta for Developers', url: 'https://developers.facebook.com/'},
-      {label: 'Meta Conversions API', url: 'https://developers.facebook.com/docs/marketing-api/conversions-api'},
+      { label: 'Meta for Developers', url: 'https://developers.facebook.com/' },
+      {
+        label: 'Meta Conversions API',
+        url: 'https://developers.facebook.com/docs/marketing-api/conversions-api',
+      },
     ],
   },
   youtube: {
@@ -700,8 +735,11 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       "YouTube runs on Google's ad stack: internal auction, VAST delivery, and first-party data (Search, Gmail, watch history) for targeting and measurement.",
     furtherReading: [
-      {label: 'YouTube advertising formats', url: 'https://support.google.com/youtube/answer/2469718'},
-      {label: 'Google DV360', url: 'https://www.google.com/displayvideo/'},
+      {
+        label: 'YouTube advertising formats',
+        url: 'https://support.google.com/youtube/answer/2469718',
+      },
+      { label: 'Google DV360', url: 'https://www.google.com/displayvideo/' },
     ],
   },
   'web-display': {
@@ -730,8 +768,8 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       'A web display banner is the classic open RTB flow: Prebid and SSPs, DSPs bidding in parallel, GAM choosing the winner, and the creative rendering in a SafeFrame.',
     furtherReading: [
-      {label: 'Prebid.js', url: 'https://docs.prebid.org/'},
-      {label: 'Google Ad Manager', url: 'https://admanager.google.com/'},
+      { label: 'Prebid.js', url: 'https://docs.prebid.org/' },
+      { label: 'Google Ad Manager', url: 'https://admanager.google.com/' },
     ],
   },
   search: {
@@ -760,8 +798,8 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       'CTV/streaming video ads are served via SSAI or CSAI, bought programmatically with device and household IDs, and measured with ACR and IP-based attribution.',
     furtherReading: [
-      {label: 'IAB VAST for CTV', url: 'https://www.iab.com/guidelines/vast/'},
-      {label: 'SCTE-35', url: 'https://www.scte.org/standards'},
+      { label: 'IAB VAST for CTV', url: 'https://www.iab.com/guidelines/vast/' },
+      { label: 'SCTE-35', url: 'https://www.scte.org/standards' },
     ],
   },
   'audio-streaming': {
@@ -772,7 +810,7 @@ const examples: Record<ExampleId, Example> = {
       "You're listening to a playlist on Spotify's free tier or a podcast on SiriusXM, and a 30-second audio ad plays between songs. Just like CTV, this ad wasn't just 'broadcast' to everyone — it was selected for you in a real-time auction based on your listener profile, mood, and demographics.",
       'Audio advertising is uniquely personal. It "follows" the user across devices — from mobile phones to smart speakers (Alexa/Google Home) to connected cars. Because listeners are often "eyes-busy" (driving, exercising, cooking), audio ads rely on high-quality production and clear calls to action.',
       'SiriusXM and Pandora (SXM Media) operate one of the largest digital audio marketplaces. They use their own first-party data (what you listen to, your subscription data) to help advertisers target specific "moods" or "moments" — like "workout," "focus," or "party."',
-      "Podcast advertising is a growing sub-sector. While many podcast ads are still 'host-read' (baked into the audio file), programmatic 'dynamically inserted' ads are becoming the norm. This allows a podcast recorded three years ago to serve a relevant, current ad to a new listener today.",
+      'Podcast ads can be host-read or voiced by other talent. Either format can be embedded in the episode or inserted dynamically, depending on the publisher and placement. Dynamic insertion lets a current campaign appear in an older episode.',
     ],
     technicalFlow: [
       "<strong>Audio Ad Request:</strong> The streaming app (e.g., Spotify) reaches a natural break or a pre-defined ad slot. It sends a request to an Audio SSP (like AdsWizz or Targetspot). The request includes listener ID, device type, content category (e.g., 'True Crime Podcast'), and often 'mood' or 'genre' metadata.",
@@ -782,13 +820,16 @@ const examples: Record<ExampleId, Example> = {
     ],
     keyTakeaways: [
       'Programmatic audio uses VAST/DAAAST to deliver ads to streaming apps, smart speakers, and cars.',
-      'Targeting is based on first-party listener data, genre, and "mood" context. LTR (Listen-Through Rate) is the primary success metric.',
+      'Streaming players may report listen-through rate. For podcast downloads, check how ad delivery is counted and whether the player can confirm playback. See the <a href="/training/unified-media#audio">digital audio module</a>.',
     ],
     inOneSentence:
       'Audio ads are delivered programmatically to streaming services and podcasts using VAST XML, targeted by listener behavior and context.',
     furtherReading: [
-      {label: 'IAB Digital Audio Guide', url: 'https://www.iab.com/insights/digital-audio-buyers-guide/'},
-      {label: 'SXM Media', url: 'https://www.sxmmedia.com/'},
+      {
+        label: 'IAB Digital Audio Guide',
+        url: 'https://www.iab.com/insights/digital-audio-buyers-guide/',
+      },
+      { label: 'SXM Media', url: 'https://www.sxmmedia.com/' },
     ],
   },
   'digital-billboard': {
@@ -796,7 +837,7 @@ const examples: Record<ExampleId, Example> = {
     label: 'Programmatic DOOH (Billboard)',
     surface: 'Digital Billboards, Transit Screens, and Elevators',
     story: [
-      "You're driving down a highway or standing in an elevator, and the digital screen changes to show an ad for a local car dealership or a new movie. This is Digital Out-of-Home (DOOH). While traditional billboards were static paper, modern DOOH is connected to the internet and bought programmatically.",
+      "You're driving down a highway or standing in an elevator, and the digital screen changes to show an ad for a local car dealership or a new movie. This is Digital Out-of-Home (DOOH). Digital screens can be bought directly or through programmatic platforms.",
       'Programmatic DOOH (pDOOH) allows advertisers to buy screens based on "triggers" like weather, time of day, or proximity to a store. If it starts raining, a DSP can automatically start bidding on screens for umbrella or rain boot ads.',
       'The bridge to digital is <strong>Location Data</strong>. By analyzing anonymized GPS signals from mobile phones (foot traffic), ad tech companies can estimate how many people — and what <em>types</em> of people — are passing a specific billboard at any given hour.',
       'This creates a "one-to-many" medium. Unlike a phone where one ad = one person, a billboard impression might represent 50 people who drove past it. Measurement is therefore based on "multipliers" provided by companies like Geopath.',
@@ -805,7 +846,7 @@ const examples: Record<ExampleId, Example> = {
       "<strong>The DOOH Ad Request:</strong> The screen's media player (e.g., JCDecaux, Clear Channel) sends a request to a DOOH SSP (like Vistar Media or Place Exchange). The request includes the Screen ID, its latitude/longitude, and the current 'loop' status.",
       "<strong>Impression Multipliers:</strong> Because one screen play reaches many people, the SSP uses a 'multiplier.' If data shows 45 people typically see that screen at 5:00 PM on a Tuesday, the DSP is charged for 45 impressions for a single ad play.",
       "<strong>Geo-Fencing and Retargeting:</strong> Advertisers often use 'Mobile Extension' or 'Geo-Retargeting.' If your phone's GPS data shows you were in the vicinity of a billboard, the advertiser can later retarget you with a follow-up ad on your mobile phone to 'close the loop.'",
-      "<strong>Store Visit Attribution:</strong> This is the 'holy grail' of OOH. By matching mobile GPS data (users who were near the billboard) with store visit data (users who later entered the retail location), advertisers can prove that the billboard actually drove physical foot traffic.",
+      '<strong>Store Visit Attribution:</strong> Some studies associate estimated screen exposure with later visits using eligible location data. Use a comparison group and a defined visit window to estimate incremental impact. The <a href="/training/unified-media#location">location intelligence module</a> walks through the design.',
     ],
     keyTakeaways: [
       'DOOH is a "one-to-many" medium bought via specialized SSPs. It uses foot traffic data to estimate impressions.',
@@ -814,8 +855,11 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       'Digital Out-of-Home ads are digital screens in public spaces bought programmatically using location data and real-world triggers.',
     furtherReading: [
-      {label: 'Vistar Media - What is pDOOH?', url: 'https://www.vistarmedia.com/blog/what-is-programmatic-dooh'},
-      {label: 'Geopath Measurement', url: 'https://geopath.org/'},
+      {
+        label: 'Vistar Media - What is pDOOH?',
+        url: 'https://www.vistarmedia.com/blog/what-is-programmatic-dooh',
+      },
+      { label: 'Geopath Measurement', url: 'https://geopath.org/' },
     ],
   },
   'video-player': {
@@ -844,13 +888,35 @@ const examples: Record<ExampleId, Example> = {
     inOneSentence:
       'CTV/streaming video ads are served via SSAI or CSAI, bought programmatically with device and household IDs, and measured with ACR and IP-based attribution.',
     furtherReading: [
-      {label: 'IAB VAST for CTV', url: 'https://www.iab.com/guidelines/vast/'},
-      {label: 'SCTE-35', url: 'https://www.scte.org/standards'},
+      { label: 'IAB VAST for CTV', url: 'https://www.iab.com/guidelines/vast/' },
+      { label: 'SCTE-35', url: 'https://www.scte.org/standards' },
     ],
   },
-};
+}
 
 const glossary: Record<GlossaryId, GlossaryEntry> = {
+  'unified-media-platform': {
+    id: 'unified-media-platform',
+    term: 'Unified Media Platform (UMP)',
+    category: 'Marketplace',
+    shortDefinition: 'A platform that coordinates media workflows across channels.',
+    definition: [
+      'Capabilities can span planning, activation, optimization, and measurement. Verify which stages the platform controls and who can authorize a budget change.',
+      'Work through a local campaign in the <a href="/training/unified-media">unified media buying guide</a>.',
+    ],
+    related: ['cow', 'dsp', 'ssp', 'walled-garden'],
+  },
+  'trade-area': {
+    id: 'trade-area',
+    term: 'Trade Area',
+    category: 'Data',
+    shortDefinition: 'The geographic area from which a venue draws its visitors or customers.',
+    definition: [
+      'Visitor origin data can show where a store draws traffic and help buyers choose relevant venues or markets. A distance radius describes proximity and may cover a different area.',
+      'See the <a href="/training/unified-media#location">location intelligence module</a> for how this informs a local media plan.',
+    ],
+    related: ['foot-traffic', 'dooh'],
+  },
   yield: {
     id: 'yield',
     term: 'Yield',
@@ -888,7 +954,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ssp',
     term: 'Supply-Side Platform (SSP)',
     category: 'Marketplace',
-    shortDefinition: 'Software that helps publishers send inventory into auctions and manage yield.',
+    shortDefinition:
+      'Software that helps publishers send inventory into auctions and manage yield.',
     definition: [
       'An SSP connects publisher inventory to many exchanges and DSPs, packaging ad slots into bid requests.',
       "It enforces floors, deals, and business rules, and routes demand in ways that aim to maximize the publisher's yield.",
@@ -943,7 +1010,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'clean-room',
     term: 'Clean Room',
     category: 'Measurement',
-    shortDefinition: 'A secure environment where two or more parties combine data without sharing raw PII.',
+    shortDefinition:
+      'A secure environment where two or more parties combine data without sharing raw PII.',
     definition: [
       'Clean rooms allow advertisers, publishers, and data providers to match audiences, run attribution, or build overlap segments without exposing personally identifiable information.',
       'Use cases: audience planning (reach overlap), attribution (exposure-to-conversion), and activation (targeting instructions). Major clouds and vendors (LiveRamp, Habu, InfoSum) offer clean room products.',
@@ -954,7 +1022,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'currency',
     term: 'Currency',
     category: 'Measurement',
-    shortDefinition: 'The agreed standard used to transact and measure media (e.g. Nielsen, VideoAmp, iSpot).',
+    shortDefinition:
+      'The agreed standard used to transact and measure media (e.g. Nielsen, VideoAmp, iSpot).',
     definition: [
       'In TV and video, currency is the measurement product that defines what "counts" for guarantees: ratings, reach, demo delivery. Nielsen has long been the dominant TV currency; VideoAmp and iSpot offer alternatives built on set-top box, ACR, and streaming data.',
       'Upfront and scatter deals are contracted against a chosen currency; make-goods are calculated when delivery falls short of guarantees.',
@@ -965,7 +1034,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'upfronts',
     term: 'Upfronts',
     category: 'Measurement',
-    shortDefinition: "The annual TV ad sales market where networks sell much of the coming season's inventory.",
+    shortDefinition:
+      "The annual TV ad sales market where networks sell much of the coming season's inventory.",
     definition: [
       'During the upfronts (typically spring), networks present programming and strike deals with advertisers and agencies. Deals are expressed in terms of a currency (e.g. Nielsen C3/C7 or an alternative) with guarantees on reach and demo delivery.',
       'Scatter is the market for buying remaining inventory closer to airdate; prices often differ from upfront based on supply and demand.',
@@ -976,7 +1046,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'pixel',
     term: 'Ad Pixel (Beacons & Tags)',
     category: 'Measurement',
-    shortDefinition: 'A small piece of code that fires when an ad is shown, clicked, or a user converts.',
+    shortDefinition:
+      'A small piece of code that fires when an ad is shown, clicked, or a user converts.',
     definition: [
       'Pixels are typically a 1×1 image request or script that sends an event (impression, click, conversion) to an ad server, advertiser, or measurement partner. Payloads include event type, timestamp, and identifiers (cookie, device ID, hashed email).',
       '<strong>Terminology variations:</strong> While "pixel" is common, Google refers to them as <strong>Tags</strong>, some platforms call them <strong>Beacons</strong>, and Meta uses the term <strong>Meta Pixel</strong> (formerly Facebook Pixel). In server-side contexts, they are often called <strong>Pings</strong> or <strong>Postbacks</strong>.',
@@ -1013,7 +1084,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'creative',
     term: 'Ad Creative',
     category: 'Marketplace',
-    shortDefinition: 'The actual ad content delivered to users — images, HTML5 animations, video, or native formats.',
+    shortDefinition:
+      'The actual ad content delivered to users — images, HTML5 animations, video, or native formats.',
     definition: [
       "A creative is the ad unit itself — what the user sees and interacts with. Creative types: (1) Display: static images (PNG/JPG) or HTML5 animated banners (a ZIP of HTML/CSS/JS assets); (2) Video: MP4 files served via VAST XML, ranging from 6-second bumpers to 30-second spots; (3) Native: headlines, images, and descriptions assembled by the publisher's UI template; (4) Rich media: expandable banners, interstitials, or video overlays.",
       '<strong>Platform names:</strong> In Google Campaign Manager, a creative is a distinct object. In Meta, it\'s the "Ad" layer of the hierarchy. In many DSPs, you upload "Assets" which are then grouped into "Creatives."',
@@ -1025,7 +1097,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'cpm',
     term: 'CPM (Cost per Mille)',
     category: 'Marketplace',
-    shortDefinition: 'The price of 1,000 ad impressions — the standard unit of pricing in programmatic advertising.',
+    shortDefinition:
+      'The price of 1,000 ad impressions — the standard unit of pricing in programmatic advertising.',
     definition: [
       "CPM stands for Cost per Mille (Latin for thousand). It's the standard pricing unit in programmatic advertising: the price an advertiser pays for 1,000 impressions of their ad. A $5 CPM means the advertiser pays $5 for every 1,000 times their ad is shown, or $0.005 per impression.",
       'CPMs vary enormously by format, audience quality, and context. Open-web display banners: $1–5 CPM. Video pre-roll: $10–25 CPM. Connected TV: $25–50 CPM. LinkedIn B2B targeting: $60–100 CPM. Premium publisher direct deals: $20–50+ CPM. Factors driving higher CPMs: audience targeting precision, viewability, brand-safe context, engaged format (video vs display), and low supply vs high demand.',
@@ -1037,7 +1110,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'open-rtb',
     term: 'OpenRTB',
     category: 'Marketplace',
-    shortDefinition: 'The industry standard API specification for real-time bidding between exchanges and DSPs.',
+    shortDefinition:
+      'The industry standard API specification for real-time bidding between exchanges and DSPs.',
     definition: [
       "OpenRTB (Open Real-Time Bidding) is a JSON-over-HTTP API specification developed and maintained by the IAB Tech Lab. It defines the exact format for bid requests (sent by exchanges to DSPs) and bid responses (returned by DSPs to exchanges), enabling interoperability between different companies' systems without custom integrations.",
       'A bid request JSON object contains: imp[] (impression array — slot dimensions, format, floor price), site/app (URL, domain, content category, publisher ID), user (ID, geo, segment list), device (user agent, IP, device type, mobile ad ID), and regs (GDPR consent, CCPA flags, COPPA). A bid response contains: seatbid[].bid[] with price (CPM), adm (ad markup — HTML or VAST XML), nurl (win notification URL), and creative attributes.',
@@ -1075,7 +1149,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'brand-safety',
     term: 'Brand Safety',
     category: 'Measurement',
-    shortDefinition: "Ensuring ads don't appear next to content that could harm the advertiser's brand reputation.",
+    shortDefinition:
+      "Ensuring ads don't appear next to content that could harm the advertiser's brand reputation.",
     definition: [
       "Brand safety is the practice of preventing ads from appearing adjacent to content that conflicts with an advertiser's values or that could damage their brand reputation. Risk categories: adult content, violent content, hate speech, illegal activity, misinformation, drug/alcohol content, and political content. A family-friendly cereal brand doesn't want its ad appearing next to graphic news content; a luxury brand doesn't want to appear on low-quality, clickbait sites.",
       "Brand safety is measured and enforced by verification vendors: Integral Ad Science (IAS) and DoubleVerify (DV). Both maintain content classification databases covering millions of URLs and app bundles. They use ML classifiers to categorize page content in real time. Their classifications map to the IAB's Content Taxonomy and GARM (Global Alliance for Responsible Media) brand safety floor definitions.",
@@ -1087,7 +1162,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'viewability',
     term: 'Viewability',
     category: 'Measurement',
-    shortDefinition: 'A measurement of whether an ad had the opportunity to be seen by a real user.',
+    shortDefinition:
+      'A measurement of whether an ad had the opportunity to be seen by a real user.',
     definition: [
       'Viewability measures whether an ad was actually visible on screen, versus just served (loaded in a browser but perhaps below the fold, in a hidden tab, or instantly scrolled past). The MRC (Media Rating Council) defines viewability standards: display ads must be at least 50% of pixels in-view for 1+ continuous second; video ads at least 50% in-view for 2+ continuous seconds.',
       "Viewability is measured by JavaScript tags (from IAS or DoubleVerify) that use the browser's Intersection Observer API to calculate what percentage of the ad's bounding box is within the browser viewport, and for how long. In SafeFrame iframes (sandboxed creative environments), visibility data is passed via the SafeFrame communication API. Mobile in-app viewability uses OMID (Open Measurement SDK) — a standardized SDK that enables consistent measurement across mobile environments.",
@@ -1112,7 +1188,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ssai',
     term: 'SSAI (Server-Side Ad Insertion)',
     category: 'Marketplace',
-    shortDefinition: 'Stitching ads into a video stream server-side, creating a seamless content and ad experience.',
+    shortDefinition:
+      'Stitching ads into a video stream server-side, creating a seamless content and ad experience.',
     definition: [
       'Server-Side Ad Insertion (SSAI) is the technique of inserting ads into a video stream on the server before delivering it to the player. Unlike Client-Side Ad Insertion (CSAI) where the player requests ads separately via VAST, SSAI creates a single continuous video stream that alternates between content and ads — completely transparent to the player and immune to ad blockers.',
       "How SSAI works: The streaming platform's ad server intercepts the content delivery manifest (HLS or DASH), detects ad break cue points (SCTE-35 markers in broadcast streams), makes ad decisions (real-time auction or pre-fetched based on user/content data), retrieves ad video files from advertisers, transcodes them to match content quality settings, and stitches the ad segments into the manifest. The player receives one manifest with seamless transitions between content and ad segments.",
@@ -1124,7 +1201,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'frequency-cap',
     term: 'Frequency Cap',
     category: 'Marketplace',
-    shortDefinition: 'A limit on how many times a specific user sees the same ad within a given time period.',
+    shortDefinition:
+      'A limit on how many times a specific user sees the same ad within a given time period.',
     definition: [
       "A frequency cap limits how many times an advertiser's ad is shown to the same user in a defined period (e.g., 3 times per day, 10 times per week, 20 times per campaign). Without frequency capping, a single user could be shown the same ad dozens of times, wasting budget and creating a negative user experience (ad fatigue). Most DSPs and ad servers support frequency caps at the campaign, line item, and creative level.",
       'Technically, frequency is tracked by storing impression counts per user ID in a fast distributed cache (Redis, Aerospike, or Memcached) with a time-to-live (TTL) matching the cap window. At bid time, the DSP reads the current frequency count from the cache; if the user has already reached the cap, the campaign is excluded from bidding for this impression. The cache must handle millions of lookups per second with sub-millisecond latency.',
@@ -1174,7 +1252,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'publisher',
     term: 'Publisher',
     category: 'Marketplace',
-    shortDefinition: 'A company or property that owns ad inventory and sells it to advertisers, often via an SSP.',
+    shortDefinition:
+      'A company or property that owns ad inventory and sells it to advertisers, often via an SSP.',
     definition: [
       'Publishers are the supply side of ad tech: they own the surfaces where ads appear (websites, apps, streaming services, games). From The New York Times to a small blog using Google AdSense, publishers monetize their audience by selling ad slots.',
       'Publishers use ad servers (e.g. Google Ad Manager) to manage direct-sold and programmatic demand, set floor prices, and maximize yield. Quality of inventory — brand safety, viewability, audience — determines CPMs.',
@@ -1196,9 +1275,10 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'agency',
     term: 'Agency',
     category: 'Marketplace',
-    shortDefinition: 'An intermediary that plans, buys, and manages ad campaigns on behalf of advertisers.',
+    shortDefinition:
+      'An intermediary that plans, buys, and manages ad campaigns on behalf of advertisers.',
     definition: [
-      'Agencies (e.g. GroupM, Publicis, IPG Mediabrands) handle media planning, programmatic buying, creative trafficking, and reporting. Large agencies are often part of a <strong>Holding Company</strong> (the "Big Six"), which centralizes buying power and technology across multiple agency brands.',
+      'Agencies handle planning, buying, trafficking, and reporting. An agency can be independent or belong to a media network within a holding company. See the <a href="/training/campaign-planning#agencies">agency structures guide</a>.',
       'They negotiate rates, set up campaigns in DSPs, and ensure brand safety and performance targets are met. Inside an agency, roles like <strong>Ad Ops</strong> handle technical execution while account teams handle strategy.',
     ],
     related: ['advertiser', 'dsp', 'campaign', 'holding-company', 'ad-ops'],
@@ -1207,7 +1287,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'campaign',
     term: 'Campaign',
     category: 'Marketplace',
-    shortDefinition: 'A structured set of ads with a budget, goal, flight dates, and targeting rules.',
+    shortDefinition:
+      'A structured set of ads with a budget, goal, flight dates, and targeting rules.',
     definition: [
       'Inside a DSP, campaigns contain line items (targeting rules, bids) and creatives. The hierarchy is typically Account → Campaign → Line Item → Creative. Campaigns define the objective (e.g. conversions, reach) and budget pacing.',
       'Reporting and attribution are usually at campaign level; optimization happens at line item and creative level.',
@@ -1218,7 +1299,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'segment',
     term: 'Audience Segment',
     category: 'Data',
-    shortDefinition: 'A group of users sharing traits used for targeting (e.g. in-market, demographic, behavioral).',
+    shortDefinition:
+      'A group of users sharing traits used for targeting (e.g. in-market, demographic, behavioral).',
     definition: [
       'Segments are built from first-party, second-party, or third-party data and stored in identity graphs or DMPs. At bid time, the DSP checks whether the user ID is in the segment and applies bid multipliers or targeting rules.',
       "Examples: 'luxury car intenders', 'lapsed purchasers', 'camping enthusiasts'. Cross-device segments require identity resolution.",
@@ -1229,7 +1311,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ad-server',
     term: 'Ad Server',
     category: 'Marketplace',
-    shortDefinition: 'System that stores, selects, and serves ad creatives and tracks impressions and clicks.',
+    shortDefinition:
+      'System that stores, selects, and serves ad creatives and tracks impressions and clicks.',
     definition: [
       'Buy-side ad servers (e.g. Google Campaign Manager 360) store creatives, fire impression/click pixels, and handle redirect chains for attribution. Sell-side ad servers (e.g. Google Ad Manager) decide which demand source wins each slot and serve the creative.',
       "Ad servers are the systems that actually deliver the ad markup to the user's browser or app.",
@@ -1240,7 +1323,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'exchange',
     term: 'Ad Exchange',
     category: 'Marketplace',
-    shortDefinition: 'A marketplace that runs real-time auctions connecting publisher inventory to buyer bids.',
+    shortDefinition:
+      'A marketplace that runs real-time auctions connecting publisher inventory to buyer bids.',
     definition: [
       'Exchanges receive bid requests from SSPs (or directly from publishers), fan them out to DSPs, run the auction, and return the winning creative. OpenRTB is the standard protocol. Google AdX, Xandr, and Index Exchange are major exchanges.',
       "Exchanges may take a fee on clearing price; they are the 'marketplace' layer between supply and demand.",
@@ -1284,7 +1368,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'third-party-data',
     term: 'Third-Party Data',
     category: 'Data',
-    shortDefinition: 'Audience data aggregated and sold by data brokers, historically cookie-based.',
+    shortDefinition:
+      'Audience data aggregated and sold by data brokers, historically cookie-based.',
     definition: [
       'Third-party data comes from data brokers (e.g. Oracle BlueKai, Experian) — demographic segments, purchase-intent signals, behavioral categories. It was activated via third-party cookies; as browsers restrict cookies, this data is declining. DMPs were built around it.',
       "Second-party data is another company's first-party data shared in a direct partnership.",
@@ -1317,7 +1402,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'gam',
     term: 'Google Ad Manager (GAM)',
     category: 'Marketplace',
-    shortDefinition: 'The dominant publisher ad server (formerly DoubleClick for Publishers / DFP).',
+    shortDefinition:
+      'The dominant publisher ad server (formerly DoubleClick for Publishers / DFP).',
     definition: [
       'GAM manages direct-sold and programmatic demand, ad slot definitions, creative trafficking, and reporting. Publishers use GAM as the central decision engine: it compares header bidding results, direct campaigns, and programmatic line items and serves the highest-yield creative.',
       'Unified auction in GAM lets all demand compete in one auction.',
@@ -1328,7 +1414,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'walled-garden',
     term: 'Walled Garden',
     category: 'Marketplace',
-    shortDefinition: 'A closed platform that owns inventory, data, and buying (e.g. Meta, Google, Amazon).',
+    shortDefinition:
+      'A closed platform that owns inventory, data, and buying (e.g. Meta, Google, Amazon).',
     definition: [
       "Walled gardens don't expose inventory via open OpenRTB; advertisers buy through their own interfaces (Meta Ads Manager, Google Ads, Amazon DSP). They combine first-party data, owned inventory, and proprietary auctions — creating scale and targeting others can't match, but also antitrust and transparency concerns.",
       'Independent DSPs and the open programmatic ecosystem sit outside walled gardens.',
@@ -1351,7 +1438,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ad-ops',
     term: 'Ad Operations (Ad Ops)',
     category: 'Marketplace',
-    shortDefinition: 'The technical team that executes, traffics, and optimizes ad campaigns and publisher inventory.',
+    shortDefinition:
+      'The technical team that executes, traffics, and optimizes ad campaigns and publisher inventory.',
     definition: [
       'Ad Ops is the "engine room" of advertising. On the buy side (agency/advertiser), they traffic creatives into ad servers, set up tracking pixels, configure targeting in DSPs, and ensure campaigns launch on time. On the sell side (publisher), they manage inventory, set up header bidding, and optimize yield.',
       'Key tasks: creative QA, pixel implementation, discrepancy troubleshooting, and reporting. They are the bridge between the media plan and the technical reality of the internet. Increasingly, Ad Ops roles are becoming more technical, often requiring knowledge of SQL, JavaScript, and data visualization.',
@@ -1373,7 +1461,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'rate-card',
     term: 'Rate Card',
     category: 'Marketplace',
-    shortDefinition: 'A document provided by a publisher detailing their ad rates and placement options.',
+    shortDefinition:
+      'A document provided by a publisher detailing their ad rates and placement options.',
     definition: [
       'A rate card is the official "menu" of a publisher. It lists the standard costs (usually in CPM) for different ad units, sponsorship packages, and targeting options. While programmatic advertising has moved towards dynamic pricing, rate cards are still the foundation for direct-sold and guaranteed deals.',
       'In the local media world, rate cards are essential for transparency between local broadcasters and local businesses. They often include "frequency discounts" where the rate decreases as the advertiser commits to more impressions or spots.',
@@ -1384,7 +1473,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'local-media',
     term: 'Local Media',
     category: 'Marketplace',
-    shortDefinition: 'Advertising targeted at a specific geographic area, often via local broadcasters or publishers.',
+    shortDefinition:
+      'Advertising targeted at a specific geographic area, often via local broadcasters or publishers.',
     definition: [
       'Local media focuses on a specific DMA (Designated Market Area) or city. This includes local TV stations, local newspapers, regional radio, and geo-fenced digital ads. Local advertising is critical for "brick and mortar" businesses that need to drive physical foot traffic.',
       'Ribeye Media specializes in local media, helping local broadcasters compete with global giants by providing a unified workflow (the C.O.W.) to manage their cross-channel inventory.',
@@ -1395,7 +1485,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'global-media',
     term: 'Global Media',
     category: 'Marketplace',
-    shortDefinition: 'Mass-scale advertising across multiple countries and regions, usually via major platforms.',
+    shortDefinition:
+      'Mass-scale advertising across multiple countries and regions, usually via major platforms.',
     definition: [
       'Global media refers to advertising on massive platforms that span the entire world — like Meta, YouTube, or Netflix. These platforms offer "scale" that local media cannot match, but they often lack the deep community connection and local relevance of a neighborhood publisher.',
       'Global advertisers (like Coca-Cola or Nike) often mix global media for brand awareness with local media for specific regional promotions.',
@@ -1406,7 +1497,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'spo',
     term: 'Supply Path Optimization (SPO)',
     category: 'Marketplace',
-    shortDefinition: 'The strategy of finding the most efficient and direct path to buy a publisher’s inventory.',
+    shortDefinition:
+      'The strategy of finding the most efficient and direct path to buy a publisher’s inventory.',
     definition: [
       'SPO is the process by which DSPs and buyers evaluate the many ways they can buy the same impression and choose the most efficient one. Because the same publisher inventory is often available through multiple SSPs and exchanges, SPO helps reduce fee leakage and improves transparency.',
       'Effective SPO can increase the "working media" (the actual money that goes to the publisher) by cutting out unnecessary intermediaries who add fees without adding value.',
@@ -1417,7 +1509,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'retail-media',
     term: 'Retail Media Network (RMN)',
     category: 'Marketplace',
-    shortDefinition: 'An advertising platform owned by a retailer, using their first-party shopper data.',
+    shortDefinition:
+      'An advertising platform owned by a retailer, using their first-party shopper data.',
     definition: [
       'Retail Media is the "third wave" of digital advertising (after Search and Social). Retailers like Amazon, Walmart, and Kroger let brands buy ads on their websites or using their shopper data to target users elsewhere.',
       'The power of Retail Media is "closed-loop attribution": because the retailer knows what you saw AND what you bought, they can prove exactly how many jars of peanut butter an ad sold.',
@@ -1439,7 +1532,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'curation',
     term: 'Curation',
     category: 'Marketplace',
-    shortDefinition: 'The process of bundling premium inventory into custom "curated" marketplaces.',
+    shortDefinition:
+      'The process of bundling premium inventory into custom "curated" marketplaces.',
     definition: [
       'Curation allows intermediaries (like agencies or data providers) to create custom inventory pools within an SSP. They select high-quality publishers and layer on specific data (like attention metrics or sustainability scores) to create a curated "deal" that a DSP can then target.',
       'Curation is a way to reduce the complexity of the open web by providing a "pre-filtered" marketplace of high-performing inventory.',
@@ -1450,7 +1544,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'mfa',
     term: 'Made For Advertising (MFA)',
     category: 'Marketplace',
-    shortDefinition: 'Low-quality websites designed solely to maximize ad revenue, often with poor user experience.',
+    shortDefinition:
+      'Low-quality websites designed solely to maximize ad revenue, often with poor user experience.',
     definition: [
       'MFA sites are built to harvest programmatic ad spend. They typically have low-quality content, extremely high ad density, and use aggressive tactics to keep users clicking. They often perform well on "vanity metrics" like CTR but drive very little actual business value.',
       'The industry is currently pushing to exclude MFA sites from media plans to improve "working media" efficiency and reduce the carbon footprint of digital advertising.',
@@ -1461,7 +1556,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'sustainability',
     term: 'Sustainability (Green Media)',
     category: 'Marketplace',
-    shortDefinition: 'Measuring and reducing the carbon footprint of digital advertising campaigns.',
+    shortDefinition:
+      'Measuring and reducing the carbon footprint of digital advertising campaigns.',
     definition: [
       'Digital advertising has a significant environmental impact due to the massive server power required for RTB auctions. Sustainability initiatives in ad tech (like Scope3) aim to measure the carbon emissions of each ad impression.',
       'Advertisers are increasingly choosing "green media" paths by excluding high-emission publishers (like MFA sites) and shortening the supply chain (SPO) to reduce the number of server calls per auction.',
@@ -1494,7 +1590,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'line-item',
     term: 'Line Item',
     category: 'Marketplace',
-    shortDefinition: 'The granular tactical unit of a campaign where targeting and bidding are defined.',
+    shortDefinition:
+      'The granular tactical unit of a campaign where targeting and bidding are defined.',
     definition: [
       'Line items live under an IO or Campaign. This is where the actual "work" happens: you set the specific audience targeting (e.g. "Females 25-34 in Chicago"), the bid price, the frequency caps, and assign the creatives.',
       '<strong>Nomenclature confusion:</strong> In Google DV360, they are "Line Items." In Meta Ads Manager, they are <strong>Ad Sets</strong>. In The Trade Desk, they are <strong>Ad Groups</strong>. In Xandr, they can be <strong>Augmented Line Items (ALIs)</strong>. Despite the different names, they all serve the same purpose: defining the "who, where, and how much."',
@@ -1505,7 +1602,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'signal-loss',
     term: 'Signal Loss',
     category: 'Data',
-    shortDefinition: 'The reduction in trackable data due to privacy regulations and browser restrictions.',
+    shortDefinition:
+      'The reduction in trackable data due to privacy regulations and browser restrictions.',
     definition: [
       'Signal loss refers to the "blinding" of ad tech systems caused by the deprecation of third-party cookies (Chrome), Apple\'s App Tracking Transparency (ATT), and regulations like GDPR/CCPA. This makes it harder to target users and measure whether an ad led to a sale.',
       'To combat signal loss, the industry is moving toward first-party data, Privacy Sandbox APIs, and modeled conversions (using AI to "guess" conversions where data is missing).',
@@ -1549,7 +1647,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'shoppable-ads',
     term: 'Shoppable Ads',
     category: 'Marketplace',
-    shortDefinition: 'Ad formats that allow users to purchase a product directly within the ad unit.',
+    shortDefinition:
+      'Ad formats that allow users to purchase a product directly within the ad unit.',
     definition: [
       'Shoppable ads remove the friction of clicking to a separate website. On Instagram, you can "Add to Cart" directly. On CTV (Connected TV), you can scan a QR code on the screen to buy the product on your phone. This is a core part of the Retail Media explosion.',
     ],
@@ -1579,7 +1678,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'margin',
     term: 'Margin (Ad Tech)',
     category: 'Marketplace',
-    shortDefinition: 'The difference between the price a company pays for inventory and the price they sell it for.',
+    shortDefinition:
+      'The difference between the price a company pays for inventory and the price they sell it for.',
     definition: [
       'Margin is the lifeblood of ad tech intermediaries. For an agency trading desk, margin is the profit they keep after paying the DSP and the publisher. High margins are often found in "blind" buys where the advertiser doesn\'t see the breakdown of costs.',
       'Industry trends are pushing toward "Disclosed" models where margins are capped and transparent, rather than "Non-Disclosed" models where margins can exceed 30%.',
@@ -1590,7 +1690,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'billing-event',
     term: 'Billing Event',
     category: 'Measurement',
-    shortDefinition: 'The specific action that triggers a payment (e.g. an impression, a click, or 10s of video).',
+    shortDefinition:
+      'The specific action that triggers a payment (e.g. an impression, a click, or 10s of video).',
     definition: [
       'Not every impression is billed. A "Billable Impression" might require the ad to be 100% viewable, or for the video to play for at least 2 seconds. The billing event defines the contract between the buyer and the seller.',
     ],
@@ -1610,10 +1711,11 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'holding-company',
     term: 'Agency Holding Company',
     category: 'Marketplace',
-    shortDefinition: 'A massive global parent company that owns dozens of individual ad and media agencies.',
+    shortDefinition:
+      'A massive global parent company that owns dozens of individual ad and media agencies.',
     definition: [
-      'The "Big Six" holding companies (WPP, Publicis, Omnicom, Interpublic, Dentsu, and Havas) own the vast majority of the world\'s largest media agencies. For example, WPP owns Mindshare, Wavemaker, and EssenceMediacom. These sub-agencies often specialize in different regions or client types, but they share the parent company\'s "Trading Desk" and technology stack.',
-      'Holding companies use their scale to negotiate better rates with publishers (like Google, Meta, and NBCUniversal). In the programmatic era, they have consolidated their buying power into internal teams like <strong>Publicis Media</strong> or <strong>GroupM</strong> to maximize efficiency and data leverage.',
+      'WPP Media, formerly GroupM, includes Mindshare, Wavemaker, and EssenceMediacom. Omnicom completed its acquisition of Interpublic in November 2025.',
+      'Holding companies can provide shared technology, procurement, and trading. Arrangements vary by agency and advertiser. See the <a href="/training/campaign-planning#agencies">agency structures guide</a> for how to trace ownership, execution, and billing.',
     ],
     related: ['agency', 'advertiser'],
   },
@@ -1621,7 +1723,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'programmatic-audio',
     term: 'Programmatic Audio',
     category: 'Marketplace',
-    shortDefinition: 'Automated buying and selling of audio ad inventory (podcasts, streaming music, digital radio).',
+    shortDefinition:
+      'Automated buying and selling of audio ad inventory (podcasts, streaming music, digital radio).',
     definition: [
       'Audio ads served in digital environments like Spotify, Pandora, iHeartRadio, and SiriusXM. Unlike traditional radio, these can be targeted based on listener demographics, interests, and device data.',
       'Technical standards like DAAAST (Digital Audio Ad Serving Template) or VAST with audio extensions are used to deliver these ads.',
@@ -1632,10 +1735,11 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'dooh',
     term: 'Digital Out-of-Home (DOOH)',
     category: 'Marketplace',
-    shortDefinition: 'Digital billboards and screens in public spaces that can be bought programmatically.',
+    shortDefinition:
+      'Digital billboards and screens in public spaces that can be bought programmatically.',
     definition: [
-      'DOOH refers to digital screens in public places: highway billboards, bus shelters, elevators (Captivate), and gyms. Programmatic DOOH (pDOOH) allows these screens to be bought via DSPs just like web ads.',
-      'Measurement is based on "impressions" calculated via foot traffic data and mobile location signals, rather than 1:1 user tracking.',
+      'DOOH covers digital screens in public places, including billboards, bus shelters, elevators, and gyms. Buyers can purchase inventory directly or use a DSP for programmatic deals.',
+      'Proof of play records an ad airing. An impression estimate can represent multiple exposures per play. See the <a href="/training/unified-media#dooh">DOOH module</a> for a worked example.',
     ],
     related: ['ooh', 'foot-traffic', 'gps-data'],
   },
@@ -1643,7 +1747,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'ooh',
     term: 'Out-of-Home (OOH)',
     category: 'Marketplace',
-    shortDefinition: 'Traditional physical advertising in the real world (billboards, posters, transit ads).',
+    shortDefinition:
+      'Traditional physical advertising in the real world (billboards, posters, transit ads).',
     definition: [
       'The original "mass media" format. OOH includes everything from the massive billboards in Times Square to the posters on the side of a bus. It is increasingly being "digitized" into DOOH.',
       'OOH is often used for broad reach and brand awareness, but modern data allows it to be linked to digital outcomes via location data.',
@@ -1654,7 +1759,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'geo-fencing',
     term: 'Geo-Fencing',
     category: 'Data',
-    shortDefinition: 'Creating a virtual perimeter around a physical location to target ads to users inside it.',
+    shortDefinition:
+      'Creating a virtual perimeter around a physical location to target ads to users inside it.',
     definition: [
       'Using GPS, Wi-Fi, or cellular data to identify when a device enters a specific geographic area (e.g., within 500 meters of a retail store).',
       'Advertisers use geo-fencing to serve relevant ads (e.g., a coupon when you walk near a store) or to measure "store visits" after a user has seen an ad.',
@@ -1665,7 +1771,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'foot-traffic',
     term: 'Foot Traffic Data',
     category: 'Data',
-    shortDefinition: 'Anonymized location data showing how many people visit specific physical locations.',
+    shortDefinition:
+      'Anonymized location data showing how many people visit specific physical locations.',
     definition: [
       'Aggregated location signals from mobile apps (with user consent) used to measure how many people visit stores, malls, or billboards.',
       'This data is critical for OOH measurement and "Store Visit" attribution (linking a digital ad view to a physical visit).',
@@ -1687,7 +1794,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     id: 'lwa',
     term: 'Listen-While-Active (LWA)',
     category: 'Measurement',
-    shortDefinition: 'A metric for audio advertising indicating the user is actively listening to the content.',
+    shortDefinition:
+      'A metric for audio advertising indicating the user is actively listening to the content.',
     definition: [
       'In audio, unlike display, "viewability" doesn\'t exist. LWA or completion rates are used to verify that the ad was actually heard by a user while the app was in the foreground or actively streaming.',
     ],
@@ -1725,166 +1833,166 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     ],
     related: ['dsp', 'ctv', 'programmatic-audio', 'dooh'],
   },
-};
+}
 
 // --- Glossary auto-linking ---
 
-const GLOSS_TERM_DEFS: Array<{pattern: RegExp; id: GlossaryId}> = [
+const GLOSS_TERM_DEFS: Array<{ pattern: RegExp; id: GlossaryId }> = [
   // Multi-word terms first so they're tokenized before single-word patterns run
-  {pattern: /\bfirst[ -]party data\b/gi, id: 'first-party-data'},
-  {pattern: /\bthird[ -]party data\b/gi, id: 'third-party-data'},
-  {pattern: /\bwalled gardens?\b/gi, id: 'walled-garden'},
-  {pattern: /\bfloor prices?\b/gi, id: 'floor-price'},
-  {pattern: /\bfill rates?\b/gi, id: 'fill-rate'},
-  {pattern: /\bad servers?\b/gi, id: 'ad-server'},
-  {pattern: /\bOpenRTB\b/g, id: 'open-rtb'},
-  {pattern: /\bheader[ -]bidding\b/gi, id: 'header-bidding'},
-  {pattern: /\bprogrammatic[ -]guaranteed\b/gi, id: 'programmatic-guaranteed'},
-  {pattern: /\bprivate marketplace\b/gi, id: 'pmp'},
-  {pattern: /\bbrand[ -]safety\b/gi, id: 'brand-safety'},
-  {pattern: /\bfrequency[ -]caps?\b/gi, id: 'frequency-cap'},
-  {pattern: /\bfrequency[ -]capping\b/gi, id: 'frequency-cap'},
-  {pattern: /\bdynamic creative optimization\b/gi, id: 'dco'},
-  {pattern: /\bclean rooms?\b/gi, id: 'clean-room'},
-  {pattern: /\bidentity (?:graphs?|resolution)\b/gi, id: 'identity-graph'},
-  {pattern: /\bdata lakes?\b/gi, id: 'data-lake'},
-  {pattern: /\bquality scores?\b/gi, id: 'quality-score'},
-  {pattern: /\bconnected TV\b/g, id: 'ctv'},
-  {pattern: /\bserver-side ad insertion\b/gi, id: 'ssai'},
-  {pattern: /\bData Management Platform\b/gi, id: 'dmp'},
+  { pattern: /\bfirst[ -]party data\b/gi, id: 'first-party-data' },
+  { pattern: /\bthird[ -]party data\b/gi, id: 'third-party-data' },
+  { pattern: /\bwalled gardens?\b/gi, id: 'walled-garden' },
+  { pattern: /\bfloor prices?\b/gi, id: 'floor-price' },
+  { pattern: /\bfill rates?\b/gi, id: 'fill-rate' },
+  { pattern: /\bad servers?\b/gi, id: 'ad-server' },
+  { pattern: /\bOpenRTB\b/g, id: 'open-rtb' },
+  { pattern: /\bheader[ -]bidding\b/gi, id: 'header-bidding' },
+  { pattern: /\bprogrammatic[ -]guaranteed\b/gi, id: 'programmatic-guaranteed' },
+  { pattern: /\bprivate marketplace\b/gi, id: 'pmp' },
+  { pattern: /\bbrand[ -]safety\b/gi, id: 'brand-safety' },
+  { pattern: /\bfrequency[ -]caps?\b/gi, id: 'frequency-cap' },
+  { pattern: /\bfrequency[ -]capping\b/gi, id: 'frequency-cap' },
+  { pattern: /\bdynamic creative optimization\b/gi, id: 'dco' },
+  { pattern: /\bclean rooms?\b/gi, id: 'clean-room' },
+  { pattern: /\bidentity (?:graphs?|resolution)\b/gi, id: 'identity-graph' },
+  { pattern: /\bdata lakes?\b/gi, id: 'data-lake' },
+  { pattern: /\bquality scores?\b/gi, id: 'quality-score' },
+  { pattern: /\bconnected TV\b/g, id: 'ctv' },
+  { pattern: /\bserver-side ad insertion\b/gi, id: 'ssai' },
+  { pattern: /\bData Management Platform\b/gi, id: 'dmp' },
   // Single-word / acronyms
-  {pattern: /\bPrebid\b/g, id: 'prebid'},
-  {pattern: /\bGAM\b/g, id: 'gam'},
-  {pattern: /\bDSPs?\b/g, id: 'dsp'},
-  {pattern: /\bSSPs?\b/g, id: 'ssp'},
-  {pattern: /\bDMPs?\b/g, id: 'dmp'},
-  {pattern: /\bRTB\b/g, id: 'rtb'},
-  {pattern: /\beCPMs?\b/g, id: 'cpm'},
-  {pattern: /\bvCPMs?\b/g, id: 'cpm'},
-  {pattern: /\bCPMs?\b/g, id: 'cpm'},
-  {pattern: /\bVAST\b/g, id: 'vast'},
-  {pattern: /\bVMAP\b/g, id: 'vast'},
-  {pattern: /\bSSAI\b/g, id: 'ssai'},
-  {pattern: /\bCTV\b/g, id: 'ctv'},
-  {pattern: /\bPMP\b/g, id: 'pmp'},
-  {pattern: /\bDCO\b/g, id: 'dco'},
-  {pattern: /\bviewabilit(?:y|ies)\b/gi, id: 'viewability'},
-  {pattern: /\battribution\b/gi, id: 'attribution'},
-  {pattern: /\bupfronts?\b/gi, id: 'upfronts'},
-  {pattern: /\bpixels?\b/gi, id: 'pixel'},
-  {pattern: /\byield\b/gi, id: 'yield'},
-  {pattern: /\binventory\b/gi, id: 'inventory'},
-  {pattern: /\bimpressions?\b/gi, id: 'impression'},
-  {pattern: /\bpublishers?\b/gi, id: 'publisher'},
-  {pattern: /\badvertisers?\b/gi, id: 'advertiser'},
-  {pattern: /\bagencies\b/gi, id: 'agency'},
-  {pattern: /\bagency\b/gi, id: 'agency'},
-  {pattern: /\bcampaigns?\b/gi, id: 'campaign'},
-  {pattern: /\bsegments?\b/gi, id: 'segment'},
-  {pattern: /\bexchanges?\b/gi, id: 'exchange'},
-  {pattern: /\bretargeting\b/gi, id: 'retargeting'},
-  {pattern: /\bcreatives?\b/gi, id: 'creative'},
-  {pattern: /\bGoogle Ad Manager\b/gi, id: 'gam'},
-  {pattern: /\bad[ -]ops\b/gi, id: 'ad-ops'},
-  {pattern: /\bCustomer Success Manager\b/gi, id: 'csm'},
-  {pattern: /\bCSMs?\b/g, id: 'csm'},
-  {pattern: /\bholding compan(?:y|ies)\b/gi, id: 'holding-company'},
-  {pattern: /\bprogrammatic[ -]audio\b/gi, id: 'programmatic-audio'},
-  {pattern: /\bDOOH\b/g, id: 'dooh'},
-  {pattern: /\bOOH\b/g, id: 'ooh'},
-  {pattern: /\bgeo[ -]fencing\b/gi, id: 'geo-fencing'},
-  {pattern: /\bfoot[ -]traffic\b/gi, id: 'foot-traffic'},
-  {pattern: /\bGPS\b/g, id: 'gps-data'},
-  {pattern: /\blocation data\b/gi, id: 'gps-data'},
-  {pattern: /\bprint ads?\b/gi, id: 'print-ads'},
-  {pattern: /\bprint advertising\b/gi, id: 'print-ads'},
-  {pattern: /\bC\.O\.W\.\b/g, id: 'cow'},
-  {pattern: /\bRate Card(s)?\b/gi, id: 'rate-card'},
-  {pattern: /\bLocal Media\b/gi, id: 'local-media'},
-  {pattern: /\bGlobal Media\b/gi, id: 'global-media'},
-  {pattern: /\bSupply Path Optimization\b/gi, id: 'spo'},
-  {pattern: /\bSPO\b/g, id: 'spo'},
-  {pattern: /\bRetail Media (Network)?(s)?\b/gi, id: 'retail-media'},
-  {pattern: /\bRMN(s)?\b/g, id: 'retail-media'},
-  {pattern: /\bSellers\.json\b/gi, id: 'sellers-json'},
-  {pattern: /\bCuration\b/gi, id: 'curation'},
-  {pattern: /\bMade For Advertising\b/gi, id: 'mfa'},
-  {pattern: /\bMFA\b/g, id: 'mfa'},
-  {pattern: /\bSustainability\b/gi, id: 'sustainability'},
-  {pattern: /\bGreen Media\b/gi, id: 'sustainability'},
-  {pattern: /\bWhite Label\b/gi, id: 'white-label'},
-  {pattern: /\bInsertion Order\b/gi, id: 'io'},
-  {pattern: /\bIO(s)?\b/g, id: 'io'},
-  {pattern: /\bLine Item(s)?\b/gi, id: 'line-item'},
-  {pattern: /\bSignal Loss\b/gi, id: 'signal-loss'},
-  {pattern: /\bAttention Metric(s)?\b/gi, id: 'attention-metrics'},
-  {pattern: /\bAttention Second(s)?\b/gi, id: 'attention-metrics'},
-  {pattern: /\bGen(erative)? AI\b/gi, id: 'gen-ai-creative'},
-  {pattern: /\bCMP\b/g, id: 'cmp'},
-  {pattern: /\bConsent Management Platform\b/gi, id: 'cmp'},
-  {pattern: /\bShoppable Ad(s)?\b/gi, id: 'shoppable-ads'},
-  {pattern: /\biROAS\b/g, id: 'iroas'},
-  {pattern: /\bIncremental ROAS\b/gi, id: 'iroas'},
-  {pattern: /\bMarkup\b/gi, id: 'markup'},
-  {pattern: /\bPlatform Fee(s)?\b/gi, id: 'markup'},
-  {pattern: /\bBilling Event(s)?\b/gi, id: 'billing-event'},
-  {pattern: /\bDiscrepancy\b/gi, id: 'discrepancy'},
-  {pattern: /\bRibeye Media\b/gi, id: 'cow'},
-];
+  { pattern: /\bPrebid\b/g, id: 'prebid' },
+  { pattern: /\bGAM\b/g, id: 'gam' },
+  { pattern: /\bDSPs?\b/g, id: 'dsp' },
+  { pattern: /\bSSPs?\b/g, id: 'ssp' },
+  { pattern: /\bDMPs?\b/g, id: 'dmp' },
+  { pattern: /\bRTB\b/g, id: 'rtb' },
+  { pattern: /\beCPMs?\b/g, id: 'cpm' },
+  { pattern: /\bvCPMs?\b/g, id: 'cpm' },
+  { pattern: /\bCPMs?\b/g, id: 'cpm' },
+  { pattern: /\bVAST\b/g, id: 'vast' },
+  { pattern: /\bVMAP\b/g, id: 'vast' },
+  { pattern: /\bSSAI\b/g, id: 'ssai' },
+  { pattern: /\bCTV\b/g, id: 'ctv' },
+  { pattern: /\bPMP\b/g, id: 'pmp' },
+  { pattern: /\bDCO\b/g, id: 'dco' },
+  { pattern: /\bviewabilit(?:y|ies)\b/gi, id: 'viewability' },
+  { pattern: /\battribution\b/gi, id: 'attribution' },
+  { pattern: /\bupfronts?\b/gi, id: 'upfronts' },
+  { pattern: /\bpixels?\b/gi, id: 'pixel' },
+  { pattern: /\byield\b/gi, id: 'yield' },
+  { pattern: /\binventory\b/gi, id: 'inventory' },
+  { pattern: /\bimpressions?\b/gi, id: 'impression' },
+  { pattern: /\bpublishers?\b/gi, id: 'publisher' },
+  { pattern: /\badvertisers?\b/gi, id: 'advertiser' },
+  { pattern: /\bagencies\b/gi, id: 'agency' },
+  { pattern: /\bagency\b/gi, id: 'agency' },
+  { pattern: /\bcampaigns?\b/gi, id: 'campaign' },
+  { pattern: /\bsegments?\b/gi, id: 'segment' },
+  { pattern: /\bexchanges?\b/gi, id: 'exchange' },
+  { pattern: /\bretargeting\b/gi, id: 'retargeting' },
+  { pattern: /\bcreatives?\b/gi, id: 'creative' },
+  { pattern: /\bGoogle Ad Manager\b/gi, id: 'gam' },
+  { pattern: /\bad[ -]ops\b/gi, id: 'ad-ops' },
+  { pattern: /\bCustomer Success Manager\b/gi, id: 'csm' },
+  { pattern: /\bCSMs?\b/g, id: 'csm' },
+  { pattern: /\bholding compan(?:y|ies)\b/gi, id: 'holding-company' },
+  { pattern: /\bprogrammatic[ -]audio\b/gi, id: 'programmatic-audio' },
+  { pattern: /\bDOOH\b/g, id: 'dooh' },
+  { pattern: /\bOOH\b/g, id: 'ooh' },
+  { pattern: /\bgeo[ -]fencing\b/gi, id: 'geo-fencing' },
+  { pattern: /\bfoot[ -]traffic\b/gi, id: 'foot-traffic' },
+  { pattern: /\bGPS\b/g, id: 'gps-data' },
+  { pattern: /\blocation data\b/gi, id: 'gps-data' },
+  { pattern: /\bprint ads?\b/gi, id: 'print-ads' },
+  { pattern: /\bprint advertising\b/gi, id: 'print-ads' },
+  { pattern: /\bC\.O\.W\.\b/g, id: 'cow' },
+  { pattern: /\bRate Card(s)?\b/gi, id: 'rate-card' },
+  { pattern: /\bLocal Media\b/gi, id: 'local-media' },
+  { pattern: /\bGlobal Media\b/gi, id: 'global-media' },
+  { pattern: /\bSupply Path Optimization\b/gi, id: 'spo' },
+  { pattern: /\bSPO\b/g, id: 'spo' },
+  { pattern: /\bRetail Media (Network)?(s)?\b/gi, id: 'retail-media' },
+  { pattern: /\bRMN(s)?\b/g, id: 'retail-media' },
+  { pattern: /\bSellers\.json\b/gi, id: 'sellers-json' },
+  { pattern: /\bCuration\b/gi, id: 'curation' },
+  { pattern: /\bMade For Advertising\b/gi, id: 'mfa' },
+  { pattern: /\bMFA\b/g, id: 'mfa' },
+  { pattern: /\bSustainability\b/gi, id: 'sustainability' },
+  { pattern: /\bGreen Media\b/gi, id: 'sustainability' },
+  { pattern: /\bWhite Label\b/gi, id: 'white-label' },
+  { pattern: /\bInsertion Order\b/gi, id: 'io' },
+  { pattern: /\bIO(s)?\b/g, id: 'io' },
+  { pattern: /\bLine Item(s)?\b/gi, id: 'line-item' },
+  { pattern: /\bSignal Loss\b/gi, id: 'signal-loss' },
+  { pattern: /\bAttention Metric(s)?\b/gi, id: 'attention-metrics' },
+  { pattern: /\bAttention Second(s)?\b/gi, id: 'attention-metrics' },
+  { pattern: /\bGen(erative)? AI\b/gi, id: 'gen-ai-creative' },
+  { pattern: /\bCMP\b/g, id: 'cmp' },
+  { pattern: /\bConsent Management Platform\b/gi, id: 'cmp' },
+  { pattern: /\bShoppable Ad(s)?\b/gi, id: 'shoppable-ads' },
+  { pattern: /\biROAS\b/g, id: 'iroas' },
+  { pattern: /\bIncremental ROAS\b/gi, id: 'iroas' },
+  { pattern: /\bMarkup\b/gi, id: 'markup' },
+  { pattern: /\bPlatform Fee(s)?\b/gi, id: 'markup' },
+  { pattern: /\bBilling Event(s)?\b/gi, id: 'billing-event' },
+  { pattern: /\bDiscrepancy\b/gi, id: 'discrepancy' },
+  { pattern: /\bRibeye Media\b/gi, id: 'cow' },
+]
 
-const GLOSS_SENTINEL = '\uE000';
+const GLOSS_SENTINEL = '\uE000'
 
 function linkTerms(html: string): string {
   // Split into alternating text-node / HTML-tag segments
-  const parts = html.split(/(<[^>]+>)/);
-  let insideLink = 0;
-  let insideCode = 0;
+  const parts = html.split(/(<[^>]+>)/)
+  let insideLink = 0
+  let insideCode = 0
 
   const processed = parts.map((part) => {
     if (/^<a[\s>]/i.test(part)) {
-      insideLink++;
-      return part;
+      insideLink++
+      return part
     }
     if (/^<\/a>/i.test(part)) {
-      insideLink = Math.max(0, insideLink - 1);
-      return part;
+      insideLink = Math.max(0, insideLink - 1)
+      return part
     }
     if (/^<code[\s>]/i.test(part)) {
-      insideCode++;
-      return part;
+      insideCode++
+      return part
     }
     if (/^<\/code>/i.test(part)) {
-      insideCode = Math.max(0, insideCode - 1);
-      return part;
+      insideCode = Math.max(0, insideCode - 1)
+      return part
     }
     if (part.startsWith('<')) {
-      return part;
+      return part
     }
     if (insideLink > 0 || insideCode > 0) {
-      return part;
+      return part
     }
 
     // Two-pass: first tokenise every match (prevents overlapping replacements),
     // then substitute tokens with anchor tags.
-    const tokens: Array<{orig: string; id: GlossaryId}> = [];
-    let text = part;
+    const tokens: Array<{ orig: string; id: GlossaryId }> = []
+    let text = part
 
-    for (const {pattern, id} of GLOSS_TERM_DEFS) {
+    for (const { pattern, id } of GLOSS_TERM_DEFS) {
       text = text.replace(pattern, (m) => {
-        const idx = tokens.length;
-        tokens.push({orig: m, id});
-        return `${GLOSS_SENTINEL}G${idx}${GLOSS_SENTINEL}`;
-      });
+        const idx = tokens.length
+        tokens.push({ orig: m, id })
+        return `${GLOSS_SENTINEL}G${idx}${GLOSS_SENTINEL}`
+      })
     }
 
     return text.replace(new RegExp(`${GLOSS_SENTINEL}G(\\d+)${GLOSS_SENTINEL}`, 'g'), (_, i) => {
-      const tok = tokens[Number(i)]!;
-      const tip = glossary[tok.id].shortDefinition.replace(/"/g, '&quot;');
-      return `<a class="gloss-link" href="/glossary?term=${tok.id}" title="${tip}">${tok.orig}</a>`;
-    });
-  });
+      const tok = tokens[Number(i)]!
+      const tip = glossary[tok.id].shortDefinition.replace(/"/g, '&quot;')
+      return `<a class="gloss-link" href="/glossary?term=${tok.id}" title="${tip}">${tok.orig}</a>`
+    })
+  })
 
-  return processed.join('');
+  return processed.join('')
 }
 
 // ── Satirical top banners ──────────────────────────────────────────────────
@@ -1950,10 +2058,10 @@ const funnyBanners = [
     cta: 'Blame The Algorithm',
     brand: 'DCO Unlimited™',
   },
-];
+]
 
 const renderTopBanner = (): string => {
-  const b = funnyBanners[Math.floor(Math.random() * funnyBanners.length)]!;
+  const b = funnyBanners[Math.floor(Math.random() * funnyBanners.length)]!
   return `<div class='top-banner'>
   <span class='top-banner-ad-label'>Ad</span>
   <div class='top-banner-content'>
@@ -1965,8 +2073,8 @@ const renderTopBanner = (): string => {
     <a class='top-banner-cta' href='#' onclick='return false;'>${b.cta}</a>
     <a class='top-banner-why' href='/topic/buy-side'>Why this ad?</a>
   </div>
-</div>`;
-};
+</div>`
+}
 
 const sidebarStyles = `
   .ide-sidebar {
@@ -2065,20 +2173,20 @@ const sidebarStyles = `
     transition: background 0.15s, color 0.15s;
   }
   .ide-theme-toggle:hover { background: var(--border-subtle, #e5e7eb); color: var(--text-main, #111827); }
-`;
+`
 
 const themeScript = `<script>
 (function(){
   var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
   document.documentElement.setAttribute('data-theme',t);
 })();
-</script>`;
+</script>`
 
 const renderSidebar = (currentPath: string): string => {
   const link = (href: string, icon: string, label: string): string => {
-    const active = currentPath === href ? ' active' : '';
-    return `  <a class='ide-link${active}' href='${href}'><span class='ide-link-icon'>${icon}</span>${label}</a>`;
-  };
+    const active = currentPath === href ? ' active' : ''
+    return `  <a class='ide-link${active}' href='${href}'><span class='ide-link-icon'>${icon}</span>${label}</a>`
+  }
   return [
     "<nav class='ide-sidebar' aria-label='Site navigation'>",
     "  <a class='ide-logo' href='/'>",
@@ -2089,6 +2197,9 @@ const renderSidebar = (currentPath: string): string => {
     link('/', '🏠', 'Home'),
     "  <div class='ide-section'>Topics</div>",
     link('/topic/ad-serving-rtb', '⚡', 'Ad Serving &amp; RTB'),
+    link('/training/unified-media', '🎯', 'Unified Media Buying'),
+    link('/training/campaign-planning', '📋', 'Planning &amp; Forecasting'),
+    link('/training/media-measurement', '📺', 'TV Data &amp; Attribution'),
     link('/topic/buy-side', '📈', 'Buy Side'),
     link('/topic/sell-side', '📡', 'Sell Side'),
     link('/topic/data', '📊', 'Data &amp; Identity'),
@@ -2124,18 +2235,18 @@ function updateThemeBtn(){
 }
 updateThemeBtn();
 </script>`,
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderTopicPage = (topicId: TopicId): string => {
-  const topic = topics[topicId];
+  const topic = topics[topicId]
 
-  const overviewItems = topic.overview.map((line) => `<li>${linkTerms(line)}</li>`).join('\n');
+  const overviewItems = topic.overview.map((line) => `<li>${linkTerms(line)}</li>`).join('\n')
 
-  const technicalItems = topic.technical.map((line) => `<li>${linkTerms(line)}</li>`).join('\n');
+  const technicalItems = topic.technical.map((line) => `<li>${linkTerms(line)}</li>`).join('\n')
 
   const companiesHtml =
-    topic.companies && topic.companies.length
+    topic.companies && topic.companies.length > 0
       ? [
           "<div class='company-section'>",
           "  <div class='company-section-label'>Key companies in this space</div>",
@@ -2144,10 +2255,10 @@ const renderTopicPage = (topicId: TopicId): string => {
           '  </div>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const deepDiveHtml =
-    topic.deepDive && topic.deepDive.length
+    topic.deepDive && topic.deepDive.length > 0
       ? [
           "<details class='deep-dive-section'>",
           '  <summary>Deep dive: advanced technical details</summary>',
@@ -2156,28 +2267,31 @@ const renderTopicPage = (topicId: TopicId): string => {
           '  </ul>',
           '</details>',
         ].join('\n')
-      : '';
+      : ''
 
   const inOneSentenceHtml = topic.inOneSentence
     ? `<p class='in-one-sentence'>${linkTerms(topic.inOneSentence)}</p>`
-    : '';
+    : ''
 
   const keyTermsHtml =
-    topic.keyTerms && topic.keyTerms.length
+    topic.keyTerms && topic.keyTerms.length > 0
       ? [
           "<div class='key-terms-section'>",
           "  <div class='topic-section-heading'>Key terms</div>",
           "  <div class='key-terms-chips'>",
           topic.keyTerms
-            .map((id) => `<a class='key-term-chip' href='/glossary?term=${id}'>${glossary[id]?.term ?? id}</a>`)
+            .map(
+              (id) =>
+                `<a class='key-term-chip' href='/glossary?term=${id}'>${glossary[id]?.term ?? id}</a>`
+            )
             .join('\n'),
           '  </div>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const keyTakeawaysHtml =
-    topic.keyTakeaways && topic.keyTakeaways.length
+    topic.keyTakeaways && topic.keyTakeaways.length > 0
       ? [
           "<div class='key-takeaways-section'>",
           "  <div class='topic-section-heading'>Key takeaways</div>",
@@ -2186,24 +2300,27 @@ const renderTopicPage = (topicId: TopicId): string => {
           '  </ul>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const furtherReadingHtml =
-    topic.furtherReading && topic.furtherReading.length
+    topic.furtherReading && topic.furtherReading.length > 0
       ? [
           "<div class='further-reading-section'>",
           "  <div class='topic-section-heading'>Further reading</div>",
           "  <ul class='further-reading-list'>",
           topic.furtherReading
-            .map((item) => `    <li><a href='${item.url}' target='_blank' rel='noreferrer'>${item.label}</a></li>`)
+            .map(
+              (item) =>
+                `    <li><a href='${item.url}' target='_blank' rel='noreferrer'>${item.label}</a></li>`
+            )
             .join('\n'),
           '  </ul>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const quickCheckHtml =
-    topic.quickCheck && topic.quickCheck.length
+    topic.quickCheck && topic.quickCheck.length > 0
       ? [
           "<details class='quick-check-section'>",
           '  <summary>Test yourself — quick check</summary>',
@@ -2211,19 +2328,19 @@ const renderTopicPage = (topicId: TopicId): string => {
           topic.quickCheck
             .map(
               (item, i) =>
-                `<div class='quick-check-item'><p class='quick-check-q'><strong>Q${i + 1}.</strong> ${linkTerms(item.q)}</p><p class='quick-check-a'><strong>A.</strong> ${linkTerms(item.a)}</p></div>`,
+                `<div class='quick-check-item'><p class='quick-check-q'><strong>Q${i + 1}.</strong> ${linkTerms(item.q)}</p><p class='quick-check-a'><strong>A.</strong> ${linkTerms(item.a)}</p></div>`
             )
             .join('\n'),
           '  </div>',
           '</details>',
         ].join('\n')
-      : '';
+      : ''
 
   const html = [
     '<!doctype html>',
     "<html lang='en'>",
     '<head>',
-    '  ' + FAVICON_LINK,
+    `  ${FAVICON_LINK}`,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${topic.label} – Ad Tech Deep Dive</title>`,
@@ -2235,7 +2352,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     '</head>',
     '<body>',
     "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
-    renderSidebar('/topic/' + topicId),
+    renderSidebar(`/topic/${topicId}`),
     "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -2267,7 +2384,7 @@ const renderTopicPage = (topicId: TopicId): string => {
     "        <h2 class='canvas-heading'>Under the Hood</h2>",
     "        <article class='phone'>",
     "          <div class='phone-body'>",
-    "            <div class='example-flow-diagram diagram-zoomable'>" + renderTopicFlowDiagram(topicId) + '</div>',
+    `            <div class='example-flow-diagram diagram-zoomable'>${renderTopicFlowDiagram(topicId)}</div>`,
     "            <h1 class='ecosystem-title'>Data &amp; Engineering View</h1>",
     "            <p class='ecosystem-subtitle'>Here's what happens in systems and data: schemas, pipelines, services, and code.</p>",
     "            <div class='topic-section-heading'>Technical Details</div>",
@@ -2286,23 +2403,25 @@ const renderTopicPage = (topicId: TopicId): string => {
     diagramLightboxHtml,
     '</body>',
     '</html>',
-  ].join('\n');
+  ].join('\n')
 
-  return html;
-};
+  return html
+}
 
 const renderExamplePage = (exampleId: ExampleId): string => {
-  const example = examples[exampleId];
+  const example = examples[exampleId]
 
-  const story = example.story.map((line) => `<li>${linkTerms(line)}</li>`).join('\n');
-  const technicalFlow = example.technicalFlow.map((line) => `<li>${linkTerms(line)}</li>`).join('\n');
+  const story = example.story.map((line) => `<li>${linkTerms(line)}</li>`).join('\n')
+  const technicalFlow = example.technicalFlow
+    .map((line) => `<li>${linkTerms(line)}</li>`)
+    .join('\n')
 
   const exampleInOneSentenceHtml = example.inOneSentence
     ? `<p class='in-one-sentence'>${linkTerms(example.inOneSentence)}</p>`
-    : '';
+    : ''
 
   const exampleKeyTakeawaysHtml =
-    example.keyTakeaways && example.keyTakeaways.length
+    example.keyTakeaways && example.keyTakeaways.length > 0
       ? [
           "<div class='key-takeaways-section'>",
           "  <div class='topic-section-heading'>Key takeaways</div>",
@@ -2311,27 +2430,30 @@ const renderExamplePage = (exampleId: ExampleId): string => {
           '  </ul>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const exampleFurtherReadingHtml =
-    example.furtherReading && example.furtherReading.length
+    example.furtherReading && example.furtherReading.length > 0
       ? [
           "<div class='further-reading-section'>",
           "  <div class='topic-section-heading'>Further reading</div>",
           "  <ul class='further-reading-list'>",
           example.furtherReading
-            .map((item) => `    <li><a href='${item.url}' target='_blank' rel='noreferrer'>${item.label}</a></li>`)
+            .map(
+              (item) =>
+                `    <li><a href='${item.url}' target='_blank' rel='noreferrer'>${item.label}</a></li>`
+            )
             .join('\n'),
           '  </ul>',
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const html = [
     '<!doctype html>',
     "<html lang='en'>",
     '<head>',
-    '  ' + FAVICON_LINK,
+    `  ${FAVICON_LINK}`,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     `  <title>${example.label} – End-to-end ad tech breakdown</title>`,
@@ -2343,7 +2465,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     '</head>',
     '<body>',
     "  <a href='#main-content' class='skip-link'>Skip to main content</a>",
-    renderSidebar('/example/' + exampleId),
+    renderSidebar(`/example/${exampleId}`),
     "  <div class='app-shell' id='main-content'>",
     renderTopBanner(),
     "    <div class='canvas'>",
@@ -2379,7 +2501,7 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     "      <section class='canvas-column'>",
     "        <h2 class='canvas-heading'>Ad surface &amp; data flow</h2>",
     "        <article class='phone'>",
-    "        <div class='example-flow-diagram diagram-zoomable'>" + renderExampleFlowDiagram(exampleId) + '</div>',
+    `        <div class='example-flow-diagram diagram-zoomable'>${renderExampleFlowDiagram(exampleId)}</div>`,
     renderExampleSurfaceFrame(exampleId),
     '        </article>',
     '      </section>',
@@ -2389,10 +2511,10 @@ const renderExamplePage = (exampleId: ExampleId): string => {
     diagramLightboxHtml,
     '</body>',
     '</html>',
-  ].join('\n');
+  ].join('\n')
 
-  return html;
-};
+  return html
+}
 
 const homeStyles = `
   .skip-link {
@@ -4678,7 +4800,7 @@ const homeStyles = `
   [data-theme="dark"] a { color: var(--accent-strong); }
   [data-theme="dark"] .topic-bullets li { color: var(--text-main); }
 ${sidebarStyles}
-`;
+`
 
 // Lightbox HTML injected once per page before </body>
 const diagramLightboxHtml = `
@@ -4719,24 +4841,24 @@ const diagramLightboxHtml = `
   overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
 })();
-</script>`;
+</script>`
 
-type FakeAdFormat = 'banner' | 'native' | 'search' | 'video' | 'audio';
+type FakeAdFormat = 'banner' | 'native' | 'search' | 'video' | 'audio'
 
-type FakeAdAudit = {
-  format: FakeAdFormat;
-  advertiser: string;
-  headline: string;
-  body: string;
-  cta: string;
-  cpm: string;
-  dsp: string;
-  ssp?: string;
-  targetingSignals: string[];
-  whyYou: string;
-  auctionWinner: string;
-  dealType: string;
-};
+interface FakeAdAudit {
+  format: FakeAdFormat
+  advertiser: string
+  headline: string
+  body: string
+  cta: string
+  cpm: string
+  dsp: string
+  ssp?: string
+  targetingSignals: string[]
+  whyYou: string
+  auctionWinner: string
+  dealType: string
+}
 
 const fakeAds: Record<string, FakeAdAudit> = {
   'banner-buy-side': {
@@ -4858,14 +4980,14 @@ const fakeAds: Record<string, FakeAdAudit> = {
     auctionWinner: 'Open auction on Amazon DSP audio marketplace, $18.00 CPM',
     dealType: 'Programmatic Audio (Amazon DSP)',
   },
-};
+}
 
 const renderFakeAdAuditPopover = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
-  const signals = ad.targetingSignals.map((s) => `<li>${s}</li>`).join('');
+  const signals = ad.targetingSignals.map((s) => `<li>${s}</li>`).join('')
   return [
     `<div class='ad-audit-overlay' id='audit-${auditKey}' aria-hidden='true' role='dialog' aria-label='Ad audit: how this ad was chosen'>`,
     "  <div class='ad-audit-panel'>",
@@ -4903,13 +5025,13 @@ const renderFakeAdAuditPopover = (auditKey: string): string => {
     '    </div>',
     '  </div>',
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderFakeBannerAd = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
   return [
     `<div class='fake-ad-container' data-format='${ad.format}'>`,
@@ -4929,13 +5051,13 @@ const renderFakeBannerAd = (auditKey: string): string => {
     '  </div>',
     renderFakeAdAuditPopover(auditKey),
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderFakeNativeAd = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
   return [
     `<div class='fake-ad-container' data-format='native'>`,
@@ -4953,13 +5075,13 @@ const renderFakeNativeAd = (auditKey: string): string => {
     '  </div>',
     renderFakeAdAuditPopover(auditKey),
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderFakeSearchAd = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
   return [
     `<div class='fake-ad-container' data-format='search'>`,
@@ -4974,13 +5096,13 @@ const renderFakeSearchAd = (auditKey: string): string => {
     '  </div>',
     renderFakeAdAuditPopover(auditKey),
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderFakeVideoAd = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
   return [
     `<div class='fake-ad-container' data-format='video'>`,
@@ -5004,13 +5126,13 @@ const renderFakeVideoAd = (auditKey: string): string => {
     '  </div>',
     renderFakeAdAuditPopover(auditKey),
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderFakeAudioAd = (auditKey: string): string => {
-  const ad = fakeAds[auditKey];
+  const ad = fakeAds[auditKey]
   if (!ad) {
-    return '';
+    return ''
   }
   return [
     `<div class='fake-ad-container' data-format='audio'>`,
@@ -5033,8 +5155,8 @@ const renderFakeAudioAd = (auditKey: string): string => {
     '  </div>',
     renderFakeAdAuditPopover(auditKey),
     '</div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderTopicFakeAd = (id: TopicId): string => {
   const adMap: Partial<Record<TopicId, () => string>> = {
@@ -5044,10 +5166,10 @@ const renderTopicFakeAd = (id: TopicId): string => {
     'ad-serving-rtb': () => renderFakeSearchAd('search-rtb'),
     'measurement-currency': () => renderFakeVideoAd('video-measurement'),
     'third-parties': () => renderFakeAudioAd('audio-data'),
-  };
-  const fn = adMap[id];
-  return fn ? fn() : '';
-};
+  }
+  const fn = adMap[id]
+  return fn ? fn() : ''
+}
 
 const renderTopicDiagram = (id: TopicId): string => {
   if (id === 'buy-side') {
@@ -5065,7 +5187,7 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>Each impression request flows through this chain before an ad is served and logged.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'sell-side') {
@@ -5083,7 +5205,7 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>This path controls who can even bid on an impression.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'data') {
@@ -5101,7 +5223,7 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>Events move from noisy logs to clean features that drive bidding and reporting.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'third-parties') {
@@ -5119,7 +5241,7 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>External data is normalized before it can safely influence decisions.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'ad-serving-rtb') {
@@ -5139,7 +5261,7 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>All of this happens in tens of milliseconds for each impression.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'measurement-currency') {
@@ -5157,27 +5279,27 @@ const renderTopicDiagram = (id: TopicId): string => {
       '  </div>',
       "  <p class='diagram-caption'>TV and digital measurement feed currency and clean room use cases.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
-  return '';
-};
+  return ''
+}
 
 const renderTopicFlowDiagram = (id: TopicId): string => {
   // Shared helpers
-  const bl = '#0284c7',
-    blF = '#e0f2fe';
-  const gr = '#16a34a',
-    grF = '#dcfce7';
-  const pu = '#7c3aed',
-    puF = '#ede9fe';
-  const or = '#d97706',
-    orF = '#fef3c7';
-  const st = '#475569',
-    mu = '#94a3b8';
+  const bl = '#0284c7'
+  const blF = '#e0f2fe'
+  const gr = '#16a34a'
+  const grF = '#dcfce7'
+  const pu = '#7c3aed'
+  const puF = '#ede9fe'
+  const or = '#d97706'
+  const orF = '#fef3c7'
+  const st = '#475569'
+  const mu = '#94a3b8'
 
   const mk = (mid: string, c: string) =>
-    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`;
+    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`
 
   const bx = (
     x: number,
@@ -5188,31 +5310,39 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
     sub: string,
     fc: string,
     sc: string,
-    co = '',
+    co = ''
   ) =>
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fc}" stroke="${sc}" stroke-width="1.5"/>` +
     `<text x="${x + w / 2}" y="${y + 16}" text-anchor="middle" font-size="10" font-weight="700" fill="${sc}">${label}</text>` +
     `<text x="${x + w / 2}" y="${y + 28}" text-anchor="middle" font-size="8" fill="${st}">${sub}</text>` +
     (co
       ? `<text x="${x + w / 2}" y="${y + 40}" text-anchor="middle" font-size="7.5" fill="${mu}" font-style="italic">${co}</text>`
-      : '');
+      : '')
 
-  const ln = (x1: number, y1: number, x2: number, y2: number, lbl: string, c: string, mid: string) =>
+  const ln = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    lbl: string,
+    c: string,
+    mid: string
+  ) =>
     `<path stroke="${c}" stroke-width="1.5" fill="none" marker-end="url(#${mid})" d="M${x1} ${y1} L${x2} ${y2}"/>` +
     (lbl
       ? `<text x="${(x1 + x2) / 2}" y="${Math.min(y1, y2) + (Math.abs(y2 - y1) || 0) / 2 - 5}" text-anchor="middle" font-size="8" fill="${c}" font-weight="600">${lbl}</text>`
-      : '');
+      : '')
 
   const zone = (x: number, y: number, w: number, h: number, label: string, c: string, fc: string) =>
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fc}" stroke="${c}" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>` +
-    `<text x="${x + 6}" y="${y + 12}" font-size="8" fill="${c}" font-weight="700" letter-spacing="0.06em">${label}</text>`;
+    `<text x="${x + 6}" y="${y + 12}" font-size="8" fill="${c}" font-weight="700" letter-spacing="0.06em">${label}</text>`
 
-  const flowCaption = (text: string) => `<p class='flow-diagram-caption'>${text}</p>`;
+  const flowCaption = (text: string) => `<p class='flow-diagram-caption'>${text}</p>`
 
   if (id === 'buy-side') {
-    const W = 560,
-      H = 270;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 270
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>RTB Bidding Architecture (Buy Side)</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5223,7 +5353,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       zone(360, 18, 196, 200, 'EXCHANGE + PUBLISHER', gr, '#f0fdf4') +
       // Row 1 nodes
       bx(8, 32, 85, 44, 'Advertiser', 'goals & budget', blF, bl, 'P&G · Nike · Samsung') +
-      bx(100, 32, 86, 44, 'Agency', 'strategy & plan', blF, bl, 'Horizon · GroupM') +
+      bx(100, 32, 86, 44, 'Agency', 'strategy & plan', blF, bl, 'Horizon · WPP Media') +
       bx(
         202,
         28,
@@ -5233,7 +5363,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
         'bid engine: evaluate every impression',
         puF,
         pu,
-        'The Trade Desk · DV360 · Amazon DSP · Xandr',
+        'The Trade Desk · DV360 · Amazon DSP · Xandr'
       ) +
       bx(366, 32, 88, 44, 'Exchange', 'OpenRTB auction', puF, pu, 'Google · Index · Xandr') +
       bx(462, 32, 90, 44, 'Publisher', 'ad slot filled', grF, gr, 'NYT · ESPN · apps') +
@@ -5250,7 +5380,17 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<rect x="202" y="130" width="148" height="18" rx="3" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>` +
       `<text x="276" y="143" text-anchor="middle" font-size="8" fill="${pu}">Frequency cap · Brand safety</text>` +
       // Row 2: win flow
-      bx(202, 158, 148, 44, 'Win Notification', 'nurl + billing event', orF, or, 'DSP logs impression cost') +
+      bx(
+        202,
+        158,
+        148,
+        44,
+        'Win Notification',
+        'nurl + billing event',
+        orF,
+        or,
+        'DSP logs impression cost'
+      ) +
       bx(366, 158, 90, 44, 'Creative', 'HTML/VAST markup', blF, bl, '300×250 banner or video') +
       bx(462, 158, 90, 44, 'Pixel fires', 'impression event', grF, gr, 'S3 · BigQuery logs') +
       ln(276, 130, 276, 156, '', pu, 'ap') +
@@ -5268,15 +5408,15 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="2" y="256" font-size="7.5" fill="${mu}">Legend: Blue = buy side · Purple = DSP / exchange · Green = publisher. DSP = Demand-Side Platform · nurl = win notification URL · pCTR = predicted click-through rate</text>` +
       '</svg>' +
       flowCaption(
-        'Bid request flows from exchange to DSP; DSP returns bid and creative; the winner is notified via nurl and serves the ad.',
+        'Bid request flows from exchange to DSP; DSP returns bid and creative; the winner is notified via nurl and serves the ad.'
       )
-    );
+    )
   }
 
   if (id === 'sell-side') {
-    const W = 560,
-      H = 280;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 280
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>Publisher Yield Stack &amp; Header Bidding</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5286,7 +5426,17 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       zone(310, 18, 246, 220, 'EXCHANGE + DSPs', pu, '#faf5ff') +
       // Publisher side
       bx(8, 32, 118, 44, 'Publisher Page/App', 'ad slots available', grF, gr, 'NYT · Hulu · ESPN') +
-      bx(8, 90, 118, 44, 'GAM Ad Server', 'Google Ad Manager', grF, gr, 'direct deals checked first') +
+      bx(
+        8,
+        90,
+        118,
+        44,
+        'GAM Ad Server',
+        'Google Ad Manager',
+        grF,
+        gr,
+        'direct deals checked first'
+      ) +
       bx(8, 148, 118, 44, 'Floor Prices', 'min CPM per slot', grF, gr, 'set by yield team') +
       ln(67, 76, 67, 88, '', gr, 'ag') +
       ln(67, 134, 67, 146, '', gr, 'ag') +
@@ -5302,9 +5452,39 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<path stroke="${bl}" stroke-width="1.2" fill="none" d="M221 62 L215 122"/>` +
       `<path stroke="${bl}" stroke-width="1.2" fill="none" d="M221 62 L215 166"/>` +
       // Exchange side
-      bx(318, 52, 110, 44, 'Ad Exchange', 'OpenRTB bid request', puF, pu, 'Google · Index · Magnite') +
-      bx(318, 112, 110, 44, 'DSP Bidders', '100+ buyers competing', puF, pu, 'TTD · DV360 · Amazon') +
-      bx(318, 172, 110, 44, 'Winning Bid', 'highest price wins', '#fef3c7', or, '2nd-price or 1st-price') +
+      bx(
+        318,
+        52,
+        110,
+        44,
+        'Ad Exchange',
+        'OpenRTB bid request',
+        puF,
+        pu,
+        'Google · Index · Magnite'
+      ) +
+      bx(
+        318,
+        112,
+        110,
+        44,
+        'DSP Bidders',
+        '100+ buyers competing',
+        puF,
+        pu,
+        'TTD · DV360 · Amazon'
+      ) +
+      bx(
+        318,
+        172,
+        110,
+        44,
+        'Winning Bid',
+        'highest price wins',
+        '#fef3c7',
+        or,
+        '2nd-price or 1st-price'
+      ) +
       bx(438, 112, 112, 44, 'Creative', 'ad markup returned', grF, gr, 'HTML iframe or VAST') +
       ln(296, 96, 316, 70, '$7.10 bid', pu, 'ap') +
       ln(373, 96, 373, 110, '', pu, 'ap') +
@@ -5316,15 +5496,15 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="2" y="252" font-size="7.5" fill="${mu}">Legend: Green = publisher · Blue = header bidding · Purple = exchange/DSPs. GAM = Google Ad Manager · SSP = Supply-Side Platform · Floor = minimum CPM</text>` +
       '</svg>' +
       flowCaption(
-        'Publisher runs GAM and Prebid; SSPs return bids in parallel; highest bid wins and is passed to GAM for the unified auction.',
+        'Publisher runs GAM and Prebid; SSPs return bids in parallel; highest bid wins and is passed to GAM for the unified auction.'
       )
-    );
+    )
   }
 
   if (id === 'data') {
-    const W = 560,
-      H = 270;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 270
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>Ad-Tech Data Pipeline Architecture</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5348,7 +5528,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
         'Kafka / Kinesis  — real-time event bus',
         'billions of events/day · partitioned by user_id',
         puF,
-        pu,
+        pu
       ) +
       ln(47, 78, 47, 92, '', pu, 'ap') +
       ln(145, 78, 200, 92, '', pu, 'ap') +
@@ -5357,7 +5537,17 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       ln(439, 78, 390, 92, '', pu, 'ap') +
       // Storage + process layer (row 2)
       bx(2, 136, 100, 40, 'Data Lake', 'S3 / GCS raw', '#fef3c7', or, 'immutable Parquet/ORC') +
-      bx(110, 136, 100, 40, 'Spark / Flink', 'ETL &amp; joins', puF, pu, 'hourly batch + streaming') +
+      bx(
+        110,
+        136,
+        100,
+        40,
+        'Spark / Flink',
+        'ETL &amp; joins',
+        puF,
+        pu,
+        'hourly batch + streaming'
+      ) +
       bx(218, 136, 100, 40, 'dbt', 'SQL transforms', puF, pu, 'clean, model, test') +
       bx(326, 136, 108, 40, 'Warehouse', 'Snowflake / BigQuery', puF, pu, 'queryable, governed') +
       bx(442, 136, 112, 40, 'Feature Store', 'Redis / Feast', blF, bl, 'low-latency bidder reads') +
@@ -5368,9 +5558,39 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       ln(434, 156, 440, 156, '', bl, 'ab') +
       // Application layer (row 3)
       bx(2, 194, 130, 40, 'Audience Segments', '1P + 3P targeting', grF, gr, 'LiveRamp · Lotame') +
-      bx(140, 194, 120, 40, 'Attribution Model', 'last-click / MTA / MMM', grF, gr, 'Rockerbox · Northbeam') +
-      bx(268, 194, 120, 40, 'Bidder Enrichment', 'user score at bid time', grF, gr, '&lt;5ms latency SLA') +
-      bx(396, 194, 158, 40, 'Reporting &amp; BI', 'Looker · Tableau · custom', grF, gr, 'pacing, ROAS, reach') +
+      bx(
+        140,
+        194,
+        120,
+        40,
+        'Attribution Model',
+        'last-click / MTA / MMM',
+        grF,
+        gr,
+        'Rockerbox · Northbeam'
+      ) +
+      bx(
+        268,
+        194,
+        120,
+        40,
+        'Bidder Enrichment',
+        'user score at bid time',
+        grF,
+        gr,
+        '&lt;5ms latency SLA'
+      ) +
+      bx(
+        396,
+        194,
+        158,
+        40,
+        'Reporting &amp; BI',
+        'Looker · Tableau · custom',
+        grF,
+        gr,
+        'pacing, ROAS, reach'
+      ) +
       ln(434, 176, 66, 192, '', gr, 'ag') +
       ln(434, 176, 198, 192, '', gr, 'ag') +
       ln(498, 176, 326, 192, '', gr, 'ag') +
@@ -5378,15 +5598,15 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="2" y="254" font-size="7.5" fill="${mu}">Legend: Blue = collection · Purple = storage/process · Green = applications. ACR = Automatic Content Recognition · CAPI = Conversions API · dbt = data build tool · MTA = Multi-Touch Attribution · MMM = Media Mix Modeling</text>` +
       '</svg>' +
       flowCaption(
-        'Events flow from collection (SDKs, pixels, logs) into storage and processing, then into audience segments, attribution, and bidder enrichment.',
+        'Events flow from collection (SDKs, pixels, logs) into storage and processing, then into audience segments, attribution, and bidder enrichment.'
       )
-    );
+    )
   }
 
   if (id === 'third-parties') {
-    const W = 560,
-      H = 270;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 270
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>Third-Party Ecosystem: Identity, Verification &amp; Measurement</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5396,41 +5616,151 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       zone(178, 16, 196, 220, 'BRAND SAFETY + FRAUD', pu, '#faf5ff') +
       zone(380, 16, 178, 220, 'MEASUREMENT', gr, '#f0fdf4') +
       // Identity track
-      bx(8, 32, 158, 40, 'Publisher (ATS.js)', 'user logs in, email hashed', blF, bl, 'NYT, ESPN, Conde Nast') +
-      bx(8, 88, 158, 40, 'LiveRamp ATS', 'email → RampID resolution', blF, bl, 'deterministic ID graph') +
-      bx(8, 144, 158, 40, 'UID2 / ID5', 'open-source unified ID', blF, bl, 'TTD · built on consent') +
+      bx(
+        8,
+        32,
+        158,
+        40,
+        'Publisher (ATS.js)',
+        'user logs in, email hashed',
+        blF,
+        bl,
+        'NYT, ESPN, Conde Nast'
+      ) +
+      bx(
+        8,
+        88,
+        158,
+        40,
+        'LiveRamp ATS',
+        'email → RampID resolution',
+        blF,
+        bl,
+        'deterministic ID graph'
+      ) +
+      bx(
+        8,
+        144,
+        158,
+        40,
+        'UID2 / ID5',
+        'open-source unified ID',
+        blF,
+        bl,
+        'TTD · built on consent'
+      ) +
       bx(8, 200, 158, 40, 'DSP Matching', 'buyer targets RampID', blF, bl, 'no cookie needed') +
       ln(87, 72, 87, 86, 'hashed email', bl, 'ab') +
       ln(87, 128, 87, 142, 'resolve ID', bl, 'ab') +
       ln(87, 184, 87, 198, 'pass in bid req', bl, 'ab') +
       // Verification track
-      bx(184, 32, 184, 40, 'URL / Page Scanner', 'content category + risk', puF, pu, 'IAS · DoubleVerify · Oracle') +
-      bx(184, 88, 184, 40, 'Brand Safety Score', 'block violent / adult / fake news', puF, pu, 'pre-bid API signal') +
-      bx(184, 144, 184, 40, 'IVT Detection', 'bot traffic, datacenter IPs', puF, pu, 'GIVT + SIVT categories') +
-      bx(184, 200, 184, 40, 'Viewability Signal', 'MRC: 50% pixels, 1 sec', puF, pu, 'Moat · IAS tag in creative') +
+      bx(
+        184,
+        32,
+        184,
+        40,
+        'URL / Page Scanner',
+        'content category + risk',
+        puF,
+        pu,
+        'IAS · DoubleVerify · Oracle'
+      ) +
+      bx(
+        184,
+        88,
+        184,
+        40,
+        'Brand Safety Score',
+        'block violent / adult / fake news',
+        puF,
+        pu,
+        'pre-bid API signal'
+      ) +
+      bx(
+        184,
+        144,
+        184,
+        40,
+        'IVT Detection',
+        'bot traffic, datacenter IPs',
+        puF,
+        pu,
+        'GIVT + SIVT categories'
+      ) +
+      bx(
+        184,
+        200,
+        184,
+        40,
+        'Viewability Signal',
+        'MRC: 50% pixels, 1 sec',
+        puF,
+        pu,
+        'Moat · IAS tag in creative'
+      ) +
       ln(276, 72, 276, 86, 'score', pu, 'ap') +
       ln(276, 128, 276, 142, 'flag', pu, 'ap') +
       ln(276, 184, 276, 198, 'measure', pu, 'ap') +
       // Measurement track
-      bx(386, 32, 166, 40, 'Nielsen Panels', '30,000-person sample', grF, gr, 'demographic ratings data') +
-      bx(386, 88, 166, 40, 'VideoAmp / iSpot', 'set-top box + ACR data', grF, gr, 'millions of households') +
-      bx(386, 144, 166, 40, 'C3 / C7 Currency', 'live + 3/7-day DVR views', grF, gr, 'TV buying standard') +
-      bx(386, 200, 166, 40, 'Clean Room', 'Snowflake / ADH / AWS', grF, gr, 'overlap w/o sharing PII') +
+      bx(
+        386,
+        32,
+        166,
+        40,
+        'Nielsen Panels',
+        '30,000-person sample',
+        grF,
+        gr,
+        'demographic ratings data'
+      ) +
+      bx(
+        386,
+        88,
+        166,
+        40,
+        'VideoAmp / iSpot',
+        'set-top box + ACR data',
+        grF,
+        gr,
+        'millions of households'
+      ) +
+      bx(
+        386,
+        144,
+        166,
+        40,
+        'C3 / C7 Currency',
+        'live + 3/7-day DVR views',
+        grF,
+        gr,
+        'TV buying standard'
+      ) +
+      bx(
+        386,
+        200,
+        166,
+        40,
+        'Clean Room',
+        'Snowflake / ADH / AWS',
+        grF,
+        gr,
+        'overlap w/o sharing PII'
+      ) +
       ln(469, 72, 469, 86, 'panel data', gr, 'ag') +
       ln(469, 128, 469, 142, 'ratings', gr, 'ag') +
       ln(469, 184, 469, 198, 'match', gr, 'ag') +
       `<text x="2" y="252" font-size="7.5" fill="${mu}">Legend: Blue = identity · Purple = brand safety/fraud · Green = measurement. ATS = Authenticated Traffic Solution · RampID = LiveRamp ID · IVT = Invalid Traffic · ADH = Ads Data Hub</text>` +
       '</svg>' +
       flowCaption(
-        'Third-party providers span identity (LiveRamp, UID2), verification (IAS, DoubleVerify), and measurement (Nielsen, VideoAmp, clean rooms).',
+        'Third-party providers span identity (LiveRamp, UID2), verification (IAS, DoubleVerify), and measurement (Nielsen, VideoAmp, clean rooms).'
       )
-    );
+    )
   }
 
   if (id === 'ad-serving-rtb') {
-    const W = 560,
-      H = 280;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 280
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>Full RTB Lifecycle: Page Load to Ad Render (&lt;150ms)</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5482,15 +5812,15 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="2" y="228" font-size="7.5" fill="${mu}">Legend: Blue = request flow · Purple = auction · Green = creative/render. nurl = win notification URL · seatbid = DSP bid response · GPT = Google Publisher Tag · Prebid.js = header bidding library</text>` +
       '</svg>' +
       flowCaption(
-        'Sequential steps from page load to ad render: ad request → bid request → DSP evaluation → auction → winner notified → creative served.',
+        'Sequential steps from page load to ad render: ad request → bid request → DSP evaluation → auction → winner notified → creative served.'
       )
-    );
+    )
   }
 
   if (id === 'measurement-currency') {
-    const W = 560,
-      H = 270;
-    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`;
+    const W = 560
+    const H = 270
+    const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}</defs>`
     return (
       `<div class='flow-title'>Measurement, Attribution &amp; TV Currency</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">` +
@@ -5512,16 +5842,46 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       ln(231, 72, 231, 82, '', or, 'ab') +
       // TV track
       bx(284, 32, 120, 40, 'Nielsen Panels', '30k HH sample', grF, gr, 'C3/C7 demo ratings') +
-      bx(412, 32, 138, 40, 'VideoAmp / iSpot', 'STB + ACR data', grF, gr, 'millions of households') +
+      bx(
+        412,
+        32,
+        138,
+        40,
+        'VideoAmp / iSpot',
+        'STB + ACR data',
+        grF,
+        gr,
+        'millions of households'
+      ) +
       bx(284, 84, 120, 40, 'Upfront Deals', 'annual commitments', grF, gr, '$20B+ US TV market') +
       bx(412, 84, 138, 40, 'Make-Goods', 'missed rating deliver', grF, gr, 'bonus impressions') +
       ln(344, 72, 344, 82, '', gr, 'ag') +
       ln(481, 72, 481, 82, '', gr, 'ag') +
       // Shared infrastructure
-      bx(8, 148, 130, 40, 'Clean Room', 'Snowflake · ADH · AWS', puF, pu, 'privacy-safe data join') +
+      bx(
+        8,
+        148,
+        130,
+        40,
+        'Clean Room',
+        'Snowflake · ADH · AWS',
+        puF,
+        pu,
+        'privacy-safe data join'
+      ) +
       bx(146, 148, 120, 40, 'Identity Graph', 'RampID / UID2 link', puF, pu, 'cross-device match') +
       bx(274, 148, 130, 40, 'Incrementality', 'holdout testing', puF, pu, 'true causal lift') +
-      bx(412, 148, 142, 40, 'Reach &amp; Frequency', 'deduped audience size', puF, pu, 'Nielsen DAR / comScore') +
+      bx(
+        412,
+        148,
+        142,
+        40,
+        'Reach &amp; Frequency',
+        'deduped audience size',
+        puF,
+        pu,
+        'Nielsen DAR / comScore'
+      ) +
       ln(138, 168, 144, 168, '', pu, 'ap') +
       ln(266, 168, 272, 168, '', pu, 'ap') +
       ln(404, 168, 410, 168, '', pu, 'ap') +
@@ -5530,13 +5890,13 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       `<text x="2" y="256" font-size="7.5" fill="${mu}">Legend: Blue = digital attribution · Green = TV/CTV currency · Purple = shared infrastructure. C3/C7 = live + DVR · MTA = Multi-Touch Attribution · MMM = Media Mix Model · ADH = Ads Data Hub</text>` +
       '</svg>' +
       flowCaption(
-        'Measurement covers pixels, attribution models, and currency (Nielsen, VideoAmp); clean rooms and identity graphs support cross-party analysis.',
+        'Measurement covers pixels, attribution models, and currency (Nielsen, VideoAmp); clean rooms and identity graphs support cross-party analysis.'
       )
-    );
+    )
   }
 
-  return '';
-};
+  return ''
+}
 
 const renderExampleDiagram = (id: ExampleId): string => {
   if (id === 'instagram') {
@@ -5554,7 +5914,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       '  </div>',
       "  <p class='diagram-caption'>Those events feed ETL pipelines that maintain your interest profile.</p>",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'youtube') {
@@ -5571,7 +5931,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Viewability & completion</strong>Quartile events feed optimization</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'web-display') {
@@ -5588,7 +5948,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Logs</strong>Impressions, viewability, clicks</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'search') {
@@ -5605,7 +5965,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Click & conversion</strong>Signals feed attribution & smart bidding</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'video-player') {
@@ -5622,7 +5982,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Server logs</strong>Impression & quartile tracking</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'audio-streaming') {
@@ -5639,7 +5999,7 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Beacons</strong>Listen-through rate tracking</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'digital-billboard') {
@@ -5656,15 +6016,15 @@ const renderExampleDiagram = (id: ExampleId): string => {
       "    <div class='diagram-node'><strong>Location match</strong>Bridges ad play to store visit</div>",
       '  </div>',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
-  return '';
-};
+  return ''
+}
 
 const renderHomeExamplePhone = (id: ExampleId): string => {
-  const learnHref = `/example/${id}`;
-  const label = examples[id].label;
+  const learnHref = `/example/${id}`
+  const label = examples[id].label
 
   const tabs = [
     "          <div class='example-tabs'>",
@@ -5676,7 +6036,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     `            <a class='example-tab${id === 'audio-streaming' ? ' active' : ''}' href='/?example=audio-streaming'>Audio</a>`,
     `            <a class='example-tab${id === 'digital-billboard' ? ' active' : ''}' href='/?example=digital-billboard'>OOH</a>`,
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const instagramFrame = [
     "          <div class='instagram-header'>",
@@ -5704,7 +6064,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     "              <button class='instagram-cta-button'>Shop now</button>",
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const youtubeFrame = [
     "          <div class='yt-frame'>",
@@ -5724,7 +6084,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '              </div>',
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const webFrame = [
     "          <div class='web-frame'>",
@@ -5745,7 +6105,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     "              <div class='web-lines' style='width:70%;margin-top:6px;'></div>",
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const searchFrame = [
     "          <div class='search-frame'>",
@@ -5765,7 +6125,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '              <div>Free shipping on orders over $50. Explore 1–4 person options.</div>',
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const streamFrame = [
     "          <div class='stream-frame'>",
@@ -5784,7 +6144,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '              </div>',
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const audioFrame = [
     "          <div class='stream-frame'>",
@@ -5805,7 +6165,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '              <div style="font-size:0.7rem;color:#9ca3af;margin-top:2px;">"Gear up for your next hike"</div>',
     '            </div>',
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const billboardFrame = [
     "          <div class='billboard-frame' style='background:#0f172a; height:320px; display:flex; flex-direction:column; padding:20px; align-items:center;'>",
@@ -5819,7 +6179,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     "            <div style='width:20px; height:60px; background:#334155;'></div>",
     "            <div style='width:100px; height:10px; background:#334155; border-radius:4px;'></div>",
     '          </div>',
-  ].join('\n');
+  ].join('\n')
 
   const frame =
     id === 'instagram'
@@ -5834,7 +6194,7 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
               ? audioFrame
               : id === 'digital-billboard'
                 ? billboardFrame
-                : streamFrame;
+                : streamFrame
 
   return [
     "        <article class='phone phone-instagram' aria-label='Ad example preview'>",
@@ -5854,25 +6214,25 @@ const renderHomeExamplePhone = (id: ExampleId): string => {
     '              </div>',
     '            </div>',
     `            <button class="viz-flow-btn viz-flow-btn--home" onclick="openFov('${id}')">&#9654; Visualize Ad Flow</button>`,
-    "            <a class='insight-link' href='" + learnHref + "'>Full technical breakdown →</a>",
+    `            <a class='insight-link' href='${learnHref}'>Full technical breakdown →</a>`,
     '          </div>',
     '        </article>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderExampleFlowDiagram = (id: ExampleId): string => {
-  const bl = '#0284c7',
-    blF = '#e0f2fe';
-  const gr = '#16a34a',
-    grF = '#dcfce7';
-  const pu = '#7c3aed',
-    puF = '#ede9fe';
-  const or = '#d97706';
-  const st = '#475569',
-    mu = '#94a3b8';
+  const bl = '#0284c7'
+  const blF = '#e0f2fe'
+  const gr = '#16a34a'
+  const grF = '#dcfce7'
+  const pu = '#7c3aed'
+  const puF = '#ede9fe'
+  const or = '#d97706'
+  const st = '#475569'
+  const mu = '#94a3b8'
 
   const mk = (mid: string, c: string) =>
-    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`;
+    `<marker id="${mid}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="${c}"/></marker>`
 
   const bx = (
     x: number,
@@ -5883,26 +6243,34 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
     sub: string,
     fc: string,
     sc: string,
-    co = '',
+    co = ''
   ) =>
     `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="${fc}" stroke="${sc}" stroke-width="1.5"/>` +
     `<text x="${x + w / 2}" y="${y + 14}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${sc}">${label}</text>` +
     `<text x="${x + w / 2}" y="${y + 25}" text-anchor="middle" font-size="7" fill="${st}">${sub}</text>` +
     (co
       ? `<text x="${x + w / 2}" y="${y + 35}" text-anchor="middle" font-size="6.5" fill="${mu}" font-style="italic">${co}</text>`
-      : '');
+      : '')
 
-  const ln = (x1: number, y1: number, x2: number, y2: number, lbl: string, c: string, mid: string) =>
+  const ln = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    lbl: string,
+    c: string,
+    mid: string
+  ) =>
     `<path stroke="${c}" stroke-width="1.4" fill="none" marker-end="url(#${mid})" d="M${x1} ${y1} L${x2} ${y2}"/>` +
     (lbl
       ? `<text x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 3}" text-anchor="middle" font-size="6.5" fill="${c}" font-weight="600">${lbl}</text>`
-      : '');
+      : '')
 
-  const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}${mk('ao', or)}</defs>`;
+  const defs = `<defs>${mk('ab', bl)}${mk('ap', pu)}${mk('ag', gr)}${mk('ao', or)}</defs>`
 
   if (id === 'search') {
-    const W = 560,
-      H = 250;
+    const W = 560
+    const H = 250
     return (
       `<div class='flow-title'>Google Search Ads: Query to Click &amp; Feedback Loop</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
@@ -5932,7 +6300,17 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       // Row 2: post-click feedback
       bx(2, 140, 100, 44, 'Click', 'user clicks ad', blF, bl, 'CPC charged') +
       bx(110, 140, 100, 44, 'Landing Page', 'conversion event', blF, bl, 'Goal tag fires') +
-      bx(218, 140, 110, 44, 'Smart Bidding', 'tROAS / tCPA model', puF, pu, 'updates bid strategy') +
+      bx(
+        218,
+        140,
+        110,
+        44,
+        'Smart Bidding',
+        'tROAS / tCPA model',
+        puF,
+        pu,
+        'updates bid strategy'
+      ) +
       bx(336, 140, 110, 44, 'Conversion Data', 'signal fed to model', grF, gr, 'gclid match') +
       bx(454, 140, 100, 44, 'Next Auctions', 'bid auto-adjusted', grF, gr, 'closed-loop system') +
       ln(102, 162, 108, 162, 'CPC', bl, 'ab') +
@@ -5943,12 +6321,12 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       `<text x="300" y="118" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Smart Bidding feedback loop</text>` +
       `<text x="2" y="202" font-size="6.5" fill="${mu}">QS = Quality Score · LP = Landing Page · CPC = Cost Per Click · VCG = Vickrey-Clarke-Groves (generalized 2nd price) · tROAS/tCPA = target return / cost bidding strategies</text>` +
       '</svg>'
-    );
+    )
   }
 
   if (id === 'instagram') {
-    const W = 560,
-      H = 240;
+    const W = 560
+    const H = 240
     return (
       `<div class='flow-title'>Instagram / Meta Feed Ad: From Scroll to Conversion API</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
@@ -5968,7 +6346,17 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       bx(2, 108, 110, 44, 'Pixel / SDK', 'browser + app events', blF, bl, 'Meta Pixel · CAPI') +
       bx(120, 108, 110, 44, 'Event Match', 'email / phone hash', blF, bl, 'hashed PII lookup') +
       bx(238, 108, 110, 44, 'Conversion API', 'server-to-server', puF, pu, 'bypasses iOS block') +
-      bx(356, 108, 110, 44, 'Audience Rebuild', 'lookalike + retarget', puF, pu, 'Custom Audiences') +
+      bx(
+        356,
+        108,
+        110,
+        44,
+        'Audience Rebuild',
+        'lookalike + retarget',
+        puF,
+        pu,
+        'Custom Audiences'
+      ) +
       bx(474, 108, 80, 44, 'Next Bid', 'model updated', grF, gr, 'closed loop') +
       ln(112, 130, 118, 130, '', bl, 'ab') +
       ln(230, 130, 236, 130, '', bl, 'ab') +
@@ -5978,12 +6366,12 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       `<text x="280" y="78" text-anchor="middle" font-size="7" fill="${or}" font-style="italic">Conversion signal feeds back into auction model</text>` +
       `<text x="2" y="176" font-size="6.5" fill="${mu}">CAPI = Conversions API · DPA = Dynamic Product Ads · DCO = Dynamic Creative Optimization · FBX = Facebook Exchange · Advantage+ = Meta's automated campaign system</text>` +
       '</svg>'
-    );
+    )
   }
 
   if (id === 'youtube') {
-    const W = 560,
-      H = 240;
+    const W = 560
+    const H = 240
     return (
       `<div class='flow-title'>YouTube Pre-Roll: IMA SDK → VAST → Quartile Tracking</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
@@ -6007,7 +6395,17 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       `<text x="441" y="110" text-anchor="middle" font-size="6.5" fill="${st}">&lt;TrackingEvents&gt;</text>` +
       `<text x="441" y="121" text-anchor="middle" font-size="6.5" fill="${st}">&lt;VideoClicks&gt;</text>` +
       // Row 2: tracking
-      bx(2, 118, 96, 44, 'Quartile Events', '0% 25% 50% 75% 100%', blF, bl, 'pixel fires per mark') +
+      bx(
+        2,
+        118,
+        96,
+        44,
+        'Quartile Events',
+        '0% 25% 50% 75% 100%',
+        blF,
+        bl,
+        'pixel fires per mark'
+      ) +
       bx(106, 118, 96, 44, 'Viewability', 'VPAID / OM SDK', blF, bl, 'IAS · DV measure') +
       bx(210, 118, 96, 44, 'Skip Tracked', 'if viewer skips', puF, pu, 'skip counted, no charge') +
       bx(314, 118, 96, 44, 'Attribution', 'view-through', puF, pu, '30-day window') +
@@ -6018,12 +6416,12 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(410, 140, 416, 140, '', gr, 'ag') +
       `<text x="2" y="186" font-size="6.5" fill="${mu}">IMA = Interactive Media Ads SDK · VAST = Video Ad Serving Template · PAL = Programmatic Access Library · VTR = View-Through Rate · CPV = Cost Per View · OM SDK = Open Measurement SDK</text>` +
       '</svg>'
-    );
+    )
   }
 
   if (id === 'web-display') {
-    const W = 560,
-      H = 250;
+    const W = 560
+    const H = 250
     return (
       `<div class='flow-title'>Web Display Banner: Prebid.js Header Bidding in Detail</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
@@ -6057,12 +6455,12 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(410, 162, 416, 162, '', gr, 'ag') +
       `<text x="2" y="206" font-size="6.5" fill="${mu}">GAM = Google Ad Manager · IX = Index Exchange · key-val = key-value pair used to route bids in GAM · CM360 = Campaign Manager 360 · Prebid.js = open-source header bidding wrapper</text>` +
       '</svg>'
-    );
+    )
   }
 
   if (id === 'video-player') {
-    const W = 560,
-      H = 250;
+    const W = 560
+    const H = 250
     return (
       `<div class='flow-title'>CTV / Streaming: SCTE-35 Cues → SSAI → Server-Side Beacons</div>` +
       `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${defs}` +
@@ -6088,7 +6486,17 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       // Row 2: tracking + identity
       bx(2, 140, 96, 46, 'Server Beacon', 'impression logged', blF, bl, 'server-to-server') +
       bx(106, 140, 96, 46, 'Quartile Fires', '0/25/50/75/100%', blF, bl, 'no client pixel needed') +
-      bx(210, 140, 96, 46, 'Freq Cap Update', 'user+device profile', puF, pu, 'Redis / identity svc') +
+      bx(
+        210,
+        140,
+        96,
+        46,
+        'Freq Cap Update',
+        'user+device profile',
+        puF,
+        pu,
+        'Redis / identity svc'
+      ) +
       bx(314, 140, 100, 46, 'ACR Matching', 'show + ad overlap', puF, pu, 'Samba TV · LG Ads') +
       bx(422, 140, 132, 46, 'Attribution', 'HH lift / tune-in', grF, gr, 'iSpot · VideoAmp') +
       ln(98, 163, 104, 163, '', bl, 'ab') +
@@ -6097,41 +6505,77 @@ const renderExampleFlowDiagram = (id: ExampleId): string => {
       ln(414, 163, 420, 163, '', gr, 'ag') +
       `<text x="2" y="206" font-size="6.5" fill="${mu}">SCTE-35 = digital program insertion standard · SSAI = Server-Side Ad Insertion · ADS = Ad Decision Server · ACR = Automatic Content Recognition · FA = Fingerprinting/Advertising ID</text>` +
       '</svg>'
-    );
+    )
   }
 
-  return '';
-};
+  return ''
+}
 
 // ============================================================
 // Ad Flow Overlay — animated step-through visualization
 // ============================================================
 
-type AdFlowNode = {id: string; label: string; sub: string; x: number; y: number; cat: string};
-type AdFlowEdge = {id: string; from: string; to: string; label: string; d?: string};
-type AdFlowStep = {title: string; desc: string; nodes: string[]; edges: string[]};
-type AdFlowDef = {subtitle: string; nodes: AdFlowNode[]; edges: AdFlowEdge[]; steps: AdFlowStep[]};
+interface AdFlowNode {
+  id: string
+  label: string
+  sub: string
+  x: number
+  y: number
+  cat: string
+}
+interface AdFlowEdge {
+  id: string
+  from: string
+  to: string
+  label: string
+  d?: string
+}
+interface AdFlowStep {
+  title: string
+  desc: string
+  nodes: string[]
+  edges: string[]
+}
+interface AdFlowDef {
+  subtitle: string
+  nodes: AdFlowNode[]
+  edges: AdFlowEdge[]
+  steps: AdFlowStep[]
+}
 
 const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   instagram: {
     subtitle: 'From feed scroll to CAPI conversion signal',
     nodes: [
-      {id: 'user', label: "User's Phone", sub: 'Instagram App', x: 55, y: 80, cat: 'user'},
-      {id: 'sdk', label: 'Meta SDK', sub: 'Pixel + Events API', x: 195, y: 80, cat: 'pub'},
-      {id: 'auc', label: 'Advantage+', sub: 'Ad Auction', x: 345, y: 80, cat: 'exchange'},
-      {id: 'mldco', label: 'ML Ranking', sub: 'p(action) \u00d7 bid', x: 495, y: 80, cat: 'exchange'},
-      {id: 'imp', label: 'Ad Renders', sub: 'Impression Fires', x: 650, y: 80, cat: 'measure'},
-      {id: 'capi', label: 'Conv. API', sub: 'Server-Side Signal', x: 495, y: 255, cat: 'measure'},
-      {id: 'model', label: 'Bid Model', sub: 'Auto-Updated', x: 345, y: 255, cat: 'exchange'},
+      { id: 'user', label: "User's Phone", sub: 'Instagram App', x: 55, y: 80, cat: 'user' },
+      { id: 'sdk', label: 'Meta SDK', sub: 'Pixel + Events API', x: 195, y: 80, cat: 'pub' },
+      { id: 'auc', label: 'Advantage+', sub: 'Ad Auction', x: 345, y: 80, cat: 'exchange' },
+      {
+        id: 'mldco',
+        label: 'ML Ranking',
+        sub: 'p(action) \u00d7 bid',
+        x: 495,
+        y: 80,
+        cat: 'exchange',
+      },
+      { id: 'imp', label: 'Ad Renders', sub: 'Impression Fires', x: 650, y: 80, cat: 'measure' },
+      { id: 'capi', label: 'Conv. API', sub: 'Server-Side Signal', x: 495, y: 255, cat: 'measure' },
+      { id: 'model', label: 'Bid Model', sub: 'Auto-Updated', x: 345, y: 255, cat: 'exchange' },
     ],
     edges: [
-      {id: 'e0', from: 'user', to: 'sdk', label: 'scroll'},
-      {id: 'e1', from: 'sdk', to: 'auc', label: 'slot req'},
-      {id: 'e2', from: 'auc', to: 'mldco', label: 'candidates'},
-      {id: 'e3', from: 'mldco', to: 'imp', label: 'winner'},
-      {id: 'e4', from: 'imp', to: 'capi', label: 'event', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'capi', to: 'model', label: 'signal', d: 'M445 255 L395 255'},
-      {id: 'e6', from: 'model', to: 'auc', label: 'feedback', d: 'M295 255 C230 255 230 80 295 80'},
+      { id: 'e0', from: 'user', to: 'sdk', label: 'scroll' },
+      { id: 'e1', from: 'sdk', to: 'auc', label: 'slot req' },
+      { id: 'e2', from: 'auc', to: 'mldco', label: 'candidates' },
+      { id: 'e3', from: 'mldco', to: 'imp', label: 'winner' },
+      { id: 'e4', from: 'imp', to: 'capi', label: 'event', d: 'M650 105 C650 180 495 180 495 230' },
+      { id: 'e5', from: 'capi', to: 'model', label: 'signal', d: 'M445 255 L395 255' },
+      {
+        id: 'e6',
+        from: 'model',
+        to: 'auc',
+        label: 'feedback',
+        d: 'M295 255 C230 255 230 80 295 80',
+      },
     ],
     steps: [
       {
@@ -6187,21 +6631,62 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   youtube: {
     subtitle: 'From video play to view-through attribution',
     nodes: [
-      {id: 'vid', label: 'Video Plays', sub: 'Content + Player', x: 55, y: 80, cat: 'pub'},
-      {id: 'ima', label: 'IMA SDK', sub: 'Ad Request Layer', x: 195, y: 80, cat: 'pub'},
-      {id: 'gam', label: 'Google Ad Mgr', sub: 'Inventory + Auction', x: 345, y: 80, cat: 'exchange'},
-      {id: 'vast', label: 'VAST Response', sub: 'Winning Creative URL', x: 495, y: 80, cat: 'buy'},
-      {id: 'preroll', label: 'Pre-Roll Ad', sub: 'Plays in Player', x: 650, y: 80, cat: 'measure'},
-      {id: 'quartile', label: 'Quartile Events', sub: '0%\u2192100% Beacons', x: 495, y: 255, cat: 'measure'},
-      {id: 'attr', label: 'Attribution', sub: 'View-Through Credit', x: 345, y: 255, cat: 'measure'},
+      { id: 'vid', label: 'Video Plays', sub: 'Content + Player', x: 55, y: 80, cat: 'pub' },
+      { id: 'ima', label: 'IMA SDK', sub: 'Ad Request Layer', x: 195, y: 80, cat: 'pub' },
+      {
+        id: 'gam',
+        label: 'Google Ad Mgr',
+        sub: 'Inventory + Auction',
+        x: 345,
+        y: 80,
+        cat: 'exchange',
+      },
+      {
+        id: 'vast',
+        label: 'VAST Response',
+        sub: 'Winning Creative URL',
+        x: 495,
+        y: 80,
+        cat: 'buy',
+      },
+      {
+        id: 'preroll',
+        label: 'Pre-Roll Ad',
+        sub: 'Plays in Player',
+        x: 650,
+        y: 80,
+        cat: 'measure',
+      },
+      {
+        id: 'quartile',
+        label: 'Quartile Events',
+        sub: '0%\u2192100% Beacons',
+        x: 495,
+        y: 255,
+        cat: 'measure',
+      },
+      {
+        id: 'attr',
+        label: 'Attribution',
+        sub: 'View-Through Credit',
+        x: 345,
+        y: 255,
+        cat: 'measure',
+      },
     ],
     edges: [
-      {id: 'e0', from: 'vid', to: 'ima', label: 'video starts'},
-      {id: 'e1', from: 'ima', to: 'gam', label: 'ad request'},
-      {id: 'e2', from: 'gam', to: 'vast', label: 'winning bid'},
-      {id: 'e3', from: 'vast', to: 'preroll', label: 'VAST + creative'},
-      {id: 'e4', from: 'preroll', to: 'quartile', label: 'playback events', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'quartile', to: 'attr', label: 'view data', d: 'M445 255 L395 255'},
+      { id: 'e0', from: 'vid', to: 'ima', label: 'video starts' },
+      { id: 'e1', from: 'ima', to: 'gam', label: 'ad request' },
+      { id: 'e2', from: 'gam', to: 'vast', label: 'winning bid' },
+      { id: 'e3', from: 'vast', to: 'preroll', label: 'VAST + creative' },
+      {
+        id: 'e4',
+        from: 'preroll',
+        to: 'quartile',
+        label: 'playback events',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      { id: 'e5', from: 'quartile', to: 'attr', label: 'view data', d: 'M445 255 L395 255' },
     ],
     steps: [
       {
@@ -6251,23 +6736,63 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   'web-display': {
     subtitle: 'From page load to programmatic impression',
     nodes: [
-      {id: 'page', label: 'Page Loads', sub: 'Prebid.js Fires', x: 55, y: 80, cat: 'pub'},
-      {id: 'prebid', label: 'Header Bidding', sub: 'Parallel SSP Requests', x: 195, y: 80, cat: 'pub'},
-      {id: 'bids', label: 'RTB Bids', sub: '<80ms Timeout', x: 345, y: 80, cat: 'exchange'},
-      {id: 'gam', label: 'GAM Decision', sub: 'Direct vs Programmatic', x: 495, y: 80, cat: 'exchange'},
-      {id: 'iframe', label: 'Creative Loads', sub: 'Sandboxed iFrame', x: 650, y: 80, cat: 'buy'},
-      {id: 'viewab', label: 'Viewability', sub: 'IAS / Moat Checks', x: 495, y: 255, cat: 'measure'},
-      {id: 'conv', label: 'Conversion Px', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure'},
-      {id: 'attr', label: 'Attribution', sub: 'Impressions + ROAS', x: 195, y: 255, cat: 'measure'},
+      { id: 'page', label: 'Page Loads', sub: 'Prebid.js Fires', x: 55, y: 80, cat: 'pub' },
+      {
+        id: 'prebid',
+        label: 'Header Bidding',
+        sub: 'Parallel SSP Requests',
+        x: 195,
+        y: 80,
+        cat: 'pub',
+      },
+      { id: 'bids', label: 'RTB Bids', sub: '<80ms Timeout', x: 345, y: 80, cat: 'exchange' },
+      {
+        id: 'gam',
+        label: 'GAM Decision',
+        sub: 'Direct vs Programmatic',
+        x: 495,
+        y: 80,
+        cat: 'exchange',
+      },
+      { id: 'iframe', label: 'Creative Loads', sub: 'Sandboxed iFrame', x: 650, y: 80, cat: 'buy' },
+      {
+        id: 'viewab',
+        label: 'Viewability',
+        sub: 'IAS / Moat Checks',
+        x: 495,
+        y: 255,
+        cat: 'measure',
+      },
+      { id: 'conv', label: 'Conversion Px', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure' },
+      {
+        id: 'attr',
+        label: 'Attribution',
+        sub: 'Impressions + ROAS',
+        x: 195,
+        y: 255,
+        cat: 'measure',
+      },
     ],
     edges: [
-      {id: 'e0', from: 'page', to: 'prebid', label: 'page loads'},
-      {id: 'e1', from: 'prebid', to: 'bids', label: '10+ SSPs'},
-      {id: 'e2', from: 'bids', to: 'gam', label: 'highest bid wins'},
-      {id: 'e3', from: 'gam', to: 'iframe', label: 'creative loads'},
-      {id: 'e4', from: 'iframe', to: 'viewab', label: '1s in view?', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'iframe', to: 'conv', label: 'user clicks', d: 'M650 105 C650 325 345 325 345 230'},
-      {id: 'e6', from: 'conv', to: 'attr', label: 'goal signal', d: 'M295 255 L245 255'},
+      { id: 'e0', from: 'page', to: 'prebid', label: 'page loads' },
+      { id: 'e1', from: 'prebid', to: 'bids', label: '10+ SSPs' },
+      { id: 'e2', from: 'bids', to: 'gam', label: 'highest bid wins' },
+      { id: 'e3', from: 'gam', to: 'iframe', label: 'creative loads' },
+      {
+        id: 'e4',
+        from: 'iframe',
+        to: 'viewab',
+        label: '1s in view?',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      {
+        id: 'e5',
+        from: 'iframe',
+        to: 'conv',
+        label: 'user clicks',
+        d: 'M650 105 C650 325 345 325 345 230',
+      },
+      { id: 'e6', from: 'conv', to: 'attr', label: 'goal signal', d: 'M295 255 L245 255' },
     ],
     steps: [
       {
@@ -6323,24 +6848,57 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   search: {
     subtitle: 'From keyword auction to Smart Bidding feedback',
     nodes: [
-      {id: 'query', label: 'Search Query', sub: 'Keywords Tokenized', x: 55, y: 80, cat: 'user'},
-      {id: 'match', label: 'Keyword Match', sub: 'Campaign Lookup', x: 195, y: 80, cat: 'exchange'},
-      {id: 'qs', label: 'Quality Score', sub: '1\u201310 Rating', x: 345, y: 80, cat: 'exchange'},
-      {id: 'rank', label: 'Ad Rank', sub: 'bid \u00d7 QS \u00d7 context', x: 495, y: 80, cat: 'exchange'},
-      {id: 'serp', label: 'SERP Renders', sub: 'Sponsored Results', x: 650, y: 80, cat: 'measure'},
-      {id: 'click', label: 'Click + CPC', sub: 'Vickrey Pricing', x: 495, y: 255, cat: 'measure'},
-      {id: 'goal', label: 'Conversion', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure'},
-      {id: 'smart', label: 'Smart Bidding', sub: 'Model Updates', x: 195, y: 255, cat: 'buy'},
+      { id: 'query', label: 'Search Query', sub: 'Keywords Tokenized', x: 55, y: 80, cat: 'user' },
+      {
+        id: 'match',
+        label: 'Keyword Match',
+        sub: 'Campaign Lookup',
+        x: 195,
+        y: 80,
+        cat: 'exchange',
+      },
+      { id: 'qs', label: 'Quality Score', sub: '1\u201310 Rating', x: 345, y: 80, cat: 'exchange' },
+      {
+        id: 'rank',
+        label: 'Ad Rank',
+        sub: 'bid \u00d7 QS \u00d7 context',
+        x: 495,
+        y: 80,
+        cat: 'exchange',
+      },
+      {
+        id: 'serp',
+        label: 'SERP Renders',
+        sub: 'Sponsored Results',
+        x: 650,
+        y: 80,
+        cat: 'measure',
+      },
+      { id: 'click', label: 'Click + CPC', sub: 'Vickrey Pricing', x: 495, y: 255, cat: 'measure' },
+      { id: 'goal', label: 'Conversion', sub: 'Goal Tag Fires', x: 345, y: 255, cat: 'measure' },
+      { id: 'smart', label: 'Smart Bidding', sub: 'Model Updates', x: 195, y: 255, cat: 'buy' },
     ],
     edges: [
-      {id: 'e0', from: 'query', to: 'match', label: 'keyword'},
-      {id: 'e1', from: 'match', to: 'qs', label: 'candidates'},
-      {id: 'e2', from: 'qs', to: 'rank', label: 'QS scores'},
-      {id: 'e3', from: 'rank', to: 'serp', label: 'positions'},
-      {id: 'e4', from: 'serp', to: 'click', label: 'user clicks', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'click', to: 'goal', label: 'gclid match', d: 'M445 255 L395 255'},
-      {id: 'e6', from: 'goal', to: 'smart', label: 'signal', d: 'M295 255 L245 255'},
-      {id: 'e7', from: 'smart', to: 'rank', label: 'bid adjusted', d: 'M195 230 C160 230 160 80 445 80'},
+      { id: 'e0', from: 'query', to: 'match', label: 'keyword' },
+      { id: 'e1', from: 'match', to: 'qs', label: 'candidates' },
+      { id: 'e2', from: 'qs', to: 'rank', label: 'QS scores' },
+      { id: 'e3', from: 'rank', to: 'serp', label: 'positions' },
+      {
+        id: 'e4',
+        from: 'serp',
+        to: 'click',
+        label: 'user clicks',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      { id: 'e5', from: 'click', to: 'goal', label: 'gclid match', d: 'M445 255 L395 255' },
+      { id: 'e6', from: 'goal', to: 'smart', label: 'signal', d: 'M295 255 L245 255' },
+      {
+        id: 'e7',
+        from: 'smart',
+        to: 'rank',
+        label: 'bid adjusted',
+        d: 'M195 230 C160 230 160 80 445 80',
+      },
     ],
     steps: [
       {
@@ -6396,23 +6954,57 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   'video-player': {
     subtitle: 'From SCTE-35 cue to household attribution',
     nodes: [
-      {id: 'stream', label: 'Content Stream', sub: 'HLS/DASH Playing', x: 55, y: 80, cat: 'pub'},
-      {id: 'scte', label: 'SCTE-35 Cue', sub: 'Ad Break Signal', x: 195, y: 80, cat: 'pub'},
-      {id: 'ads', label: 'Ad Decision', sub: 'OpenRTB CTV Auction', x: 345, y: 80, cat: 'exchange'},
-      {id: 'ssai', label: 'SSAI Server', sub: 'Stitches Manifest', x: 495, y: 80, cat: 'exchange'},
-      {id: 'player', label: 'Seamless Play', sub: 'No Buffering Gap', x: 650, y: 80, cat: 'buy'},
-      {id: 'beacon', label: 'Server Beacons', sub: 'Quartile Events', x: 495, y: 255, cat: 'measure'},
-      {id: 'acr', label: 'ACR Matching', sub: 'Content Overlap', x: 345, y: 255, cat: 'measure'},
-      {id: 'attr', label: 'HH Attribution', sub: 'Tune-in / Lift', x: 195, y: 255, cat: 'measure'},
+      { id: 'stream', label: 'Content Stream', sub: 'HLS/DASH Playing', x: 55, y: 80, cat: 'pub' },
+      { id: 'scte', label: 'SCTE-35 Cue', sub: 'Ad Break Signal', x: 195, y: 80, cat: 'pub' },
+      {
+        id: 'ads',
+        label: 'Ad Decision',
+        sub: 'OpenRTB CTV Auction',
+        x: 345,
+        y: 80,
+        cat: 'exchange',
+      },
+      {
+        id: 'ssai',
+        label: 'SSAI Server',
+        sub: 'Stitches Manifest',
+        x: 495,
+        y: 80,
+        cat: 'exchange',
+      },
+      { id: 'player', label: 'Seamless Play', sub: 'No Buffering Gap', x: 650, y: 80, cat: 'buy' },
+      {
+        id: 'beacon',
+        label: 'Server Beacons',
+        sub: 'Quartile Events',
+        x: 495,
+        y: 255,
+        cat: 'measure',
+      },
+      { id: 'acr', label: 'ACR Matching', sub: 'Content Overlap', x: 345, y: 255, cat: 'measure' },
+      {
+        id: 'attr',
+        label: 'HH Attribution',
+        sub: 'Tune-in / Lift',
+        x: 195,
+        y: 255,
+        cat: 'measure',
+      },
     ],
     edges: [
-      {id: 'e0', from: 'stream', to: 'scte', label: 'content plays'},
-      {id: 'e1', from: 'scte', to: 'ads', label: 'break detected'},
-      {id: 'e2', from: 'ads', to: 'ssai', label: 'winning ad'},
-      {id: 'e3', from: 'ssai', to: 'player', label: 'stitched stream'},
-      {id: 'e4', from: 'player', to: 'beacon', label: 'playback events', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'beacon', to: 'acr', label: 'exposure data', d: 'M445 255 L395 255'},
-      {id: 'e6', from: 'acr', to: 'attr', label: 'show overlap', d: 'M295 255 L245 255'},
+      { id: 'e0', from: 'stream', to: 'scte', label: 'content plays' },
+      { id: 'e1', from: 'scte', to: 'ads', label: 'break detected' },
+      { id: 'e2', from: 'ads', to: 'ssai', label: 'winning ad' },
+      { id: 'e3', from: 'ssai', to: 'player', label: 'stitched stream' },
+      {
+        id: 'e4',
+        from: 'player',
+        to: 'beacon',
+        label: 'playback events',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      { id: 'e5', from: 'beacon', to: 'acr', label: 'exposure data', d: 'M445 255 L395 255' },
+      { id: 'e6', from: 'acr', to: 'attr', label: 'show overlap', d: 'M295 255 L245 255' },
     ],
     steps: [
       {
@@ -6468,21 +7060,41 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   'audio-streaming': {
     subtitle: 'From ad break to listen-through rate',
     nodes: [
-      {id: 'app', label: 'Streaming App', sub: 'Spotify/SXM App', x: 55, y: 80, cat: 'pub'},
-      {id: 'req', label: 'Ad Request', sub: 'Audio VAST Request', x: 195, y: 80, cat: 'exchange'},
-      {id: 'auc', label: 'Audio Auction', sub: 'Mood/Genre Bid', x: 345, y: 80, cat: 'exchange'},
-      {id: 'vast', label: 'VAST Audio', sub: 'MP3/AAC Stream', x: 495, y: 80, cat: 'buy'},
-      {id: 'play', label: 'Audio Plays', sub: 'Background Audio', x: 650, y: 80, cat: 'user'},
-      {id: 'track', label: 'Tracking Beacons', sub: 'Quartile Pings', x: 495, y: 255, cat: 'measure'},
-      {id: 'ltr', label: 'LTR Metric', sub: 'Listen-Through Rate', x: 345, y: 255, cat: 'measure'},
+      { id: 'app', label: 'Streaming App', sub: 'Spotify/SXM App', x: 55, y: 80, cat: 'pub' },
+      { id: 'req', label: 'Ad Request', sub: 'Audio VAST Request', x: 195, y: 80, cat: 'exchange' },
+      { id: 'auc', label: 'Audio Auction', sub: 'Mood/Genre Bid', x: 345, y: 80, cat: 'exchange' },
+      { id: 'vast', label: 'VAST Audio', sub: 'MP3/AAC Stream', x: 495, y: 80, cat: 'buy' },
+      { id: 'play', label: 'Audio Plays', sub: 'Background Audio', x: 650, y: 80, cat: 'user' },
+      {
+        id: 'track',
+        label: 'Tracking Beacons',
+        sub: 'Quartile Pings',
+        x: 495,
+        y: 255,
+        cat: 'measure',
+      },
+      {
+        id: 'ltr',
+        label: 'LTR Metric',
+        sub: 'Listen-Through Rate',
+        x: 345,
+        y: 255,
+        cat: 'measure',
+      },
     ],
     edges: [
-      {id: 'e0', from: 'app', to: 'req', label: 'natural break'},
-      {id: 'e1', from: 'req', to: 'auc', label: 'context + ID'},
-      {id: 'e2', from: 'auc', to: 'vast', label: 'winning ad'},
-      {id: 'e3', from: 'vast', to: 'play', label: 'audio buffer'},
-      {id: 'e4', from: 'play', to: 'track', label: 'events', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'track', to: 'ltr', label: 'aggregated', d: 'M445 255 L395 255'},
+      { id: 'e0', from: 'app', to: 'req', label: 'natural break' },
+      { id: 'e1', from: 'req', to: 'auc', label: 'context + ID' },
+      { id: 'e2', from: 'auc', to: 'vast', label: 'winning ad' },
+      { id: 'e3', from: 'vast', to: 'play', label: 'audio buffer' },
+      {
+        id: 'e4',
+        from: 'play',
+        to: 'track',
+        label: 'events',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      { id: 'e5', from: 'track', to: 'ltr', label: 'aggregated', d: 'M445 255 L395 255' },
     ],
     steps: [
       {
@@ -6520,21 +7132,48 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
   'digital-billboard': {
     subtitle: 'From foot traffic trigger to store visit attribution',
     nodes: [
-      {id: 'screen', label: 'Digital Screen', sub: 'Billboard Hardware', x: 55, y: 80, cat: 'pub'},
-      {id: 'ssp', label: 'DOOH SSP', sub: 'Vistar/PlaceExchange', x: 195, y: 80, cat: 'exchange'},
-      {id: 'dsp', label: 'DOOH DSP', sub: 'Triggers: Weather/Geo', x: 345, y: 80, cat: 'buy'},
-      {id: 'mult', label: 'Multiplier', sub: 'Foot Traffic Data', x: 495, y: 80, cat: 'measure'},
-      {id: 'view', label: 'Public Display', sub: 'One-to-Many View', x: 650, y: 80, cat: 'user'},
-      {id: 'gps', label: 'Mobile GPS', sub: 'Hashed IDs in Proximity', x: 495, y: 255, cat: 'data'},
-      {id: 'store', label: 'Store Visit', sub: 'Attribution Lift', x: 345, y: 255, cat: 'measure'},
+      {
+        id: 'screen',
+        label: 'Digital Screen',
+        sub: 'Billboard Hardware',
+        x: 55,
+        y: 80,
+        cat: 'pub',
+      },
+      { id: 'ssp', label: 'DOOH SSP', sub: 'Vistar/PlaceExchange', x: 195, y: 80, cat: 'exchange' },
+      { id: 'dsp', label: 'DOOH DSP', sub: 'Triggers: Weather/Geo', x: 345, y: 80, cat: 'buy' },
+      { id: 'mult', label: 'Multiplier', sub: 'Foot Traffic Data', x: 495, y: 80, cat: 'measure' },
+      { id: 'view', label: 'Public Display', sub: 'One-to-Many View', x: 650, y: 80, cat: 'user' },
+      {
+        id: 'gps',
+        label: 'Mobile GPS',
+        sub: 'Hashed IDs in Proximity',
+        x: 495,
+        y: 255,
+        cat: 'data',
+      },
+      {
+        id: 'store',
+        label: 'Store Visit',
+        sub: 'Attribution Lift',
+        x: 345,
+        y: 255,
+        cat: 'measure',
+      },
     ],
     edges: [
-      {id: 'e0', from: 'screen', to: 'ssp', label: 'ad loop req'},
-      {id: 'e1', from: 'ssp', to: 'dsp', label: 'location'},
-      {id: 'e2', from: 'dsp', to: 'mult', label: 'triggers met'},
-      {id: 'e3', from: 'mult', to: 'view', label: 'ad play'},
-      {id: 'e4', from: 'view', to: 'gps', label: 'exposure', d: 'M650 105 C650 180 495 180 495 230'},
-      {id: 'e5', from: 'gps', to: 'store', label: 'foot traffic', d: 'M445 255 L395 255'},
+      { id: 'e0', from: 'screen', to: 'ssp', label: 'ad loop req' },
+      { id: 'e1', from: 'ssp', to: 'dsp', label: 'location' },
+      { id: 'e2', from: 'dsp', to: 'mult', label: 'triggers met' },
+      { id: 'e3', from: 'mult', to: 'view', label: 'ad play' },
+      {
+        id: 'e4',
+        from: 'view',
+        to: 'gps',
+        label: 'exposure',
+        d: 'M650 105 C650 180 495 180 495 230',
+      },
+      { id: 'e5', from: 'gps', to: 'store', label: 'foot traffic', d: 'M445 255 L395 255' },
     ],
     steps: [
       {
@@ -6569,31 +7208,31 @@ const adFlowDefs: Record<ExampleId, AdFlowDef> = {
       },
     ],
   },
-};
+}
 
 const renderAdFlowOverlay = (id: ExampleId): string => {
-  const data = adFlowDefs[id];
-  const ex = examples[id];
-  const NW = 100,
-    NH = 50,
-    W = 780,
-    H = 340;
-  const nodeMap = new Map(data.nodes.map((n) => [n.id, n]));
+  const data = adFlowDefs[id]
+  const ex = examples[id]
+  const NW = 100
+  const NH = 50
+  const W = 780
+  const H = 340
+  const nodeMap = new Map(data.nodes.map((n) => [n.id, n]))
 
   const getPath = (e: AdFlowEdge): string => {
     if (e.d) {
-      return e.d;
+      return e.d
     }
-    const f = nodeMap.get(e.from)!;
-    const t = nodeMap.get(e.to)!;
-    return `M${f.x + NW / 2} ${f.y} L${t.x - NW / 2} ${t.y}`;
-  };
+    const f = nodeMap.get(e.from)!
+    const t = nodeMap.get(e.to)!
+    return `M${f.x + NW / 2} ${f.y} L${t.x - NW / 2} ${t.y}`
+  }
 
-  const getLabelPos = (e: AdFlowEdge): {lx: number; ly: number} => {
-    const f = nodeMap.get(e.from)!;
-    const t = nodeMap.get(e.to)!;
-    return {lx: (f.x + t.x) / 2, ly: (f.y + t.y) / 2 - 10};
-  };
+  const getLabelPos = (e: AdFlowEdge): { lx: number; ly: number } => {
+    const f = nodeMap.get(e.from)!
+    const t = nodeMap.get(e.to)!
+    return { lx: (f.x + t.x) / 2, ly: (f.y + t.y) / 2 - 10 }
+  }
 
   const catColor: Record<string, string> = {
     user: '#0ea5e9',
@@ -6601,45 +7240,45 @@ const renderAdFlowOverlay = (id: ExampleId): string => {
     exchange: '#8b5cf6',
     buy: '#f59e0b',
     measure: '#10b981',
-  };
+  }
   const catLabel: Record<string, string> = {
     user: 'USER',
     pub: 'PUBLISHER',
     exchange: 'EXCHANGE',
     buy: 'BUY SIDE',
     measure: 'MEASUREMENT',
-  };
+  }
 
   const svgEdges = data.edges
     .map((e) => {
-      const d = getPath(e);
-      const {lx, ly} = getLabelPos(e);
-      const fc = catColor[nodeMap.get(e.from)?.cat ?? ''] ?? '#64748b';
+      const d = getPath(e)
+      const { lx, ly } = getLabelPos(e)
+      const fc = catColor[nodeMap.get(e.from)?.cat ?? ''] ?? '#64748b'
       return `<g class="fadge" data-id="${e.id}">
       <path class="fe-bg" d="${d}" fill="none" stroke="#1e3a5f" stroke-width="1.5" marker-end="url(#fmk-dim)"/>
       <path class="fe-flow" d="${d}" fill="none" stroke="${fc}" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#fmk-bright)"/>
       <circle class="fe-packet" r="5" fill="${fc}"><animateMotion dur="1.1s" repeatCount="indefinite" path="${d}"/></circle>
       <text class="fe-lbl" x="${lx}" y="${ly}" text-anchor="middle" font-size="7" fill="#475569">${e.label}</text>
-    </g>`;
+    </g>`
     })
-    .join('\n');
+    .join('\n')
 
   const svgNodes = data.nodes
     .map((n) => {
-      const x = n.x - NW / 2,
-        y = n.y - NH / 2;
-      const c = catColor[n.cat] ?? '#64748b';
-      const cl = catLabel[n.cat] ?? '';
+      const x = n.x - NW / 2
+      const y = n.y - NH / 2
+      const c = catColor[n.cat] ?? '#64748b'
+      const cl = catLabel[n.cat] ?? ''
       return `<g class="fnode" data-id="${n.id}" data-cat="${n.cat}">
       <text x="${n.x}" y="${y - 4}" text-anchor="middle" font-size="5.5" fill="${c}" opacity="0.5" letter-spacing="0.07em">${cl}</text>
       <rect x="${x}" y="${y}" width="${NW}" height="${NH}" rx="7" fill="#1a2540" stroke="${c}" stroke-width="1.5"/>
       <text x="${n.x}" y="${n.y - 6}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${c}">${n.label}</text>
       <text x="${n.x}" y="${n.y + 9}" text-anchor="middle" font-size="7" fill="#94a3b8">${n.sub}</text>
-    </g>`;
+    </g>`
     })
-    .join('\n');
+    .join('\n')
 
-  const stepsJson = JSON.stringify(data.steps);
+  const stepsJson = JSON.stringify(data.steps)
 
   return `<div id="fov-${id}" class="fov" hidden aria-hidden="true">
   <div class="fov-bd" onclick="closeFov('${id}')"></div>
@@ -6759,8 +7398,8 @@ window.fovToggle=function(id){
   if(_c.play)_tick(id);else if(_c.t)clearInterval(_c.t);
 };
 })();
-</script>`;
-};
+</script>`
+}
 
 const renderExampleSurfaceFrame = (id: ExampleId): string => {
   if (id === 'instagram') {
@@ -6790,7 +7429,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       "              <button class='instagram-cta-button'>Shop now</button>",
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'youtube') {
@@ -6812,7 +7451,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       '              </div>',
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'web-display') {
@@ -6835,7 +7474,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       "              <div class='web-lines' style='width:70%;margin-top:6px;'></div>",
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'search') {
@@ -6857,7 +7496,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       '              <div>Free shipping on orders over $50. Explore 1–4 person options.</div>',
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'audio-streaming') {
@@ -6888,7 +7527,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       "              <button class='instagram-cta-button' style='padding:4px 8px;font-size:0.65rem;'>Shop</button>",
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'digital-billboard') {
@@ -6915,7 +7554,7 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
       '              </div>',
       '            </div>',
       '          </div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   // video-player / streaming
@@ -6936,33 +7575,33 @@ const renderExampleSurfaceFrame = (id: ExampleId): string => {
     '              </div>',
     '            </div>',
     '          </div>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const getGlossaryIllustration = (id: GlossaryId): string => {
-  const W = 260,
-    H = 160;
-  const bl = '#0284c7',
-    blF = '#e0f2fe',
-    blD = '#0c4a6e';
-  const gr = '#16a34a',
-    grF = '#dcfce7';
-  const pu = '#7c3aed',
-    puF = '#ede9fe';
-  const or = '#d97706',
-    orF = '#fef3c7';
-  const rd = '#dc2626',
-    rdF = '#fee2e2';
-  const st = '#475569',
-    mu = '#94a3b8';
+  const W = 260
+  const H = 160
+  const bl = '#0284c7'
+  const blF = '#e0f2fe'
+  const blD = '#0c4a6e'
+  const gr = '#16a34a'
+  const grF = '#dcfce7'
+  const pu = '#7c3aed'
+  const puF = '#ede9fe'
+  const or = '#d97706'
+  const orF = '#fef3c7'
+  const rd = '#dc2626'
+  const rdF = '#fee2e2'
+  const st = '#475569'
+  const mu = '#94a3b8'
   const mk = (mid: string, c: string) =>
-    `<defs><marker id="${mid}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${c}"/></marker></defs>`;
+    `<defs><marker id="${mid}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${c}"/></marker></defs>`
 
   const defaultSvg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Term</title>
       ${mk('a', bl)}
       <text x="8" y="14" font-size="9" fill="${bl}" font-weight="700">Glossary term</text>
       <rect x="10" y="25" width="240" height="100" rx="6" fill="#f8fafc" stroke="${st}" stroke-width="1"/>
-      <text x="130" y="80" text-anchor="middle" font-size="8" fill="${mu}">See definition for details</text></svg>`;
+      <text x="130" y="80" text-anchor="middle" font-size="8" fill="${mu}">See definition for details</text></svg>`
 
   const svgs: Partial<Record<GlossaryId, string>> = {
     yield: `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><title>Yield optimization curve</title>
@@ -7515,9 +8154,9 @@ const getGlossaryIllustration = (id: GlossaryId): string => {
       <text x="8" y="126" font-size="7" fill="${mu}">Ad Rank = Max CPC bid × QS × auction-time factors + ad extensions</text>
       <text x="8" y="138" font-size="7" fill="${mu}">High QS = lower actual CPC charged (auction mechanics)</text>
       <text x="8" y="150" font-size="7" fill="${mu}">Scale: 1–10 (shown in Google Ads UI per keyword/ad combo)</text></svg>`,
-  };
-  return svgs[id] ?? defaultSvg;
-};
+  }
+  return svgs[id] ?? defaultSvg
+}
 
 const GLOSSARY_ILLUSTRATION_CAPTIONS: Partial<Record<GlossaryId, string>> = {
   yield: 'Yield curve: revenue per impression over time; optimized with floors and demand.',
@@ -7563,22 +8202,22 @@ const GLOSSARY_ILLUSTRATION_CAPTIONS: Partial<Record<GlossaryId, string>> = {
   gam: 'Google Ad Manager: publisher ad server and unified auction.',
   'walled-garden': 'Closed ecosystem (e.g. Meta, Google) that owns data and inventory.',
   dmp: 'Legacy data platform for third-party segments; declining post-cookie.',
-};
+}
 
 const getGlossaryIllustrationCaption = (id: GlossaryId): string =>
-  GLOSSARY_ILLUSTRATION_CAPTIONS[id] ?? 'No diagram — see definition below.';
+  GLOSSARY_ILLUSTRATION_CAPTIONS[id] ?? 'No diagram — see definition below.'
 
 const renderGlossaryPage = (selected?: GlossaryId): string => {
-  const allEntries = Object.values(glossary);
-  const active = selected && glossary[selected] ? glossary[selected] : allEntries[0];
+  const allEntries = Object.values(glossary)
+  const active = selected && glossary[selected] ? glossary[selected] : allEntries[0]
   if (!active) {
-    return '';
+    return ''
   }
 
   const listHtml = allEntries
     .sort((a, b) => a.term.localeCompare(b.term))
     .map((entry) => {
-      const isActive = entry.id === active.id;
+      const isActive = entry.id === active.id
       return [
         `<a class='glossary-item${isActive ? ' active' : ''}' href='/glossary?term=${entry.id}'>`,
         '  <span>',
@@ -7586,16 +8225,16 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
         '  </span>',
         `  <small>${entry.category}</small>`,
         '</a>',
-      ].join('\n');
+      ].join('\n')
     })
-    .join('\n');
+    .join('\n')
 
   const byCategory = {
     Marketplace: [] as typeof allEntries,
     Data: [] as typeof allEntries,
     Measurement: [] as typeof allEntries,
-  };
-  allEntries.forEach((e) => byCategory[e.category].push(e));
+  }
+  allEntries.forEach((e) => byCategory[e.category].push(e))
   const studySetHtml = [
     "<details class='glossary-study-set'>",
     '  <summary>Study set — review by category</summary>',
@@ -7606,37 +8245,37 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
         byCategory[cat]
           .map(
             (e) =>
-              `<a class='glossary-study-card' href='/glossary?term=${e.id}'><strong>${e.term}</strong><span>${e.shortDefinition}</span></a>`,
+              `<a class='glossary-study-card' href='/glossary?term=${e.id}'><strong>${e.term}</strong><span>${e.shortDefinition}</span></a>`
           )
           .join('') +
-        '</div>',
+        '</div>'
     ),
     '  </div>',
     '</details>',
-  ].join('\n');
+  ].join('\n')
 
-  const definitionList = active.definition.map((line) => `<li>${linkTerms(line)}</li>`).join('\n');
+  const definitionList = active.definition.map((line) => `<li>${linkTerms(line)}</li>`).join('\n')
 
   const related =
-    active.related && active.related.length
+    active.related && active.related.length > 0
       ? [
           "<div style='margin-top:10px;font-size:0.74rem;color:var(--text-soft);'>",
           '  Related: ',
           active.related
             .map(
               (id) =>
-                `<a href='/glossary?term=${id}' style='color:var(--accent-strong);text-decoration:none;'>${glossary[id].term}</a>`,
+                `<a href='/glossary?term=${id}' style='color:var(--accent-strong);text-decoration:none;'>${glossary[id].term}</a>`
             )
             .join(' · '),
           '</div>',
         ].join('\n')
-      : '';
+      : ''
 
   const html = [
     '<!doctype html>',
     "<html lang='en'>",
     '<head>',
-    '  ' + FAVICON_LINK,
+    `  ${FAVICON_LINK}`,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     '  <title>Ad Tech Glossary</title>',
@@ -7674,8 +8313,8 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     "        <h2 class='canvas-heading'>Definition</h2>",
     "        <article class='phone'>",
     "          <div class='phone-body'>",
-    "            <div class='glossary-illustration diagram-zoomable'>" + getGlossaryIllustration(active.id) + '</div>',
-    "            <p class='glossary-illustration-caption'>" + getGlossaryIllustrationCaption(active.id) + '</p>',
+    `            <div class='glossary-illustration diagram-zoomable'>${getGlossaryIllustration(active.id)}</div>`,
+    `            <p class='glossary-illustration-caption'>${getGlossaryIllustrationCaption(active.id)}</p>`,
     `            <div class='glossary-term'>${active.term}</div>`,
     `            <p class='ecosystem-subtitle'>${active.shortDefinition}</p>`,
     "            <ul class='topic-bullets'>",
@@ -7690,10 +8329,10 @@ const renderGlossaryPage = (selected?: GlossaryId): string => {
     diagramLightboxHtml,
     '</body>',
     '</html>',
-  ].join('\n');
+  ].join('\n')
 
-  return html;
-};
+  return html
+}
 
 const renderTopicReferences = (id: TopicId): string => {
   if (id === 'buy-side' || id === 'sell-side') {
@@ -7703,7 +8342,7 @@ const renderTopicReferences = (id: TopicId): string => {
       "  <a href='https://bidscube.com/blog/2025/09/25/ad-tech-ecosystem-players-layers-and-how-it-all-connects/' target='_blank' rel='noreferrer'>this ad tech ecosystem overview</a>",
       '  for a more detailed map of buyers, sellers, and intermediaries.',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'ad-serving-rtb' || id === 'data' || id === 'third-parties') {
@@ -7712,7 +8351,7 @@ const renderTopicReferences = (id: TopicId): string => {
       '  For a deeper technical diagram of data flows and RTB, check ',
       "  <a href='https://aerospike.com/blog/programmatic-advertising-data-flow-smarter-rtb' target='_blank' rel='noreferrer'>Aerospike&apos;s programmatic data flow article</a>.",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'measurement-currency') {
@@ -7722,11 +8361,11 @@ const renderTopicReferences = (id: TopicId): string => {
       "  <a href='https://www.iab.com/guidelines/tv-measurement/' target='_blank' rel='noreferrer'>IAB TV measurement guidelines</a>",
       '  and vendor docs from Nielsen, VideoAmp, and iSpot.',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
-  return '';
-};
+  return ''
+}
 
 const renderExampleReferences = (id: ExampleId): string => {
   if (id === 'instagram' || id === 'web-display' || id === 'search') {
@@ -7736,7 +8375,7 @@ const renderExampleReferences = (id: ExampleId): string => {
       "  <a href='https://bidscube.com/blog/2025/09/25/ad-tech-ecosystem-players-layers-and-how-it-all-connects/' target='_blank' rel='noreferrer'>this ad tech ecosystem guide</a>",
       '  show how these surfaces plug into the wider marketplace.',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'youtube' || id === 'video-player') {
@@ -7746,7 +8385,7 @@ const renderExampleReferences = (id: ExampleId): string => {
       "  <a href='https://aerospike.com/blog/programmatic-advertising-data-flow-smarter-rtb' target='_blank' rel='noreferrer'>this RTB data flow deep dive</a>",
       '  which breaks down streaming and real-time decisioning.',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'audio-streaming') {
@@ -7756,7 +8395,7 @@ const renderExampleReferences = (id: ExampleId): string => {
       "  <a href='https://www.iab.com/guidelines/vast/' target='_blank' rel='noreferrer'>IAB VAST for audio</a>",
       "  and SXM Media's guide to programmatic audio.",
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
   if (id === 'digital-billboard') {
@@ -7766,11 +8405,11 @@ const renderExampleReferences = (id: ExampleId): string => {
       "  <a href='https://www.vistarmedia.com/blog/what-is-programmatic-dooh' target='_blank' rel='noreferrer'>Vistar Media's explainer</a>",
       '  and Geopath for OOH measurement standards.',
       '</div>',
-    ].join('\n');
+    ].join('\n')
   }
 
-  return '';
-};
+  return ''
+}
 
 const renderHomeOverlays = (): string => {
   const idx = JSON.stringify([
@@ -7814,14 +8453,14 @@ const renderHomeOverlays = (): string => {
       url: '/companies',
       tags: 'dsp ssp exchange ad server identity measurement ctv audio dooh vendors companies videoamp ribeye trade desk magnite pubmatic liveramp doubleverify ias nielsen comscore',
     },
-  ]);
+  ])
 
   const topicLinks = Object.values(topics)
     .map((t) => `<a class="nav-item" href="/topic/${t.id}">${t.label}</a>`)
-    .join('');
+    .join('')
   const exampleLinks = Object.values(examples)
     .map((e) => `<a class="nav-item" href="/example/${e.id}">${e.label}</a>`)
-    .join('');
+    .join('')
 
   return `
 <div id="search-ov" role="dialog" aria-modal="true" aria-label="Search">
@@ -7848,6 +8487,9 @@ const renderHomeOverlays = (): string => {
       <div class="nav-section-label">Reference</div>
       <a class="nav-item" href="/players">Players &amp; Incentives — who wants what &amp; where the money goes</a>
       <a class="nav-item" href="/companies">Ecosystem Companies — DSPs, SSPs, exchanges &amp; adjacent vendors at a glance</a>
+      <a class="nav-item" href="/training/unified-media">Unified Media Buying</a>
+      <a class="nav-item" href="/training/campaign-planning">Planning &amp; Forecasting</a>
+      <a class="nav-item" href="/training/media-measurement">TV Data &amp; Attribution</a>
       <a class="nav-item" href="/glossary">Glossary (all terms)</a>
       <div class="nav-section-label">Interview prep</div>
       <a class="nav-item" href="/#interview-prep">How to use this site</a>
@@ -7932,27 +8574,35 @@ const renderHomeOverlays = (): string => {
     if((e.key==='k'||e.key==='K') && (e.metaKey||e.ctrlKey)){ e.preventDefault(); openSearch(); }
   });
 })();
-</script>`;
-};
+</script>`
+}
 
 const renderEcosystemDiagram = (): string => {
-  const bl = '#0284c7',
-    blF = '#e0f2fe';
-  const gr = '#16a34a',
-    grF = '#dcfce7';
-  const pu = '#7c3aed',
-    puF = '#ede9fe';
-  const or = '#d97706',
-    orF = '#fef3c7';
-  const st = '#475569',
-    mu = '#94a3b8';
-  const W = 520,
-    H = 140;
-  const r = (x: number, y: number, w: number, h: number, label: string, fill: string, stroke: string) =>
-    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" font-size="9" font-weight="600" fill="${stroke}">${label}</text>`;
+  const bl = '#0284c7'
+  const blF = '#e0f2fe'
+  const gr = '#16a34a'
+  const grF = '#dcfce7'
+  const pu = '#7c3aed'
+  const puF = '#ede9fe'
+  const or = '#d97706'
+  const orF = '#fef3c7'
+  const st = '#475569'
+  const mu = '#94a3b8'
+  const W = 520
+  const H = 140
+  const r = (
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    label: string,
+    fill: string,
+    stroke: string
+  ) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/><text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" font-size="9" font-weight="600" fill="${stroke}">${label}</text>`
   const arr = (x1: number, y1: number, x2: number, y2: number) =>
-    `<path stroke="${st}" stroke-width="1.5" fill="none" marker-end="url(#em)" d="M${x1} ${y1} L${x2} ${y2}"/>`;
-  const defs = `<defs><marker id="em" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${st}"/></marker></defs>`;
+    `<path stroke="${st}" stroke-width="1.5" fill="none" marker-end="url(#em)" d="M${x1} ${y1} L${x2} ${y2}"/>`
+  const defs = `<defs><marker id="em" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="${st}"/></marker></defs>`
   return (
     `<div class='ecosystem-diagram-wrap diagram-zoomable'><div class='flow-title'>Ad tech ecosystem at a glance</div>` +
     `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-label="Ecosystem flow">` +
@@ -7974,8 +8624,8 @@ const renderEcosystemDiagram = (): string => {
     `<text x="462" y="24" text-anchor="middle" font-size="8" fill="${or}">3rd-Party</text>` +
     `<text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="7" fill="${mu}">Demand flows left → right; auctions run in the Exchange; Data &amp; Identity and verification/measurement support both sides.</text>` +
     '</svg></div>'
-  );
-};
+  )
+}
 
 const renderHowToUseAndInterviewPrep = (): string => {
   return [
@@ -7998,17 +8648,18 @@ const renderHowToUseAndInterviewPrep = (): string => {
     "    <p class='how-to-use-note'>Each topic page includes a sample ad and a “Why this ad?” breakdown. Use the menu (☰) to jump to any topic or example.</p>",
     '  </div>',
     '</details>',
-  ].join('\n');
-};
+  ].join('\n')
+}
 
 const renderNewHome = (selectedExample?: ExampleId): string => {
-  const exampleId: ExampleId = selectedExample && selectedExample in examples ? selectedExample : 'instagram';
+  const exampleId: ExampleId =
+    selectedExample && selectedExample in examples ? selectedExample : 'instagram'
 
   const html = [
     '<!doctype html>',
     "<html lang='en'>",
     '<head>',
-    '  ' + FAVICON_LINK,
+    `  ${FAVICON_LINK}`,
     "  <meta charset='utf-8' />",
     "  <meta name='viewport' content='width=device-width, initial-scale=1' />",
     '  <title>Ad Tech Ecosystem – Overview</title>',
@@ -8062,6 +8713,27 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '              </div>',
     "              <p class='ecosystem-row-label' style='margin-top:4px;font-size:0.68rem;'>Magnite · PubMatic · OpenX · Index Exchange · TripleLift</p>",
     '            </div>',
+    "            <a class='players-callout' href='/training/unified-media'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>Unified Media Buying</div>",
+    "                <div class='players-callout-sub'>A local campaign lab across DOOH, audio, podcasts, and CTV.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
+    "            <a class='players-callout' href='/training/campaign-planning'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>Campaign Planning &amp; Forecasting</div>",
+    "                <div class='players-callout-sub'>Build a media plan, forecast delivery, and assign campaign owners.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
+    "            <a class='players-callout' href='/training/media-measurement'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>TV Data, Pixels &amp; Attribution</div>",
+    "                <div class='players-callout-sub'>Follow the evidence from ad delivery to conversion credit and lift.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
     "            <a class='players-callout' href='/players'>",
     "              <div class='players-callout-left'>",
     "                <div class='players-callout-icon'>💰</div>",
@@ -8144,10 +8816,10 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     diagramLightboxHtml,
     '</body>',
     '</html>',
-  ].join('\n');
+  ].join('\n')
 
-  return html;
-};
+  return html
+}
 
 const renderPlayersPage = (): string => {
   const playersStyles = `
@@ -8368,7 +9040,7 @@ const renderPlayersPage = (): string => {
   [data-theme="dark"] .page-top-nav { background: transparent; }
   [data-theme="dark"] .page-back { color: var(--accent-strong); }
   [data-theme="dark"] a { color: var(--accent-strong); }
-  `;
+  `
 
   const players = [
     {
@@ -8377,7 +9049,7 @@ const renderPlayersPage = (): string => {
       name: 'The Advertiser',
       examples: 'Nike, a local plumber, a SaaS startup, Amazon',
       tagline: 'The one with something to sell',
-      badge: {text: 'Pays for ads', cls: 'badge-pays'},
+      badge: { text: 'Pays for ads', cls: 'badge-pays' },
       plainEnglish:
         'An advertiser is any company or person who wants to reach an audience. They pay for the ads you see. Their goal is simple on the surface — <strong>spend money, get customers</strong> — but the challenge is knowing whether the money actually worked.',
       goals: `<ul>
@@ -8393,17 +9065,18 @@ const renderPlayersPage = (): string => {
         <li><strong>Reach &amp; Frequency</strong> — who saw it and how often</li>
         <li><strong>Brand Lift</strong> — did awareness actually improve?</li>
       </ul>`,
-      economics: '<strong>Pays:</strong> Anywhere from $1–3 CPM for low-quality open-web display ads up to $20–50 CPM for premium video or connected TV. A national brand might spend $50M–$500M/year. A small business might spend $500/month on Google Ads.<br/><br/><strong>Agency fee:</strong> If they use an agency, ~10–15% of their media budget goes to the agency before a single ad is shown.',
+      economics:
+        '<strong>Pays:</strong> Anywhere from $1–3 CPM for low-quality open-web display ads up to $20–50 CPM for premium video or connected TV. A national brand might spend $50M–$500M/year. A small business might spend $500/month on Google Ads.<br/><br/><strong>Agency fee:</strong> If they use an agency, ~10–15% of their media budget goes to the agency before a single ad is shown.',
       fear: 'Paying for ads nobody saw, ads appearing next to brand-damaging content, having no idea if any of it worked, or being overcharged because the supply chain is opaque.',
-      links: [{label: 'Buy Side →', href: '/topic/buy-side'}],
+      links: [{ label: 'Buy Side →', href: '/topic/buy-side' }],
     },
     {
       icon: '🤝',
       iconBg: '#fef9c3',
       name: 'The Ad Agency',
-      examples: 'GroupM, Dentsu, Havas, a boutique media shop',
+      examples: 'WPP Media, Dentsu, Havas, a boutique media shop',
       tagline: 'The expert middleman between brand and media',
-      badge: {text: 'Earns % of spend', cls: 'badge-earns'},
+      badge: { text: 'Earns % of spend', cls: 'badge-earns' },
       plainEnglish:
         'Agencies plan and buy advertising on behalf of brands. They know which TV channels, websites, and apps reach which audiences. They negotiate rates, run the campaigns, and report back on what happened. <strong>They get paid a percentage of whatever the brand spends</strong>, which creates interesting incentives.',
       goals: `<ul>
@@ -8420,7 +9093,7 @@ const renderPlayersPage = (): string => {
       </ul>`,
       economics: `<strong>Earns:</strong> Traditionally 10–15% commission on all media spend placed. A $100M client generates $10–15M in agency revenue before any production or service fees. Some agencies also operate their own DSPs (trading desks) and earn additional margin on programmatic buys — sometimes without the client fully knowing how much.<br/><br/>Trend: brands increasingly going "in-house" and cutting agencies out of programmatic buying.`,
       fear: 'Advertisers discovering they can go direct to platforms (Google, Meta) or set up an in-house programmatic team. Also: clients auditing the trading desk and finding undisclosed margins.',
-      links: [{label: 'Buy Side →', href: '/topic/buy-side'}],
+      links: [{ label: 'Buy Side →', href: '/topic/buy-side' }],
     },
     {
       icon: '⚡',
@@ -8428,7 +9101,7 @@ const renderPlayersPage = (): string => {
       name: 'The DSP',
       examples: 'The Trade Desk, Google DV360, Amazon DSP, Xandr',
       tagline: 'The bidding engine for advertisers',
-      badge: {text: 'Earns ~15–20% of spend', cls: 'badge-earns'},
+      badge: { text: 'Earns ~15–20% of spend', cls: 'badge-earns' },
       plainEnglish:
         "A Demand-Side Platform is the software that actually places bids in the ad auction. When you visit a web page, that page silently runs an auction in under 100 milliseconds, and the DSP is the system submitting the bid. It knows what audiences the advertiser cares about, what they're willing to pay, and decides in real time whether this particular user, on this particular page, is worth bidding for.",
       goals: `<ul>
@@ -8444,11 +9117,12 @@ const renderPlayersPage = (): string => {
         <li><strong>p99 bid latency</strong> (must be under 100ms)</li>
         <li><strong>Unique reach</strong></li>
       </ul>`,
-      economics: '<strong>Earns:</strong> The Trade Desk charges roughly 21% platform fee on all spend run through it — so for every $100 an advertiser allocates, $21 goes to TTD and $79 goes toward actual media.<br/><br/>Google DV360 fees vary by deal type but are in the same range. Some DSPs charge a flat CPM (e.g., $0.35–1.00 per 1,000 impressions) instead of a percentage.',
+      economics:
+        '<strong>Earns:</strong> The Trade Desk charges roughly 21% platform fee on all spend run through it — so for every $100 an advertiser allocates, $21 goes to TTD and $79 goes toward actual media.<br/><br/>Google DV360 fees vary by deal type but are in the same range. Some DSPs charge a flat CPM (e.g., $0.35–1.00 per 1,000 impressions) instead of a percentage.',
       fear: 'Being disintermediated — either by advertisers going direct to walled gardens (Google, Meta) or by publishers creating private deal structures that bypass the open exchange.',
       links: [
-        {label: 'Buy Side →', href: '/topic/buy-side'},
-        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
+        { label: 'Buy Side →', href: '/topic/buy-side' },
+        { label: 'RTB Flow →', href: '/topic/ad-serving-rtb' },
       ],
     },
     {
@@ -8457,7 +9131,7 @@ const renderPlayersPage = (): string => {
       name: 'The Ad Exchange',
       examples: 'Google AdX, Xandr (Microsoft), OpenX, Amazon Publisher Services',
       tagline: 'The stock market for ad impressions',
-      badge: {text: 'Earns per transaction', cls: 'badge-earns'},
+      badge: { text: 'Earns per transaction', cls: 'badge-earns' },
       plainEnglish:
         "An ad exchange is the neutral marketplace where DSPs (buyers) and SSPs (sellers) meet to trade ad impressions in real-time auctions. Think of it like a stock exchange — it doesn't own the inventory, it just runs the market. Every time a page loads with an ad slot, the exchange runs an auction in milliseconds, picks the winner, and facilitates the transaction.",
       goals: `<ul>
@@ -8475,8 +9149,8 @@ const renderPlayersPage = (): string => {
       economics: `<strong>Earns:</strong> Usually 5–20% of transaction value as a "take rate." Google AdX is estimated to earn 20%+ on many transactions. On a $10 CPM impression, the exchange might keep $1–2, passing $8–9 to the SSP/publisher.<br/><br/>Google is dominant here — AdX processes a disproportionate share of global display auctions, which is central to their antitrust case.`,
       fear: 'Regulatory breakup (the DOJ sued Google over its exchange dominance), private marketplaces cutting out the open exchange, and fraud eroding trust in the marketplace.',
       links: [
-        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
-        {label: 'Sell Side →', href: '/topic/sell-side'},
+        { label: 'RTB Flow →', href: '/topic/ad-serving-rtb' },
+        { label: 'Sell Side →', href: '/topic/sell-side' },
       ],
     },
     {
@@ -8485,7 +9159,7 @@ const renderPlayersPage = (): string => {
       name: 'The SSP',
       examples: 'Magnite, PubMatic, Index Exchange, TripleLift',
       tagline: "The publisher's agent in the auction",
-      badge: {text: 'Earns 10–20% of publisher revenue', cls: 'badge-earns'},
+      badge: { text: 'Earns 10–20% of publisher revenue', cls: 'badge-earns' },
       plainEnglish:
         'A Supply-Side Platform helps publishers (websites, apps, streaming services) sell their ad inventory as efficiently as possible. The SSP connects the publisher to dozens of demand sources simultaneously — running a mini auction called "header bidding" that finds the highest willing buyer for each impression. Without an SSP, a publisher would have to negotiate individually with every advertiser, which is impossible at scale.',
       goals: `<ul>
@@ -8503,8 +9177,8 @@ const renderPlayersPage = (): string => {
       economics: `<strong>Earns:</strong> 10–20% of the publisher's ad revenue. If the exchange clears an impression at $8 CPM, the SSP might keep $0.80–1.60 and pass $6.40–7.20 to the publisher.<br/><br/>Multiple SSPs often compete for the same impression (header bidding), each taking a fee. It's possible the same impression routes through 2–3 SSPs and an exchange before reaching the publisher — each one skimming a cut.`,
       fear: 'DSPs reducing SSP connections via Supply Path Optimization (SPO) — if a DSP decides to only route through 5 SSPs instead of 20, the other 15 lose most of their revenue.',
       links: [
-        {label: 'Sell Side →', href: '/topic/sell-side'},
-        {label: 'RTB Flow →', href: '/topic/ad-serving-rtb'},
+        { label: 'Sell Side →', href: '/topic/sell-side' },
+        { label: 'RTB Flow →', href: '/topic/ad-serving-rtb' },
       ],
     },
     {
@@ -8513,7 +9187,7 @@ const renderPlayersPage = (): string => {
       name: 'The Publisher',
       examples: 'The New York Times, ESPN, a food blog, Spotify, an app developer',
       tagline: 'Owns the audience and the ad slots',
-      badge: {text: 'Earns ~40–60¢ of each $1 spent', cls: 'badge-earns'},
+      badge: { text: 'Earns ~40–60¢ of each $1 spent', cls: 'badge-earns' },
       plainEnglish:
         "Publishers create content — articles, videos, podcasts, apps — that attract an audience. They monetize that audience primarily through ads. The publisher is at the end of the value chain: they deliver the impression the advertiser paid for, but they're also the most dependent on everyone else in the ecosystem to get paid fairly.",
       goals: `<ul>
@@ -8530,7 +9204,7 @@ const renderPlayersPage = (): string => {
       </ul>`,
       economics: `<strong>Earns:</strong> The publisher receives what's left after every middleman takes a cut. A $10 advertiser CPM might yield $4–6 for the publisher after exchange, SSP, and data fees.<br/><br/>Premium publishers (NYT, ESPN) with direct sales teams can earn $15–50 CPM. Long-tail publishers relying entirely on programmatic open market might earn $0.50–3 CPM. Ad blocking costs publishers an estimated $10B/year globally.`,
       fear: 'Traffic collapse (Google algorithm update, social platform deprioritizing links), ad blocking, Google killing third-party cookies eroding their targeting value, and the entire middleman stack eating most of the revenue they generate.',
-      links: [{label: 'Sell Side →', href: '/topic/sell-side'}],
+      links: [{ label: 'Sell Side →', href: '/topic/sell-side' }],
     },
     {
       icon: '🗂️',
@@ -8538,7 +9212,7 @@ const renderPlayersPage = (): string => {
       name: 'The Data Provider',
       examples: 'LiveRamp, Oracle Advertising, Nielsen, Acxiom',
       tagline: 'Sells knowledge about who the audience really is',
-      badge: {text: 'Earns CPM data fees', cls: 'badge-earns'},
+      badge: { text: 'Earns CPM data fees', cls: 'badge-earns' },
       plainEnglish:
         'Data providers enrich ad targeting by adding knowledge that neither the publisher nor the advertiser has on their own. They collect demographic, behavioral, purchase, and location data from thousands of sources — retail loyalty programs, app usage, surveys, offline purchase data — and package it into "segments" that advertisers can buy to improve their targeting.',
       goals: `<ul>
@@ -8555,7 +9229,7 @@ const renderPlayersPage = (): string => {
       </ul>`,
       economics: `<strong>Earns:</strong> Data fees are typically layered on top of media CPMs. Buying a "luxury auto intender" segment might cost $1–3 additional CPM on top of the media cost. On a $10 total CPM, $1–3 might go to the data provider.<br/><br/>LiveRamp's identity resolution service (RampID) is embedded in billions of transactions per day, generating hundreds of millions in annual revenue.`,
       fear: "Privacy regulation (GDPR, CCPA) eliminating third-party data collection. Apple's App Tracking Transparency and Google's deprecation of third-party cookies have already materially impacted this business.",
-      links: [{label: 'Data & Identity →', href: '/topic/data'}],
+      links: [{ label: 'Data & Identity →', href: '/topic/data' }],
     },
     {
       icon: '🔬',
@@ -8563,7 +9237,7 @@ const renderPlayersPage = (): string => {
       name: 'The Measurement Vendor',
       examples: 'Nielsen, DoubleVerify, IAS (Integral Ad Science), comScore',
       tagline: 'The independent referee of the ecosystem',
-      badge: {text: 'Earns SaaS + per-impression fees', cls: 'badge-earns'},
+      badge: { text: 'Earns SaaS + per-impression fees', cls: 'badge-earns' },
       plainEnglish:
         'Measurement vendors answer the hard question: <em>did this ad actually work, and was it real?</em> They verify that ads were viewable (not buried below the fold), served to real humans (not bots), appeared in brand-safe contexts, and reached the claimed audience. Without them, the ecosystem would be operating on the honor system — and "marking your own homework" doesn\'t inspire confidence.',
       goals: `<ul>
@@ -8581,8 +9255,8 @@ const renderPlayersPage = (): string => {
       economics: `<strong>Earns:</strong> A combination of annual SaaS contracts and per-impression measurement fees (roughly $0.01–0.05 per 1,000 impressions). IAS and DoubleVerify each generate $400–500M+ in annual revenue. Nielsen has historically earned hundreds of millions annually from TV measurement licensing.<br/><br/>The measurement industry is under pressure as platforms (Google, Meta) increasingly offer their own measurement tools — leading to "marking your own homework" concerns.`,
       fear: 'Platforms self-reporting replacing independent measurement, the transition from panel-based (Nielsen) to always-on digital measurement losing them relevance, and streaming services refusing to grant measurement access.',
       links: [
-        {label: '3rd-Party Providers →', href: '/topic/third-parties'},
-        {label: 'Measurement →', href: '/topic/measurement-currency'},
+        { label: '3rd-Party Providers →', href: '/topic/third-parties' },
+        { label: 'Measurement →', href: '/topic/measurement-currency' },
       ],
     },
     {
@@ -8591,7 +9265,7 @@ const renderPlayersPage = (): string => {
       name: 'The User',
       examples: 'You. Anyone browsing, watching, scrolling',
       tagline: 'The product being sold',
-      badge: {text: 'Gets free content; gives attention & data', cls: 'badge-both'},
+      badge: { text: 'Gets free content; gives attention & data', cls: 'badge-both' },
       plainEnglish:
         "The user is the person all of this is actually about — and yet they have the least visibility into what's happening. Every scroll, click, and purchase you make is data that flows back into this ecosystem. You're not the customer — you're the product. The \"payment\" is access to free content (news, social media, video) in exchange for your attention and data.",
       goals: `<ul>
@@ -8616,7 +9290,7 @@ const renderPlayersPage = (): string => {
       name: 'Ad Operations (Ad Ops)',
       examples: 'The technical team at an agency or publisher',
       tagline: 'The engine room of the ad tech stack',
-      badge: {text: 'Essential labor', cls: 'badge-earns'},
+      badge: { text: 'Essential labor', cls: 'badge-earns' },
       plainEnglish:
         'Ad Ops is where the "magic" (and the headaches) happen. They are the technical specialists who actually set up the campaigns, traffic the creatives, place the pixels, and troubleshoot when something breaks. If an ad doesn\'t show or a conversion doesn\'t track, Ad Ops is the first call.',
       goals: `<ul>
@@ -8631,9 +9305,10 @@ const renderPlayersPage = (): string => {
         <li><strong>Discrepancy %</strong> (e.g. advertiser vs publisher numbers)</li>
         <li><strong>Fill rate</strong> (on the sell side)</li>
       </ul>`,
-      economics: '<strong>Earns:</strong> Typically salaried employees at agencies, publishers, or ad tech companies. Their value is in technical precision — a single typo in a tracking URL can waste millions of dollars in ad spend. Many companies are now outsourcing Ad Ops to global service hubs to reduce costs.',
+      economics:
+        '<strong>Earns:</strong> Typically salaried employees at agencies, publishers, or ad tech companies. Their value is in technical precision — a single typo in a tracking URL can waste millions of dollars in ad spend. Many companies are now outsourcing Ad Ops to global service hubs to reduce costs.',
       fear: 'A "dead pixel" on a massive campaign launch, creatives being rejected by exchanges, or the increasing complexity of "privacy-safe" measurement making their jobs 10x harder.',
-      links: [{label: 'Glossary: Ad Ops →', href: '/glossary?term=ad-ops'}],
+      links: [{ label: 'Glossary: Ad Ops →', href: '/glossary?term=ad-ops' }],
     },
     {
       icon: '📈',
@@ -8641,7 +9316,7 @@ const renderPlayersPage = (): string => {
       name: 'Customer Success (CSM)',
       examples: 'Account Managers at TTD, Google, or Magnite',
       tagline: 'The strategic partner and growth driver',
-      badge: {text: 'Relationship & Growth', cls: 'badge-earns'},
+      badge: { text: 'Relationship & Growth', cls: 'badge-earns' },
       plainEnglish:
         "CSMs at ad tech companies are the bridge between the technology and the client's business goals. They don't just provide support; they proactively look for ways to help the client spend more money more effectively. They are part consultant, part salesperson, and part product expert.",
       goals: `<ul>
@@ -8656,11 +9331,12 @@ const renderPlayersPage = (): string => {
         <li><strong>Client Health Score</strong></li>
         <li><strong>NPS (Net Promoter Score)</strong></li>
       </ul>`,
-      economics: '<strong>Earns:</strong> Salary + Performance Bonuses tied to client spend or retention. A successful CSM at a major DSP might manage $50M+ in annual media spend across their book of business.',
+      economics:
+        '<strong>Earns:</strong> Salary + Performance Bonuses tied to client spend or retention. A successful CSM at a major DSP might manage $50M+ in annual media spend across their book of business.',
       fear: 'Clients "churning" to a competitor, budget cuts at the advertiser level, or the platform failing to deliver results during a critical campaign.',
-      links: [{label: 'Glossary: CSM →', href: '/glossary?term=csm'}],
+      links: [{ label: 'Glossary: CSM →', href: '/glossary?term=csm' }],
     },
-  ];
+  ]
 
   const playerCardsHtml = players
     .map(
@@ -8700,14 +9376,14 @@ const renderPlayersPage = (): string => {
           </div>
         </div>
         ${
-          p.links.length
+          p.links.length > 0
             ? `<div class='player-links'>${p.links.map((l) => `<a class='player-link' href='${l.href}'>${l.label}</a>`).join('')}</div>`
             : ''
         }
       </div>
-    </details>`,
+    </details>`
     )
-    .join('\n');
+    .join('\n')
 
   const tensionCards = [
     {
@@ -8740,7 +9416,7 @@ const renderPlayersPage = (): string => {
       b: 'Walled Gardens',
       desc: 'Google and Meta prefer self-measurement ("trust us, your ads worked"). Independent vendors like IAS and Nielsen push for third-party verification. The tension is fundamentally about who controls the truth.',
     },
-  ];
+  ]
 
   const tensionCardsHtml = tensionCards
     .map(
@@ -8749,20 +9425,55 @@ const renderPlayersPage = (): string => {
       <div class='tension-vs'>Tension</div>
       <div class='tension-parties'>${t.a} vs ${t.b}</div>
       <div class='tension-desc'>${t.desc}</div>
-    </div>`,
+    </div>`
     )
-    .join('\n');
+    .join('\n')
 
   const moneyFlowSteps = [
-    {actor: 'Advertiser', desc: 'Sets a $10.00 CPM budget', amount: '−$10.00', cls: 'passes'},
-    {actor: 'Agency', desc: 'Takes ~15% commission before placing the buy', amount: '−$1.50', cls: 'keeps'},
-    {actor: 'DSP', desc: 'Takes ~20% platform fee on remaining $8.50', amount: '−$1.70', cls: 'keeps'},
-    {actor: 'Ad Exchange', desc: 'Takes ~15% on the $6.80 clearing bid', amount: '−$1.02', cls: 'keeps'},
-    {actor: 'SSP', desc: 'Takes ~12% on revenue passed from exchange', amount: '−$0.70', cls: 'keeps'},
-    {actor: 'Data Provider', desc: 'Audience segment fee layered on the buy', amount: '−$0.50', cls: 'keeps'},
-    {actor: 'Measurement', desc: 'Verification fee (DV, IAS, Nielsen)', amount: '−$0.10', cls: 'keeps'},
-    {actor: 'Publisher', desc: "Receives what's left after all fees", amount: '$4.48', cls: 'earns'},
-  ];
+    { actor: 'Advertiser', desc: 'Sets a $10.00 CPM budget', amount: '−$10.00', cls: 'passes' },
+    {
+      actor: 'Agency',
+      desc: 'Takes ~15% commission before placing the buy',
+      amount: '−$1.50',
+      cls: 'keeps',
+    },
+    {
+      actor: 'DSP',
+      desc: 'Takes ~20% platform fee on remaining $8.50',
+      amount: '−$1.70',
+      cls: 'keeps',
+    },
+    {
+      actor: 'Ad Exchange',
+      desc: 'Takes ~15% on the $6.80 clearing bid',
+      amount: '−$1.02',
+      cls: 'keeps',
+    },
+    {
+      actor: 'SSP',
+      desc: 'Takes ~12% on revenue passed from exchange',
+      amount: '−$0.70',
+      cls: 'keeps',
+    },
+    {
+      actor: 'Data Provider',
+      desc: 'Audience segment fee layered on the buy',
+      amount: '−$0.50',
+      cls: 'keeps',
+    },
+    {
+      actor: 'Measurement',
+      desc: 'Verification fee (DV, IAS, Nielsen)',
+      amount: '−$0.10',
+      cls: 'keeps',
+    },
+    {
+      actor: 'Publisher',
+      desc: "Receives what's left after all fees",
+      amount: '$4.48',
+      cls: 'earns',
+    },
+  ]
 
   const moneyFlowHtml = moneyFlowSteps
     .map(
@@ -8771,9 +9482,9 @@ const renderPlayersPage = (): string => {
       <div class='money-step-actor'>${s.actor}</div>
       <div class='money-step-desc'>${s.desc}</div>
       <div class='money-step-amount ${s.cls}'>${s.amount}</div>
-    </div>`,
+    </div>`
     )
-    .join('\n');
+    .join('\n')
 
   return `<!doctype html>
 <html lang='en'>
@@ -8857,8 +9568,8 @@ const renderPlayersPage = (): string => {
 
   </div>
 </body>
-</html>`;
-};
+</html>`
+}
 
 type CompanyCategory =
   | 'DSP'
@@ -8872,34 +9583,37 @@ type CompanyCategory =
   | 'CDP / DMP'
   | 'Measurement / Verification'
   | 'Walled Garden'
-  | 'Adjacent / Tools';
+  | 'Adjacent / Tools'
 
-type Company = {
-  name: string;
-  category: CompanyCategory;
-  specialty: string;
-  url: string;
-  note?: string;
-};
+interface Company {
+  name: string
+  category: CompanyCategory
+  specialty: string
+  url: string
+  note?: string
+}
 
 const companies: Company[] = [
   // ── DSPs ──
   {
     name: 'The Trade Desk',
     category: 'DSP',
-    specialty: 'Largest independent DSP. Owns UID2 identity standard. Display, video, CTV, DOOH, audio.',
+    specialty:
+      'Largest independent DSP. Owns UID2 identity standard. Display, video, CTV, DOOH, audio.',
     url: 'https://www.thetradedesk.com/',
   },
   {
     name: 'Google DV360',
     category: 'DSP',
-    specialty: "Google's enterprise DSP. Deep YouTube / GDN / AdX integration; first-party Google data.",
+    specialty:
+      "Google's enterprise DSP. Deep YouTube / GDN / AdX integration; first-party Google data.",
     url: 'https://marketingplatform.google.com/about/display-video-360/',
   },
   {
     name: 'Amazon DSP',
     category: 'DSP',
-    specialty: 'DSP backed by Amazon retail / shopping data. Reaches Amazon-owned and 3rd-party inventory.',
+    specialty:
+      'DSP backed by Amazon retail / shopping data. Reaches Amazon-owned and 3rd-party inventory.',
     url: 'https://advertising.amazon.com/solutions/products/amazon-dsp',
   },
   {
@@ -8911,19 +9625,22 @@ const companies: Company[] = [
   {
     name: 'Microsoft Invest (Xandr)',
     category: 'DSP',
-    specialty: 'Enterprise DSP acquired by Microsoft from AT&T; strong CTV / programmatic guaranteed.',
+    specialty:
+      'Enterprise DSP acquired by Microsoft from AT&T; strong CTV / programmatic guaranteed.',
     url: 'https://about.ads.microsoft.com/en/solutions/microsoft-advertising-platform',
   },
   {
     name: 'StackAdapt',
     category: 'DSP',
-    specialty: 'Self-serve multi-channel DSP popular with mid-market agencies and performance buyers.',
+    specialty:
+      'Self-serve multi-channel DSP popular with mid-market agencies and performance buyers.',
     url: 'https://www.stackadapt.com/',
   },
   {
     name: 'Basis Technologies',
     category: 'DSP',
-    specialty: 'Formerly Centro. Workflow + DSP geared toward agencies and local / regional media buying.',
+    specialty:
+      'Formerly Centro. Workflow + DSP geared toward agencies and local / regional media buying.',
     url: 'https://basis.com/',
   },
   {
@@ -8947,7 +9664,8 @@ const companies: Company[] = [
   {
     name: 'Simpli.fi',
     category: 'DSP',
-    specialty: 'Localized programmatic specialist; geo-fencing and addressable geo-fencing for local advertisers.',
+    specialty:
+      'Localized programmatic specialist; geo-fencing and addressable geo-fencing for local advertisers.',
     url: 'https://www.simpli.fi/',
   },
   {
@@ -8961,7 +9679,8 @@ const companies: Company[] = [
   {
     name: 'Magnite',
     category: 'SSP',
-    specialty: 'Largest independent SSP. Formed from Rubicon Project + Telaria + SpotX. Strong CTV.',
+    specialty:
+      'Largest independent SSP. Formed from Rubicon Project + Telaria + SpotX. Strong CTV.',
     url: 'https://www.magnite.com/',
   },
   {
@@ -8979,13 +9698,15 @@ const companies: Company[] = [
   {
     name: 'Index Exchange',
     category: 'SSP',
-    specialty: 'Independent SSP / exchange known for low-latency header bidding and supply path transparency.',
+    specialty:
+      'Independent SSP / exchange known for low-latency header bidding and supply path transparency.',
     url: 'https://www.indexexchange.com/',
   },
   {
     name: 'TripleLift',
     category: 'SSP',
-    specialty: 'SSP specializing in native, in-image, and CTV (especially programmatic creative formats).',
+    specialty:
+      'SSP specializing in native, in-image, and CTV (especially programmatic creative formats).',
     url: 'https://triplelift.com/',
   },
   {
@@ -8997,10 +9718,16 @@ const companies: Company[] = [
   {
     name: 'Equativ',
     category: 'SSP',
-    specialty: 'Formerly Smart AdServer. Independent SSP + ad server, strong in EMEA. Acquired Sharethrough.',
+    specialty:
+      'Formerly Smart AdServer. Independent SSP + ad server, strong in EMEA. Acquired Sharethrough.',
     url: 'https://equativ.com/',
   },
-  {name: 'Smaato', category: 'SSP', specialty: 'Mobile-first SSP and exchange.', url: 'https://www.smaato.com/'},
+  {
+    name: 'Smaato',
+    category: 'SSP',
+    specialty: 'Mobile-first SSP and exchange.',
+    url: 'https://www.smaato.com/',
+  },
   {
     name: 'Verve Group',
     category: 'SSP',
@@ -9010,7 +9737,8 @@ const companies: Company[] = [
   {
     name: 'Kargo',
     category: 'SSP',
-    specialty: 'Premium mobile / video SSP with proprietary ad formats; acquired VideoByte and Forsman & Bodenfors.',
+    specialty:
+      'Premium mobile / video SSP with proprietary ad formats; acquired VideoByte and Forsman & Bodenfors.',
     url: 'https://kargo.com/',
   },
 
@@ -9018,13 +9746,15 @@ const companies: Company[] = [
   {
     name: 'Google AdX (Ad Manager)',
     category: 'Exchange',
-    specialty: "World's largest ad exchange, bundled inside Google Ad Manager. At the center of DOJ antitrust case.",
+    specialty:
+      "World's largest ad exchange, bundled inside Google Ad Manager. At the center of DOJ antitrust case.",
     url: 'https://admanager.google.com/',
   },
   {
     name: 'Xandr Monetize',
     category: 'Exchange',
-    specialty: 'Microsoft-owned exchange (AppNexus heritage). Sell-side counterpart to Microsoft Invest.',
+    specialty:
+      'Microsoft-owned exchange (AppNexus heritage). Sell-side counterpart to Microsoft Invest.',
     url: 'https://www.xandr.com/',
   },
   {
@@ -9038,7 +9768,8 @@ const companies: Company[] = [
   {
     name: 'Google Ad Manager (GAM)',
     category: 'Ad Server',
-    specialty: 'Dominant publisher ad server (formerly DFP). Serves direct + programmatic via unified auction.',
+    specialty:
+      'Dominant publisher ad server (formerly DFP). Serves direct + programmatic via unified auction.',
     url: 'https://admanager.google.com/',
   },
   {
@@ -9056,19 +9787,22 @@ const companies: Company[] = [
   {
     name: 'Innovid',
     category: 'Ad Server',
-    specialty: 'Independent CTV-first ad server and creative platform; merged with FlashTalking under Mediaocean.',
+    specialty:
+      'Independent CTV-first ad server and creative platform; merged with FlashTalking under Mediaocean.',
     url: 'https://www.innovid.com/',
   },
   {
     name: 'Flashtalking by Mediaocean',
     category: 'Ad Server',
-    specialty: 'Independent buy-side ad server focused on dynamic creative, attribution and verification.',
+    specialty:
+      'Independent buy-side ad server focused on dynamic creative, attribution and verification.',
     url: 'https://www.flashtalking.com/',
   },
   {
     name: 'Disney DRAX',
     category: 'Ad Server',
-    specialty: 'Disney Real-Time Ad Exchange — the ad server / exchange behind Disney+, Hulu, ESPN ad sales.',
+    specialty:
+      'Disney Real-Time Ad Exchange — the ad server / exchange behind Disney+, Hulu, ESPN ad sales.',
     url: 'https://disneyadvertising.com/disney-real-time-ad-exchange-drax/',
   },
 
@@ -9114,19 +9848,22 @@ const companies: Company[] = [
   {
     name: 'SiriusXM Media',
     category: 'Audio / Podcast',
-    specialty: 'Combined Pandora / SiriusXM / SoundCloud / AdsWizz ad platform; largest US digital audio.',
+    specialty:
+      'Combined Pandora / SiriusXM / SoundCloud / AdsWizz ad platform; largest US digital audio.',
     url: 'https://www.siriusxmmedia.com/',
   },
   {
     name: 'Spotify Advertising',
     category: 'Audio / Podcast',
-    specialty: 'Spotify Audience Network + Ad Studio for music, podcasts, and Megaphone publishers.',
+    specialty:
+      'Spotify Audience Network + Ad Studio for music, podcasts, and Megaphone publishers.',
     url: 'https://ads.spotify.com/',
   },
   {
     name: 'iHeartMedia',
     category: 'Audio / Podcast',
-    specialty: 'Largest US radio + podcast network; ad sales across iHeartRadio and podcast portfolio.',
+    specialty:
+      'Largest US radio + podcast network; ad sales across iHeartRadio and podcast portfolio.',
     url: 'https://www.iheartmedia.com/',
   },
   {
@@ -9138,7 +9875,8 @@ const companies: Company[] = [
   {
     name: 'AdsWizz',
     category: 'Audio / Podcast',
-    specialty: 'Audio ad server / SSP / DSP under SiriusXM. Powers programmatic audio + dynamic ad insertion.',
+    specialty:
+      'Audio ad server / SSP / DSP under SiriusXM. Powers programmatic audio + dynamic ad insertion.',
     url: 'https://www.adswizz.com/',
   },
 
@@ -9146,7 +9884,8 @@ const companies: Company[] = [
   {
     name: 'Vistar Media',
     category: 'DOOH',
-    specialty: 'Leading programmatic DOOH platform — DSP, SSP, and ad server for digital out-of-home.',
+    specialty:
+      'Leading programmatic DOOH platform — DSP, SSP, and ad server for digital out-of-home.',
     url: 'https://www.vistarmedia.com/',
   },
   {
@@ -9172,7 +9911,8 @@ const companies: Company[] = [
   {
     name: 'LiveRamp',
     category: 'Identity / Data',
-    specialty: 'Dominant identity infrastructure. RampID identity graph, ATS, and data collaboration / clean room.',
+    specialty:
+      'Dominant identity infrastructure. RampID identity graph, ATS, and data collaboration / clean room.',
     url: 'https://liveramp.com/',
   },
   {
@@ -9222,7 +9962,8 @@ const companies: Company[] = [
   {
     name: 'Twilio Segment',
     category: 'CDP / DMP',
-    specialty: 'Customer Data Platform — collects first-party events and pipes them to ad / analytics tools.',
+    specialty:
+      'Customer Data Platform — collects first-party events and pipes them to ad / analytics tools.',
     url: 'https://segment.com/',
   },
   {
@@ -9240,13 +9981,15 @@ const companies: Company[] = [
   {
     name: 'Snowflake Data Clean Room',
     category: 'CDP / DMP',
-    specialty: 'Data cloud that hosts most ad-tech warehouses; native data clean room for advertiser ↔ publisher data.',
+    specialty:
+      'Data cloud that hosts most ad-tech warehouses; native data clean room for advertiser ↔ publisher data.',
     url: 'https://www.snowflake.com/',
   },
   {
     name: 'Databricks',
     category: 'CDP / DMP',
-    specialty: 'Lakehouse platform widely used by ad-tech engineering teams for ML + bid logging at scale.',
+    specialty:
+      'Lakehouse platform widely used by ad-tech engineering teams for ML + bid logging at scale.',
     url: 'https://www.databricks.com/',
   },
   {
@@ -9260,13 +10003,15 @@ const companies: Company[] = [
   {
     name: 'DoubleVerify',
     category: 'Measurement / Verification',
-    specialty: 'Brand safety, viewability, fraud (IVT), and attention measurement; pre-bid + post-bid.',
+    specialty:
+      'Brand safety, viewability, fraud (IVT), and attention measurement; pre-bid + post-bid.',
     url: 'https://doubleverify.com/',
   },
   {
     name: 'Integral Ad Science (IAS)',
     category: 'Measurement / Verification',
-    specialty: 'Brand safety, viewability, IVT, contextual targeting; competes head-to-head with DV.',
+    specialty:
+      'Brand safety, viewability, IVT, contextual targeting; competes head-to-head with DV.',
     url: 'https://integralads.com/',
   },
   {
@@ -9278,25 +10023,29 @@ const companies: Company[] = [
   {
     name: 'Nielsen',
     category: 'Measurement / Verification',
-    specialty: 'Legacy TV + cross-media currency. NielsenONE is the cross-platform measurement product.',
+    specialty:
+      'Legacy TV + cross-media currency. NielsenONE is the cross-platform measurement product.',
     url: 'https://www.nielsen.com/',
   },
   {
     name: 'Comscore',
     category: 'Measurement / Verification',
-    specialty: 'Cross-platform measurement, currency, and digital audience measurement — Nielsen alternative.',
+    specialty:
+      'Cross-platform measurement, currency, and digital audience measurement — Nielsen alternative.',
     url: 'https://www.comscore.com/',
   },
   {
     name: 'VideoAmp',
     category: 'Measurement / Verification',
-    specialty: 'Cross-screen measurement + currency challenger using ACR + STB data. Used in upfronts as alt-currency.',
+    specialty:
+      'Cross-screen measurement + currency challenger using ACR + STB data. Used in upfronts as alt-currency.',
     url: 'https://www.videoamp.com/',
   },
   {
     name: 'iSpot.tv',
     category: 'Measurement / Verification',
-    specialty: 'TV ad measurement and outcomes; ACR + smart-TV data. Approved as a Nielsen-alternative currency.',
+    specialty:
+      'TV ad measurement and outcomes; ACR + smart-TV data. Approved as a Nielsen-alternative currency.',
     url: 'https://www.ispot.tv/',
   },
   {
@@ -9314,7 +10063,8 @@ const companies: Company[] = [
   {
     name: 'Adelaide',
     category: 'Measurement / Verification',
-    specialty: 'Attention metrics (AU score) used as a media-quality currency across digital + CTV.',
+    specialty:
+      'Attention metrics (AU score) used as a media-quality currency across digital + CTV.',
     url: 'https://www.adelaidemetrics.com/',
   },
   {
@@ -9335,13 +10085,15 @@ const companies: Company[] = [
   {
     name: 'Meta Ads',
     category: 'Walled Garden',
-    specialty: 'Facebook + Instagram + WhatsApp + Audience Network. Bid-and-buy through Meta Ads Manager.',
+    specialty:
+      'Facebook + Instagram + WhatsApp + Audience Network. Bid-and-buy through Meta Ads Manager.',
     url: 'https://www.facebook.com/business/ads',
   },
   {
     name: 'Amazon Advertising',
     category: 'Walled Garden',
-    specialty: 'Sponsored Products / Sponsored Brands / DSP. Built on Amazon retail + IMDb + Twitch + Prime Video.',
+    specialty:
+      'Sponsored Products / Sponsored Brands / DSP. Built on Amazon retail + IMDb + Twitch + Prime Video.',
     url: 'https://advertising.amazon.com/',
   },
   {
@@ -9386,31 +10138,36 @@ const companies: Company[] = [
   {
     name: 'Prebid.org',
     category: 'Adjacent / Tools',
-    specialty: 'Open-source header-bidding wrapper (Prebid.js + Prebid Server). Industry standard on the open web.',
+    specialty:
+      'Open-source header-bidding wrapper (Prebid.js + Prebid Server). Industry standard on the open web.',
     url: 'https://prebid.org/',
   },
   {
     name: 'IAB Tech Lab',
     category: 'Adjacent / Tools',
-    specialty: 'Standards body for OpenRTB, VAST, ads.txt, sellers.json, GPP and most programmatic plumbing.',
+    specialty:
+      'Standards body for OpenRTB, VAST, ads.txt, sellers.json, GPP and most programmatic plumbing.',
     url: 'https://iabtechlab.com/',
   },
   {
     name: 'Mediaocean',
     category: 'Adjacent / Tools',
-    specialty: 'Workflow + ad-server backbone for major holding-company agencies (Prisma, Flashtalking, Innovid).',
+    specialty:
+      'Workflow + ad-server backbone for major holding-company agencies (Prisma, Flashtalking, Innovid).',
     url: 'https://www.mediaocean.com/',
   },
   {
     name: 'Scope3',
     category: 'Adjacent / Tools',
-    specialty: 'Sustainability + supply-chain decarbonization data; emerging media-quality scoring layer.',
+    specialty:
+      'Sustainability + supply-chain decarbonization data; emerging media-quality scoring layer.',
     url: 'https://scope3.com/',
   },
   {
     name: 'Jounce Media',
     category: 'Adjacent / Tools',
-    specialty: 'Independent supply-path research; defines what counts as MFA / made-for-advertising inventory.',
+    specialty:
+      'Independent supply-path research; defines what counts as MFA / made-for-advertising inventory.',
     url: 'https://www.jouncemedia.com/',
   },
   {
@@ -9437,7 +10194,7 @@ const companies: Company[] = [
     specialty: 'Independent data clean-room / collaboration platform.',
     url: 'https://www.infosum.com/',
   },
-];
+]
 
 const renderCompaniesPage = (): string => {
   const companiesStyles = `
@@ -9635,7 +10392,7 @@ const renderCompaniesPage = (): string => {
   [data-theme="dark"] .cat-Measurement { background: rgba(34,197,94,0.12); color: #86efac; border-color: rgba(34,197,94,0.3); }
   [data-theme="dark"] .page-back { color: var(--accent-strong); }
   [data-theme="dark"] a { color: var(--accent-strong); }
-  `;
+  `
 
   const categoryOrder: CompanyCategory[] = [
     'DSP',
@@ -9650,80 +10407,80 @@ const renderCompaniesPage = (): string => {
     'Measurement / Verification',
     'Walled Garden',
     'Adjacent / Tools',
-  ];
+  ]
 
   const catClass = (c: CompanyCategory): string => {
     switch (c) {
       case 'DSP':
-        return 'cat-DSP';
+        return 'cat-DSP'
       case 'SSP':
-        return 'cat-SSP';
+        return 'cat-SSP'
       case 'Exchange':
-        return 'cat-Exchange';
+        return 'cat-Exchange'
       case 'Ad Server':
-        return 'cat-AdServer';
+        return 'cat-AdServer'
       case 'CTV / Streaming':
-        return 'cat-CTV';
+        return 'cat-CTV'
       case 'Audio / Podcast':
-        return 'cat-Audio';
+        return 'cat-Audio'
       case 'DOOH':
-        return 'cat-DOOH';
+        return 'cat-DOOH'
       case 'Identity / Data':
-        return 'cat-Identity';
+        return 'cat-Identity'
       case 'CDP / DMP':
-        return 'cat-CDP';
+        return 'cat-CDP'
       case 'Measurement / Verification':
-        return 'cat-Measurement';
+        return 'cat-Measurement'
       case 'Walled Garden':
-        return 'cat-Walled';
+        return 'cat-Walled'
       case 'Adjacent / Tools':
-        return 'cat-Adjacent';
+        return 'cat-Adjacent'
     }
-  };
+  }
 
-  const counts: Record<string, number> = {};
+  const counts: Record<string, number> = {}
   for (const c of companies) {
-    counts[c.category] = (counts[c.category] ?? 0) + 1;
+    counts[c.category] = (counts[c.category] ?? 0) + 1
   }
 
   const chipsHtml = ['All', ...categoryOrder]
     .map((cat) => {
-      const isAll = cat === 'All';
-      const n = isAll ? companies.length : (counts[cat] ?? 0);
-      const active = isAll ? ' active' : '';
-      const data = isAll ? 'all' : cat;
-      return `<button type='button' class='filter-chip${active}' data-cat="${data}">${cat}<span class='filter-chip-count'>${n}</span></button>`;
+      const isAll = cat === 'All'
+      const n = isAll ? companies.length : (counts[cat] ?? 0)
+      const active = isAll ? ' active' : ''
+      const data = isAll ? 'all' : cat
+      return `<button type='button' class='filter-chip${active}' data-cat="${data}">${cat}<span class='filter-chip-count'>${n}</span></button>`
     })
-    .join('\n');
+    .join('\n')
 
   // Sort rows: by category order, then by company name within
   const sorted = [...companies].sort((a, b) => {
-    const ai = categoryOrder.indexOf(a.category);
-    const bi = categoryOrder.indexOf(b.category);
+    const ai = categoryOrder.indexOf(a.category)
+    const bi = categoryOrder.indexOf(b.category)
     if (ai !== bi) {
-      return ai - bi;
+      return ai - bi
     }
-    return a.name.localeCompare(b.name);
-  });
+    return a.name.localeCompare(b.name)
+  })
 
   const rowsHtml = sorted
     .map((c) => {
       const host = (() => {
         try {
-          return new URL(c.url).host.replace(/^www\./, '');
+          return new URL(c.url).host.replace(/^www\./, '')
         } catch {
-          return c.url;
+          return c.url
         }
-      })();
-      const haystack = `${c.name} ${c.specialty} ${c.category} ${host}`.toLowerCase();
+      })()
+      const haystack = `${c.name} ${c.specialty} ${c.category} ${host}`.toLowerCase()
       return `<tr class='company-row' data-cat="${c.category}" data-search="${haystack.replace(/"/g, '&quot;')}">
         <td><span class='cat-badge ${catClass(c.category)}'>${c.category}</span></td>
         <td class='company-name'>${c.name}</td>
         <td class='company-specialty'>${c.specialty}</td>
         <td class='company-link'><a class='companies-link' href='${c.url}' target='_blank' rel='noopener noreferrer'>${host} ↗</a></td>
-      </tr>`;
+      </tr>`
     })
-    .join('\n');
+    .join('\n')
 
   return `<!doctype html>
 <html lang='en'>
@@ -9842,77 +10599,133 @@ const renderCompaniesPage = (): string => {
   })();
   </script>
 </body>
-</html>`;
-};
+</html>`
+}
 
-const app = new Elysia();
+const renderTrainingPage = (path: string, title: string, content: string): Response =>
+  new Response(
+    `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title} | Ad Tech Guide</title>
+  ${FAVICON_LINK}
+  ${themeScript}
+  <style>
+    ${homeStyles}
+    ${sidebarStyles}
+    .training-guide { max-width: 74rem; margin: auto; padding: clamp(1rem, 4vw, 3rem); line-height: 1.65; }
+    .training-guide header, .training-guide section {
+      background: var(--card, Canvas); border: 1px solid var(--border-subtle);
+      border-radius: 1rem; padding: clamp(1rem, 4vw, 2.5rem); margin-bottom: 1rem;
+    }
+    .training-guide h1 { font-size: clamp(2rem, 6vw, 3.75rem); line-height: 1.1; margin: .45em 0; }
+    .training-guide h2, .training-guide h3 { line-height: 1.25; margin: 0 0 .65rem; }
+    .training-guide h3 { margin-top: 1.5rem; }
+    .training-guide p, .training-guide ol, .training-guide dl { margin: .65rem 0 1rem; }
+    .training-guide ol { padding-inline-start: 1.5rem; }
+    .training-guide li, .training-guide dd { margin-bottom: .65rem; }
+    .training-guide dt, .training-guide summary { font-weight: 700; }
+    .training-guide a { color: var(--accent-strong); text-decoration: underline; text-underline-offset: .18em; }
+    .training-guide nav { display: flex; gap: .5rem 1.2rem; flex-wrap: wrap; }
+    .training-guide details { border: 1px solid var(--border-subtle); padding: .75rem 1rem; border-radius: .65rem; margin-top: .75rem; }
+    .training-guide summary { cursor: pointer; }
+    body { display: block; padding: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  ${renderSidebar(path)}
+  <main class="training-guide" id="main-content">${content}</main>
+</body>
+</html>`,
+    { headers: { 'content-type': 'text/html; charset=utf-8' } }
+  )
+
+const app = new Elysia()
 
 app
-  .get('/', ({request}) => {
-    const url = new URL(request.url);
-    const exampleParam = url.searchParams.get('example') as ExampleId | null;
-    const selected = exampleParam && exampleParam in examples ? exampleParam : undefined;
+  .get('/', ({ request }) => {
+    const url = new URL(request.url)
+    const exampleParam = url.searchParams.get('example') as ExampleId | null
+    const selected = exampleParam && exampleParam in examples ? exampleParam : undefined
 
-    const html = renderNewHome(selected);
+    const html = renderNewHome(selected)
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
-  .get('/glossary', ({request}) => {
-    const url = new URL(request.url);
-    const termParam = url.searchParams.get('term') as GlossaryId | null;
-    const selected = termParam && glossary[termParam] ? termParam : undefined;
+  .get('/training/unified-media', () =>
+    renderTrainingPage('/training/unified-media', 'Unified Media Buying', unifiedMediaContent)
+  )
+  .get('/training/campaign-planning', () =>
+    renderTrainingPage(
+      '/training/campaign-planning',
+      'Campaign Planning &amp; Forecasting',
+      campaignPlanningContent
+    )
+  )
+  .get('/training/media-measurement', () =>
+    renderTrainingPage(
+      '/training/media-measurement',
+      'TV Data, Pixels &amp; Attribution',
+      mediaMeasurementContent
+    )
+  )
+  .get('/glossary', ({ request }) => {
+    const url = new URL(request.url)
+    const termParam = url.searchParams.get('term') as GlossaryId | null
+    const selected = termParam && glossary[termParam] ? termParam : undefined
 
-    const html = renderGlossaryPage(selected);
+    const html = renderGlossaryPage(selected)
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
-  .get('/topic/:id', ({params}) => {
-    const id = params.id as TopicId;
+  .get('/topic/:id', ({ params }) => {
+    const id = params.id as TopicId
     if (!(id in topics)) {
-      return new Response('Topic not found', {status: 404});
+      return new Response('Topic not found', { status: 404 })
     }
 
-    const html = renderTopicPage(id);
+    const html = renderTopicPage(id)
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
-  .get('/example/:id', ({params}) => {
-    const id = params.id as ExampleId;
+  .get('/example/:id', ({ params }) => {
+    const id = params.id as ExampleId
     if (!(id in examples)) {
-      return new Response('Example not found', {status: 404});
+      return new Response('Example not found', { status: 404 })
     }
 
-    const html = renderExamplePage(id);
+    const html = renderExamplePage(id)
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
   .get('/players', () => {
-    const html = renderPlayersPage();
+    const html = renderPlayersPage()
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
   .get('/companies', () => {
-    const html = renderCompaniesPage();
+    const html = renderCompaniesPage()
     return new Response(html, {
-      headers: {'content-type': 'text/html; charset=utf-8'},
-    });
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   })
   .get('/health', () => ({
     status: 'ok',
     timestamp: new Date().toISOString(),
-  }));
+  }))
 
 if (process.env.VERCEL !== '1') {
-  const port = Number(process.env.PORT ?? 4500);
-  app.listen(port);
-
-  console.log(`🧠 Ad tech learning app running at http://localhost:${port}`);
+  const port = Number(process.env.PORT ?? 4500)
+  app.listen(port)
 }
 
-export type App = typeof app;
-export default app;
+export type App = typeof app
+export default app
