@@ -1,5 +1,8 @@
 import {Elysia} from 'elysia';
+import {campaignPlanningContent} from './campaign-planning';
 import {FAVICON_BASE64} from './favicon-data';
+import {mediaMeasurementContent} from './media-measurement';
+import {unifiedMediaContent} from './unified-media';
 
 // Favicon: PNG embedded as data URL so it always shows (no extra request, works in Safari).
 const FAVICON_LINK = `<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,${FAVICON_BASE64}" /><link rel="shortcut icon" href="data:image/png;base64,${FAVICON_BASE64}" />`;
@@ -101,6 +104,8 @@ type GlossaryId =
   | 'holding-company'
   | 'programmatic-audio'
   | 'dooh'
+  | 'unified-media-platform'
+  | 'trade-area'
   | 'ooh'
   | 'geo-fencing'
   | 'foot-traffic'
@@ -159,7 +164,7 @@ const topics: Record<TopicId, Topic> = {
     overview: [
       '<strong>The buy side</strong> is the demand side of digital advertising: everyone involved in deciding <em>which</em> ads to show and <em>how much to pay</em>. It spans the <strong>advertiser</strong> (the brand paying for ads), the <strong>agency</strong> (which plans and buys on their behalf), and the <strong>Demand-Side Platform (DSP)</strong> — the software that actually submits bids in real-time auctions. When you see an ad anywhere on the internet, the buy side has already decided, in under 100 milliseconds, that you were worth showing it to and at what price.',
       '<strong>Advertisers</strong> are the brands and companies paying for ads: Nike, a local restaurant, a SaaS startup. They define campaign goals (brand awareness, app installs, e-commerce purchases), budgets, flight dates, and targeting requirements. Most advertisers don’t operate DSPs directly — they work through agencies or managed service teams.',
-      '<strong>Agencies</strong> (WPP’s GroupM, Publicis, IPG Mediabrands, Havas) act as expert intermediaries. They handle media planning (which channels reach my audience?), buying (negotiating rates and setting up programmatic campaigns), creative trafficking, and performance reporting. Holding-company agencies often operate their own trading desks that centralize DSP access across many clients.',
+      '<strong>Agencies</strong> (Mindshare, agencies within Publicis Media, and independents) act as expert intermediaries. They handle media planning (which channels reach my audience?), buying (negotiating rates and setting up programmatic campaigns), creative trafficking, and performance reporting. Holding-company agencies often operate their own trading desks that centralize DSP access across many clients.',
       'A <strong>Demand-Side Platform (DSP)</strong> is the core technology that connects advertiser budgets and targeting rules to the actual ad auction. The DSP receives a bid request from an exchange (describing an available impression), evaluates it against active campaigns in milliseconds, and either passes or returns a bid with a price and creative. The biggest independent DSP is <strong>The Trade Desk</strong>. Other major players include <strong>Google DV360</strong>, <strong>Amazon DSP</strong>, <strong>Microsoft Xandr</strong>, and <strong>Yahoo DSP</strong>.',
       '<strong>The Trade Desk</strong> is the largest independent (non-walled-garden) DSP, used by agencies and brands worldwide. Their platform (called Solimar) supports display, video, audio, connected TV (CTV), digital out-of-home (DOOH), and native formats — all in one interface. They built <strong>Unified ID 2.0 (UID2)</strong>, an open-source identity standard based on hashed and encrypted emails, designed as a privacy-respecting alternative to third-party cookies. The Trade Desk is ‘independent’ because they don’t own media, unlike Google or Amazon.',
       '<strong>Google DV360</strong> (Display & Video 360) is Google’s enterprise buying platform. It has deep native integration with YouTube, Google Display Network, and Google’s own ad exchange (AdX), plus external inventory. Because Google also owns the user’s search history, email (Gmail), location (Maps), and browser (Chrome), DV360 benefits from audience data that no independent DSP can match. This ‘walled garden’ advantage creates both power and antitrust scrutiny.',
@@ -298,7 +303,7 @@ const topics: Record<TopicId, Topic> = {
       '<strong>Audience segment architecture:</strong> User segments (e.g., ‘camping enthusiast’, ‘luxury car intender’, ‘lapsed purchaser’) are built from behavioral signals in the warehouse: visit frequency, category engagement, purchase recency/frequency/value (RFV), content consumption patterns. The segment membership is stored in a fast lookup store — Redis, DynamoDB, or Aerospike — keyed by user ID. At bid time, the DSP queries this store with a sub-millisecond latency requirement. You cannot run a SQL query at bid time; everything that touches the critical path must be pre-computed and stored in memory or SSD.',
       '<strong>Feature engineering for ML bidding models:</strong> DSP bid models consume pre-computed feature vectors for each impression. Typical features: hour-of-day, day-of-week, device type (mobile/desktop/tablet), OS, browser, content category (IAB taxonomy), advertiser × domain historical pCTR, user recency (days since last seen), segment membership (one-hot encoded or embedded), auction win-rate for this domain/SSP, viewability rate for this placement. The model outputs a bid price as a function of predicted value. Models are trained offline but inference runs in real-time, requiring tight latency budgets (<5ms for the model call itself).',
       '<strong>Identity resolution in practice:</strong> LiveRamp’s identity graph maintains a probabilistic and deterministic graph connecting: email hash (SHA-256) ↔ cookie IDs ↔ device IDs (IDFA, GAID) ↔ publisher login IDs ↔ household/postal data. When an advertiser uploads a CRM file (hashed emails), LiveRamp resolves each record against the graph to find matching cookies and device IDs across the web. This ‘audience onboarding’ process feeds segments into DSPs. The match rate — how many CRM records find a web identity — is a key metric, typically 40–60%.',
-      '<strong>Data clean rooms (technical):</strong> LiveRamp Data Collaboration, Snowflake Data Clean Room, AWS Clean Rooms, and Google Ads Data Hub all follow the same pattern: two parties deposit their data into a shared compute environment governed by strict query controls. Neither party can see the other’s raw records — only aggregate query outputs are allowed (enforced by differential privacy thresholds and row minimums). Typical queries: ‘How many users in my advertiser audience saw ads from publisher X in the last 30 days?’ or ‘What was the purchase lift for users exposed to campaign Y vs control?’',
+      '<strong>Data clean rooms (technical):</strong> A clean room applies controls to data collaboration. Implementations vary in supported joins, query permissions, and permitted outputs. The <a href="/training/media-measurement#clean-rooms">clean room module</a> walks through a publisher and advertiser match.',
       '<strong>dbt (data build tool)</strong> is the dominant transformation layer for ad tech data warehouses. Teams write SELECT-based SQL models that dbt executes in the right dependency order. dbt also runs data quality tests (nulls, uniqueness, referential integrity), generates documentation, and creates a lineage graph. In an ad tech context, a typical dbt project has: source models (impressions, clicks, conversions from the lake), staging models (clean, typed), mart models (campaign reporting, audience segments, attribution) and downstream models for ML feature generation.',
       '<strong>Real-time vs batch in ad tech:</strong> Not all data needs to be real-time. Frequency cap state must be real-time (query on every bid). Segment membership can be near-real-time (updated hourly). Campaign pacing state must be near-real-time (updated every few seconds). Reporting aggregates can be batch (hourly, daily). Attribution models are typically batch (run daily over the prior day’s data). This tiered approach — mixing real-time (Kafka+Flink), near-real-time (micro-batch Spark), and batch (daily dbt runs) — is the standard architecture.',
     ],
@@ -489,7 +494,7 @@ const topics: Record<TopicId, Topic> = {
     ],
     technical: [
       '<strong>TV currency mechanics:</strong> Nielsen’s C3 and C7 ratings measure viewership of live TV + 3 days of DVR (C3) or 7 days of DVR (C7) within the ‘commercial pod’ (not the full program, but the actual commercial minutes). They’re derived from Nielsen’s ~40,000-household panel, extrapolated via statistical weighting to represent the national population. Each rating point = 1% of the target demographic. A 3.0 rating in adults 25-54 means 3% of all US adults 25-54 watched. Upfront deals are priced in CPP (cost per rating point) against the contracted currency.',
-      '<strong>Set-top box and ACR data pipelines:</strong> VideoAmp and iSpot receive tuning data from cable/satellite operators: every channel change, every minute of viewing per household. ACR data (from smart TV manufacturers like Samsung, LG via Samba TV, or Vizio via Inscape) identifies content on screen by fingerprinting frames against a reference library. Both require household-to-demographic matching via postal/survey data. The pipeline: raw tuning events → household assignment → demographic linkage → content match → audience segment → reach/frequency calculation. Processing runs at scale (millions of households) using Spark and Databricks.',
+      '<strong>Set-top box and ACR data pipelines:</strong> Tuning events and recognized screen content represent different observations. Providers combine them with schedules and metadata, then address duplicate observations and sample coverage. See the <a href="/training/media-measurement#tv">TV data module</a> for VideoAmp and person-level estimates.',
       '<strong>Digital attribution pipeline:</strong> Conversion pixel (JavaScript tag or Conversions API call) fires when a user completes a desired action (purchase, form fill, app install). The pixel includes: timestamp, advertiser campaign/line-item ID, conversion value, and user identifiers (cookie, hashed email, device ID). Attribution logic joins this conversion event to prior impression and click events for the same user (via identity resolution), then applies the chosen attribution model. This runs as a batch job (daily or hourly) in the data warehouse. Output: credited impressions/clicks per campaign, attributed revenue, ROAS.',
       '<strong>Media Mix Modeling (MMM) vs. Multi-Touch Attribution (MTA):</strong> MMM uses aggregate sales and media spend data (no individual-level data) across weeks/months to estimate the contribution of each channel to overall sales using regression or Bayesian modeling. It’s privacy-safe but has low granularity (channel-level, not impression-level). MTA uses individual-level impression/click/conversion data to assign fractional credit to each touchpoint. MTA is more actionable but requires user-level data that’s increasingly restricted. Industry practice: use both — MMM for strategic budget allocation, MTA for in-campaign optimization.',
       '<strong>Viewability and attention measurement:</strong> IAB and MRC define viewability as: display ads — 50% of pixels in-view for 1 continuous second; video ads — 50% in-view for 2 continuous seconds. IAS and DoubleVerify measure this via JavaScript Intersection Observer in the browser. ‘Attention’ goes further: attention measurement vendors (Adelaide, Lumen, TVision) measure not just whether an ad could be seen but whether users actually engaged with it — eye-tracking, dwell time, interaction rates. Attention metrics are emerging as the next generation of quality signals.',
@@ -548,7 +553,7 @@ const topics: Record<TopicId, Topic> = {
     technical: [
       '<strong>The Fragmentation Tax:</strong> Buying local media traditionally requires managing separate logins for every local broadcaster or publisher. Each might have a different ad specification, a different <strong>Rate Card</strong> structure (e.g. flat fees vs dynamic CPMs), and different reporting cadence. The technical cost of managing 500 local relationships often outweighs the media cost itself.',
       '<strong>Unified Identity in Local:</strong> Global platforms use their own logged-in user data. Local media must rely on shared identity standards like <strong>UID2</strong> or <strong>RampID</strong> to prove that the person seeing a local TV ad is the same person who later visited the local store. <strong>Geo-fencing</strong> is a key technical tactic in local media — using GPS data to only show ads to users within a few miles of a specific business.',
-      '<strong>Consolidated Omnichannel Workflow (C.O.W.):</strong> This technical approach (pioneered by Ribeye Media) involves building a "meta-DSP" or unified buying layer. It uses APIs to connect to multiple underlying SSPs and local publisher ad servers, normalizing the data into a single schema. This allows a buyer to set a single budget and have it automatically distributed across the best-performing local channels (CTV, Audio, Display) without manual trafficking for each.',
+      '<strong>Unified local workflow:</strong> Ribeye Media describes a platform that coordinates planning, activation, pacing, and reporting across owned inventory and partner channels. A workflow layer can centralize operations while buying partners execute their own line items. See the <a href="/training/unified-media">unified media buying guide</a> for how budget authority and measurement affect cross-channel allocation.',
     ],
     keyTakeaways: [
       'Global media offers scale and ease but lacks local relevance; local media offers trust and relevance but is highly fragmented.',
@@ -625,7 +630,7 @@ const topics: Record<TopicId, Topic> = {
     ],
     keyTakeaways: [
       'Different platforms use different names (Line Item vs Ad Set vs Ad Group) for the granular targeting layer.',
-      'Insertion Orders (IOs) usually represent the legal and budgetary contract, while Line Items represent the tactical execution.',
+      'A commercial IO documents the buy. A platform IO can group execution settings and line items. The <a href="/training/campaign-planning#trafficking">campaign setup guide</a> follows both from approval to launch.',
       'A "pixel" is functionally identical to a "tag" or "beacon" — it\'s just a tracking request.',
     ],
     inOneSentence:
@@ -772,7 +777,7 @@ const examples: Record<ExampleId, Example> = {
       "You're listening to a playlist on Spotify's free tier or a podcast on SiriusXM, and a 30-second audio ad plays between songs. Just like CTV, this ad wasn't just 'broadcast' to everyone — it was selected for you in a real-time auction based on your listener profile, mood, and demographics.",
       'Audio advertising is uniquely personal. It "follows" the user across devices — from mobile phones to smart speakers (Alexa/Google Home) to connected cars. Because listeners are often "eyes-busy" (driving, exercising, cooking), audio ads rely on high-quality production and clear calls to action.',
       'SiriusXM and Pandora (SXM Media) operate one of the largest digital audio marketplaces. They use their own first-party data (what you listen to, your subscription data) to help advertisers target specific "moods" or "moments" — like "workout," "focus," or "party."',
-      "Podcast advertising is a growing sub-sector. While many podcast ads are still 'host-read' (baked into the audio file), programmatic 'dynamically inserted' ads are becoming the norm. This allows a podcast recorded three years ago to serve a relevant, current ad to a new listener today.",
+      'Podcast ads can be host-read or voiced by other talent. Either format can be embedded in the episode or inserted dynamically, depending on the publisher and placement. Dynamic insertion lets a current campaign appear in an older episode.',
     ],
     technicalFlow: [
       "<strong>Audio Ad Request:</strong> The streaming app (e.g., Spotify) reaches a natural break or a pre-defined ad slot. It sends a request to an Audio SSP (like AdsWizz or Targetspot). The request includes listener ID, device type, content category (e.g., 'True Crime Podcast'), and often 'mood' or 'genre' metadata.",
@@ -782,7 +787,7 @@ const examples: Record<ExampleId, Example> = {
     ],
     keyTakeaways: [
       'Programmatic audio uses VAST/DAAAST to deliver ads to streaming apps, smart speakers, and cars.',
-      'Targeting is based on first-party listener data, genre, and "mood" context. LTR (Listen-Through Rate) is the primary success metric.',
+      'Streaming players may report listen-through rate. For podcast downloads, check how ad delivery is counted and whether the player can confirm playback. See the <a href="/training/unified-media#audio">digital audio module</a>.',
     ],
     inOneSentence:
       'Audio ads are delivered programmatically to streaming services and podcasts using VAST XML, targeted by listener behavior and context.',
@@ -796,7 +801,7 @@ const examples: Record<ExampleId, Example> = {
     label: 'Programmatic DOOH (Billboard)',
     surface: 'Digital Billboards, Transit Screens, and Elevators',
     story: [
-      "You're driving down a highway or standing in an elevator, and the digital screen changes to show an ad for a local car dealership or a new movie. This is Digital Out-of-Home (DOOH). While traditional billboards were static paper, modern DOOH is connected to the internet and bought programmatically.",
+      "You're driving down a highway or standing in an elevator, and the digital screen changes to show an ad for a local car dealership or a new movie. This is Digital Out-of-Home (DOOH). Digital screens can be bought directly or through programmatic platforms.",
       'Programmatic DOOH (pDOOH) allows advertisers to buy screens based on "triggers" like weather, time of day, or proximity to a store. If it starts raining, a DSP can automatically start bidding on screens for umbrella or rain boot ads.',
       'The bridge to digital is <strong>Location Data</strong>. By analyzing anonymized GPS signals from mobile phones (foot traffic), ad tech companies can estimate how many people — and what <em>types</em> of people — are passing a specific billboard at any given hour.',
       'This creates a "one-to-many" medium. Unlike a phone where one ad = one person, a billboard impression might represent 50 people who drove past it. Measurement is therefore based on "multipliers" provided by companies like Geopath.',
@@ -805,7 +810,7 @@ const examples: Record<ExampleId, Example> = {
       "<strong>The DOOH Ad Request:</strong> The screen's media player (e.g., JCDecaux, Clear Channel) sends a request to a DOOH SSP (like Vistar Media or Place Exchange). The request includes the Screen ID, its latitude/longitude, and the current 'loop' status.",
       "<strong>Impression Multipliers:</strong> Because one screen play reaches many people, the SSP uses a 'multiplier.' If data shows 45 people typically see that screen at 5:00 PM on a Tuesday, the DSP is charged for 45 impressions for a single ad play.",
       "<strong>Geo-Fencing and Retargeting:</strong> Advertisers often use 'Mobile Extension' or 'Geo-Retargeting.' If your phone's GPS data shows you were in the vicinity of a billboard, the advertiser can later retarget you with a follow-up ad on your mobile phone to 'close the loop.'",
-      "<strong>Store Visit Attribution:</strong> This is the 'holy grail' of OOH. By matching mobile GPS data (users who were near the billboard) with store visit data (users who later entered the retail location), advertisers can prove that the billboard actually drove physical foot traffic.",
+      '<strong>Store Visit Attribution:</strong> Some studies associate estimated screen exposure with later visits using eligible location data. Use a comparison group and a defined visit window to estimate incremental impact. The <a href="/training/unified-media#location">location intelligence module</a> walks through the design.',
     ],
     keyTakeaways: [
       'DOOH is a "one-to-many" medium bought via specialized SSPs. It uses foot traffic data to estimate impressions.',
@@ -851,6 +856,28 @@ const examples: Record<ExampleId, Example> = {
 };
 
 const glossary: Record<GlossaryId, GlossaryEntry> = {
+  'unified-media-platform': {
+    id: 'unified-media-platform',
+    term: 'Unified Media Platform (UMP)',
+    category: 'Marketplace',
+    shortDefinition: 'A platform that coordinates media workflows across channels.',
+    definition: [
+      'Capabilities can span planning, activation, optimization, and measurement. Verify which stages the platform controls and who can authorize a budget change.',
+      'Work through a local campaign in the <a href="/training/unified-media">unified media buying guide</a>.',
+    ],
+    related: ['cow', 'dsp', 'ssp', 'walled-garden'],
+  },
+  'trade-area': {
+    id: 'trade-area',
+    term: 'Trade Area',
+    category: 'Data',
+    shortDefinition: 'The geographic area from which a venue draws its visitors or customers.',
+    definition: [
+      'Visitor origin data can show where a store draws traffic and help buyers choose relevant venues or markets. A distance radius describes proximity and may cover a different area.',
+      'See the <a href="/training/unified-media#location">location intelligence module</a> for how this informs a local media plan.',
+    ],
+    related: ['foot-traffic', 'dooh'],
+  },
   yield: {
     id: 'yield',
     term: 'Yield',
@@ -1198,7 +1225,7 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'An intermediary that plans, buys, and manages ad campaigns on behalf of advertisers.',
     definition: [
-      'Agencies (e.g. GroupM, Publicis, IPG Mediabrands) handle media planning, programmatic buying, creative trafficking, and reporting. Large agencies are often part of a <strong>Holding Company</strong> (the "Big Six"), which centralizes buying power and technology across multiple agency brands.',
+      'Agencies handle planning, buying, trafficking, and reporting. An agency can be independent or belong to a media network within a holding company. See the <a href="/training/campaign-planning#agencies">agency structures guide</a>.',
       'They negotiate rates, set up campaigns in DSPs, and ensure brand safety and performance targets are met. Inside an agency, roles like <strong>Ad Ops</strong> handle technical execution while account teams handle strategy.',
     ],
     related: ['advertiser', 'dsp', 'campaign', 'holding-company', 'ad-ops'],
@@ -1612,8 +1639,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'A massive global parent company that owns dozens of individual ad and media agencies.',
     definition: [
-      'The "Big Six" holding companies (WPP, Publicis, Omnicom, Interpublic, Dentsu, and Havas) own the vast majority of the world\'s largest media agencies. For example, WPP owns Mindshare, Wavemaker, and EssenceMediacom. These sub-agencies often specialize in different regions or client types, but they share the parent company\'s "Trading Desk" and technology stack.',
-      'Holding companies use their scale to negotiate better rates with publishers (like Google, Meta, and NBCUniversal). In the programmatic era, they have consolidated their buying power into internal teams like <strong>Publicis Media</strong> or <strong>GroupM</strong> to maximize efficiency and data leverage.',
+      'WPP Media, formerly GroupM, includes Mindshare, Wavemaker, and EssenceMediacom. Omnicom completed its acquisition of Interpublic in November 2025.',
+      'Holding companies can provide shared technology, procurement, and trading. Arrangements vary by agency and advertiser. See the <a href="/training/campaign-planning#agencies">agency structures guide</a> for how to trace ownership, execution, and billing.',
     ],
     related: ['agency', 'advertiser'],
   },
@@ -1634,8 +1661,8 @@ const glossary: Record<GlossaryId, GlossaryEntry> = {
     category: 'Marketplace',
     shortDefinition: 'Digital billboards and screens in public spaces that can be bought programmatically.',
     definition: [
-      'DOOH refers to digital screens in public places: highway billboards, bus shelters, elevators (Captivate), and gyms. Programmatic DOOH (pDOOH) allows these screens to be bought via DSPs just like web ads.',
-      'Measurement is based on "impressions" calculated via foot traffic data and mobile location signals, rather than 1:1 user tracking.',
+      'DOOH covers digital screens in public places, including billboards, bus shelters, elevators, and gyms. Buyers can purchase inventory directly or use a DSP for programmatic deals.',
+      'Proof of play records an ad airing. An impression estimate can represent multiple exposures per play. See the <a href="/training/unified-media#dooh">DOOH module</a> for a worked example.',
     ],
     related: ['ooh', 'foot-traffic', 'gps-data'],
   },
@@ -2089,6 +2116,9 @@ const renderSidebar = (currentPath: string): string => {
     link('/', '🏠', 'Home'),
     "  <div class='ide-section'>Topics</div>",
     link('/topic/ad-serving-rtb', '⚡', 'Ad Serving &amp; RTB'),
+    link('/training/unified-media', '🎯', 'Unified Media Buying'),
+    link('/training/campaign-planning', '📋', 'Planning &amp; Forecasting'),
+    link('/training/media-measurement', '📺', 'TV Data &amp; Attribution'),
     link('/topic/buy-side', '📈', 'Buy Side'),
     link('/topic/sell-side', '📡', 'Sell Side'),
     link('/topic/data', '📊', 'Data &amp; Identity'),
@@ -5223,7 +5253,7 @@ const renderTopicFlowDiagram = (id: TopicId): string => {
       zone(360, 18, 196, 200, 'EXCHANGE + PUBLISHER', gr, '#f0fdf4') +
       // Row 1 nodes
       bx(8, 32, 85, 44, 'Advertiser', 'goals & budget', blF, bl, 'P&G · Nike · Samsung') +
-      bx(100, 32, 86, 44, 'Agency', 'strategy & plan', blF, bl, 'Horizon · GroupM') +
+      bx(100, 32, 86, 44, 'Agency', 'strategy & plan', blF, bl, 'Horizon · WPP Media') +
       bx(
         202,
         28,
@@ -7848,6 +7878,9 @@ const renderHomeOverlays = (): string => {
       <div class="nav-section-label">Reference</div>
       <a class="nav-item" href="/players">Players &amp; Incentives — who wants what &amp; where the money goes</a>
       <a class="nav-item" href="/companies">Ecosystem Companies — DSPs, SSPs, exchanges &amp; adjacent vendors at a glance</a>
+      <a class="nav-item" href="/training/unified-media">Unified Media Buying</a>
+      <a class="nav-item" href="/training/campaign-planning">Planning &amp; Forecasting</a>
+      <a class="nav-item" href="/training/media-measurement">TV Data &amp; Attribution</a>
       <a class="nav-item" href="/glossary">Glossary (all terms)</a>
       <div class="nav-section-label">Interview prep</div>
       <a class="nav-item" href="/#interview-prep">How to use this site</a>
@@ -8062,6 +8095,27 @@ const renderNewHome = (selectedExample?: ExampleId): string => {
     '              </div>',
     "              <p class='ecosystem-row-label' style='margin-top:4px;font-size:0.68rem;'>Magnite · PubMatic · OpenX · Index Exchange · TripleLift</p>",
     '            </div>',
+    "            <a class='players-callout' href='/training/unified-media'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>Unified Media Buying</div>",
+    "                <div class='players-callout-sub'>A local campaign lab across DOOH, audio, podcasts, and CTV.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
+    "            <a class='players-callout' href='/training/campaign-planning'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>Campaign Planning &amp; Forecasting</div>",
+    "                <div class='players-callout-sub'>Build a media plan, forecast delivery, and assign campaign owners.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
+    "            <a class='players-callout' href='/training/media-measurement'>",
+    "              <div class='players-callout-left'><div>",
+    "                <div class='players-callout-title'>TV Data, Pixels &amp; Attribution</div>",
+    "                <div class='players-callout-sub'>Follow the evidence from ad delivery to conversion credit and lift.</div>",
+    '              </div></div>',
+    "              <div class='players-callout-arrow'>→</div>",
+    '            </a>',
     "            <a class='players-callout' href='/players'>",
     "              <div class='players-callout-left'>",
     "                <div class='players-callout-icon'>💰</div>",
@@ -8401,7 +8455,7 @@ const renderPlayersPage = (): string => {
       icon: '🤝',
       iconBg: '#fef9c3',
       name: 'The Ad Agency',
-      examples: 'GroupM, Dentsu, Havas, a boutique media shop',
+      examples: 'WPP Media, Dentsu, Havas, a boutique media shop',
       tagline: 'The expert middleman between brand and media',
       badge: {text: 'Earns % of spend', cls: 'badge-earns'},
       plainEnglish:
@@ -9845,6 +9899,45 @@ const renderCompaniesPage = (): string => {
 </html>`;
 };
 
+const renderTrainingPage = (path: string, title: string, content: string): Response => new Response( `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title} | Ad Tech Guide</title>
+  ${FAVICON_LINK}
+  ${themeScript}
+  <style>
+    ${homeStyles}
+    ${sidebarStyles}
+    .training-guide { max-width: 74rem; margin: auto; padding: clamp(1rem, 4vw, 3rem); line-height: 1.65; }
+    .training-guide header, .training-guide section {
+      background: var(--card, Canvas); border: 1px solid var(--border-subtle);
+      border-radius: 1rem; padding: clamp(1rem, 4vw, 2.5rem); margin-bottom: 1rem;
+    }
+    .training-guide h1 { font-size: clamp(2rem, 6vw, 3.75rem); line-height: 1.1; margin: .45em 0; }
+    .training-guide h2, .training-guide h3 { line-height: 1.25; margin: 0 0 .65rem; }
+    .training-guide h3 { margin-top: 1.5rem; }
+    .training-guide p, .training-guide ol, .training-guide dl { margin: .65rem 0 1rem; }
+    .training-guide ol { padding-inline-start: 1.5rem; }
+    .training-guide li, .training-guide dd { margin-bottom: .65rem; }
+    .training-guide dt, .training-guide summary { font-weight: 700; }
+    .training-guide a { color: var(--accent-strong); text-decoration: underline; text-underline-offset: .18em; }
+    .training-guide nav { display: flex; gap: .5rem 1.2rem; flex-wrap: wrap; }
+    .training-guide details { border: 1px solid var(--border-subtle); padding: .75rem 1rem; border-radius: .65rem; margin-top: .75rem; }
+    .training-guide summary { cursor: pointer; }
+    body { display: block; padding: 0; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  ${renderSidebar(path)}
+  <main class="training-guide" id="main-content">${content}</main>
+</body>
+</html>`,
+  {headers: {'content-type': 'text/html; charset=utf-8'}},
+);
+
 const app = new Elysia();
 
 app
@@ -9858,6 +9951,15 @@ app
       headers: {'content-type': 'text/html; charset=utf-8'},
     });
   })
+  .get('/training/unified-media', () =>
+    renderTrainingPage('/training/unified-media', 'Unified Media Buying', unifiedMediaContent),
+  )
+  .get('/training/campaign-planning', () =>
+    renderTrainingPage('/training/campaign-planning', 'Campaign Planning &amp; Forecasting', campaignPlanningContent),
+  )
+  .get('/training/media-measurement', () =>
+    renderTrainingPage('/training/media-measurement', 'TV Data, Pixels &amp; Attribution', mediaMeasurementContent),
+  )
   .get('/glossary', ({request}) => {
     const url = new URL(request.url);
     const termParam = url.searchParams.get('term') as GlossaryId | null;
